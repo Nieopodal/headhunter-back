@@ -1,5 +1,9 @@
-export interface ApiResponse<T> {
-    isSuccess: boolean;
+export interface ApiSuccessResponse<T> {
+    isSuccess: true;
     payload: T;
-    error: string | null;
+}
+
+export interface ApiErrorResponse {
+    isSuccess: false;
+    error: string;
 }
