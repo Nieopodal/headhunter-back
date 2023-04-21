@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
-export class HeadHunterService {
+export class HeadhunterService {
 }
