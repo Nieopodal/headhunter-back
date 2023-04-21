@@ -1,10 +1,12 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DatabaseConfiguration } from './config/typeorm.config';
 import { StudentModule } from './student/student.module';
+import { AdminModule } from './admin/admin.module';
+
 
 @Module({
   imports: [
@@ -12,7 +14,8 @@ import { StudentModule } from './student/student.module';
     TypeOrmModule.forRootAsync({
       useClass: DatabaseConfiguration,
     }),
-    StudentModule,
+    forwardRef(() => StudentModule),
+    forwardRef(() => AdminModule),
   ],
   controllers: [AppController],
   providers: [AppService],
