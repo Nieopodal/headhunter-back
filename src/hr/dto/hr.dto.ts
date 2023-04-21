@@ -1,6 +1,6 @@
 import { IsEmail, IsNotEmpty, IsNumber, IsString, Length, Max, Min } from 'class-validator';
 
-export class HeadhunterDto {
+export class HrDto {
 
   @IsEmail()
   @IsNotEmpty()
