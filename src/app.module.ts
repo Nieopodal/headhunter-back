@@ -6,7 +6,7 @@ import { AppService } from './app.service';
 import { DatabaseConfiguration } from './config/typeorm.config';
 import { StudentModule } from './student/student.module';
 import { AdminModule } from './admin/admin.module';
-import { HeadHunterModule } from './head-hunter/head-hunter.module';
+import { HeadhunterModule } from './headhunter/headhunter.module';
 
 
 @Module({
@@ -17,7 +17,7 @@ import { HeadHunterModule } from './head-hunter/head-hunter.module';
     }),
     forwardRef(() => StudentModule),
     forwardRef(() => AdminModule),
-    forwardRef(() => HeadHunterModule),
+    forwardRef(() => HeadhunterModule),
   ],
   controllers: [AppController],
   providers: [AppService],
