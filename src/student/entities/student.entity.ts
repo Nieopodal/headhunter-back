@@ -18,9 +18,9 @@ export enum ExpectedContractType {
 @Entity()
 export class Student extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
-  studentId: string;
+  id: string;
 
-  @Column({ length: 50, unique: true })
+  @Column({ length: 255, unique: true, nullable: false })
   email: string;
 
   @Column({ length: 255 })
@@ -38,22 +38,37 @@ export class Student extends BaseEntity {
   @Column({ unique: true })
   githubUsername: string;
 
-  @Column({ nullable: true, default: null })
+  @Column({ type: 'simple-array', default: [] })
   portfolioUrls: string[];
 
-  @Column({ length: 400 })
+  @Column()
+  courseCompletion: number;
+
+  @Column()
+  courseEngagement: number;
+
+  @Column()
+  projectDegree: number;
+
+  @Column()
+  teamProjectDegree: number;
+
+  @Column({ type: 'simple-array', default: [] })
+  bonusProjectUrls: string[];
+
+  @Column({ length: 400, nullable: true })
   bio: string;
 
-  @Column({ type: 'enum' })
+  @Column({ type: 'enum', enum: ExpectedTypeWork, default: ExpectedTypeWork.DM })
   expectedTypeWork: ExpectedTypeWork;
 
-  @Column({ length: 60 })
+  @Column({ length: 60, nullable: true })
   targetWorkCity: string;
 
-  @Column({ type: 'enum' })
+  @Column({ type: 'enum', enum: ExpectedContractType, default: ExpectedContractType.none })
   expectedContractType: ExpectedContractType;
 
-  @Column({ type: 'numeric', length: 7 }) // maks 9 999 999
+  @Column({ type: 'numeric', precision: 9, scale: 2, nullable: true })
   expectedSalary: string;
 
   @Column({ default: false })
@@ -62,27 +77,30 @@ export class Student extends BaseEntity {
   @Column({ default: 0 })
   monthsOfCommercialExp: number;
 
-  @Column({ type: 'text' })
+  @Column({ type: 'text', nullable: true })
   education: string;
 
-  @Column({ type: 'text' })
+  @Column({ type: 'text', nullable: true })
   workExperience: string;
 
-  @Column({ type: 'text' })
+  @Column({ type: 'text', nullable: true })
   courses: string;
 
   @Column({ default: false })
   active: boolean;
 
-  @Column({ default: 'user', length: 20 })
+  @Column({ default: 'student' })
   role: string;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
   updatedAt: Date;
 
-  @Column({ default: '', length: 255, nullable: true })
+  @Column({ nullable: true, default: null, length: 255 })
+  token: string;
+
+  @Column({ nullable: true, default: null, length: 255 })
   refreshToken: string;
 }
