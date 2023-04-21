@@ -1,1 +1,1 @@
-export * from './admin.dto';
+export * from './create-admin.dto';

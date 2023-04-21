@@ -5,7 +5,6 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DatabaseConfiguration } from './config/typeorm.config';
 import { AdminModule } from './admin/admin.module';
-import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -14,7 +13,6 @@ import { UsersModule } from './users/users.module';
       useClass: DatabaseConfiguration,
     }),
     forwardRef(() => AdminModule),
-    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],

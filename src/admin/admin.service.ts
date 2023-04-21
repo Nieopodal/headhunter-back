@@ -3,9 +3,7 @@ import { Admin } from './entity/admin.entity';
 
 @Injectable()
 export class AdminService {
-  async getOneUser(id): Promise<Admin> {
-    return await Admin.findOneByOrFail({
-      id: id,
-    });
+  async getUserByEmail(email: string): Promise<Admin> {
+    return await Admin.findOneBy({ email });
   }
 }
