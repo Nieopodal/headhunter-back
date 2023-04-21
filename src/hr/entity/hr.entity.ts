@@ -14,6 +14,9 @@ export class HeadHunter extends BaseEntity {
   @Column()
   password: string;
 
+  @Column({ default: 'hr' })
+  role: string;
+
   @Column({
     length: 150,
   })
