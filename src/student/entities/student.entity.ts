@@ -1,24 +1,24 @@
 import { BaseEntity, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
 export enum ExpectedTypeWork {
-  office = `Na miejscu`,
+  office = 'Na miejscu',
   move = 'Przeprowadzka',
   remote = 'Praca zdalna',
   hybrid = 'Praca hybrydowa',
-  DM = 'Nie ma aznaczenia',
+  DM = 'Nie ma znaczenia',
 }
 
 export enum ExpectedContractType {
   B2B = 'Możliwe B2B',
   employ = 'Tylko umowa o pracę',
-  conrtract = 'Umowa zlecenie / dzieło',
+  contract = 'Umowa zlecenie / dzieło',
   none = 'Brak preferencji',
 }
 
 @Entity()
 export class Student extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
-  studentId: string;
+  id: string;
 
   @Column({ length: 50, unique: true })
   email: string;
@@ -26,34 +26,49 @@ export class Student extends BaseEntity {
   @Column({ length: 255 })
   password: string;
 
-  @Column({ length: 11, nullable: true })
+  @Column({ length: 20, nullable: true })
   contactNumber: string;
 
-  @Column({ length: 50, nullable: false })
+  @Column({ length: 50 })
   firstName: string;
 
-  @Column({ length: 70, nullable: false })
+  @Column({ length: 70 })
   lastName: string;
 
   @Column({ unique: true })
   githubUsername: string;
 
-  @Column({ nullable: true, default: null })
+  @Column({ type: 'simple-array', nullable: true })
   portfolioUrls: string[];
 
-  @Column({ length: 400 })
+  @Column({ default: 0 })
+  courseCompletion: number;
+
+  @Column({ default: 0 })
+  courseEngagement: number;
+
+  @Column({ default: 0 })
+  projectDegree: number;
+
+  @Column({ default: 0 })
+  teamProjectDegree: number;
+
+  @Column('simple-array', { nullable: true })
+  bonusProjectUrls: string[];
+
+  @Column({ length: 400, nullable: true })
   bio: string;
 
-  @Column({ type: 'enum' })
+  @Column({ type: 'enum', enum: ExpectedTypeWork, default: ExpectedTypeWork.DM })
   expectedTypeWork: ExpectedTypeWork;
 
-  @Column({ length: 60 })
+  @Column({ length: 60, nullable: true })
   targetWorkCity: string;
 
-  @Column({ type: 'enum' })
+  @Column({ type: 'enum', enum: ExpectedContractType, default: ExpectedContractType.none })
   expectedContractType: ExpectedContractType;
 
-  @Column({ type: 'numeric', length: 7 }) // maks 9 999 999
+  @Column({ type: 'numeric', precision: 9, scale: 2, nullable: true })
   expectedSalary: string;
 
   @Column({ default: false })
@@ -62,27 +77,27 @@ export class Student extends BaseEntity {
   @Column({ default: 0 })
   monthsOfCommercialExp: number;
 
-  @Column({ type: 'text' })
+  @Column({ type: 'text', nullable: true })
   education: string;
 
-  @Column({ type: 'text' })
+  @Column({ type: 'text', nullable: true })
   workExperience: string;
 
-  @Column({ type: 'text' })
+  @Column({ type: 'text', nullable: true })
   courses: string;
 
   @Column({ default: false })
   active: boolean;
 
-  @Column({ default: 'user', length: 20 })
+  @Column({ default: 'student', length: 20 })
   role: string;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
   updatedAt: Date;
 
-  @Column({ default: '', length: 255, nullable: true })
+  @Column({ nullable: true, default: null, length: 255 })
   refreshToken: string;
 }
