@@ -6,6 +6,7 @@ import { AppService } from './app.service';
 import { DatabaseConfiguration } from './config/typeorm.config';
 import { StudentModule } from './student/student.module';
 import { AdminModule } from './admin/admin.module';
+import { HrModule } from './hr/hr.module';
 
 
 @Module({
@@ -16,8 +17,10 @@ import { AdminModule } from './admin/admin.module';
     }),
     forwardRef(() => StudentModule),
     forwardRef(() => AdminModule),
+    forwardRef(() => HrModule),
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule {
+}
