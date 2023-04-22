@@ -1,17 +1,17 @@
 import { BaseEntity, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
 export enum ExpectedTypeWork {
-  office = `Na miejscu`,
+  office = 'Na miejscu',
   move = 'Przeprowadzka',
   remote = 'Praca zdalna',
   hybrid = 'Praca hybrydowa',
-  DM = 'Nie ma aznaczenia',
+  DM = 'Nie ma znaczenia',
 }
 
 export enum ExpectedContractType {
   B2B = 'Możliwe B2B',
   employ = 'Tylko umowa o pracę',
-  conrtract = 'Umowa zlecenie / dzieło',
+  contract = 'Umowa zlecenie / dzieło',
   none = 'Brak preferencji',
 }
 
@@ -20,40 +20,40 @@ export class Student extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ length: 255, unique: true, nullable: false })
+  @Column({ length: 50, unique: true })
   email: string;
 
   @Column({ length: 255 })
   password: string;
 
-  @Column({ length: 11, nullable: true })
+  @Column({ length: 20, nullable: true })
   contactNumber: string;
 
-  @Column({ length: 50, nullable: false })
+  @Column({ length: 50 })
   firstName: string;
 
-  @Column({ length: 70, nullable: false })
+  @Column({ length: 70 })
   lastName: string;
 
   @Column({ unique: true })
   githubUsername: string;
 
-  @Column({ type: 'simple-array', default: [] })
+  @Column({ type: 'simple-array', nullable: true })
   portfolioUrls: string[];
 
-  @Column()
+  @Column({ default: 0 })
   courseCompletion: number;
 
-  @Column()
+  @Column({ default: 0 })
   courseEngagement: number;
 
-  @Column()
+  @Column({ default: 0 })
   projectDegree: number;
 
-  @Column()
+  @Column({ default: 0 })
   teamProjectDegree: number;
 
-  @Column({ type: 'simple-array', default: [] })
+  @Column('simple-array', { nullable: true })
   bonusProjectUrls: string[];
 
   @Column({ length: 400, nullable: true })
@@ -89,7 +89,7 @@ export class Student extends BaseEntity {
   @Column({ default: false })
   active: boolean;
 
-  @Column({ default: 'student' })
+  @Column({ default: 'student', length: 20 })
   role: string;
 
   @CreateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
@@ -97,9 +97,6 @@ export class Student extends BaseEntity {
 
   @UpdateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
   updatedAt: Date;
-
-  @Column({ nullable: true, default: null, length: 255 })
-  token: string;
 
   @Column({ nullable: true, default: null, length: 255 })
   refreshToken: string;
