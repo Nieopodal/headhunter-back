@@ -3,18 +3,18 @@ import { BaseEntity, Column, PrimaryGeneratedColumn } from 'typeorm';
 export class HeadHunter extends BaseEntity {
 
   @PrimaryGeneratedColumn('uuid')
-  studentId: string;
+  id: string;
 
   @Column({
     unique: true,
-    length: 255,
+    length: 50,
   })
   email: string;
 
-  @Column()
+  @Column({ length: 255 })
   password: string;
 
-  @Column({ default: 'hr' })
+  @Column({ default: 'hr', lenght: 20 })
   role: string;
 
   @Column({
@@ -22,7 +22,7 @@ export class HeadHunter extends BaseEntity {
   })
   company: string;
 
-  @Column()
+  @Column({ default: 0 })
   maxReservedStudents: number;
 
   @Column({ default: '', length: 255, nullable: true })
