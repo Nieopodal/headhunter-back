@@ -7,7 +7,7 @@ import { DatabaseConfiguration } from './config/typeorm.config';
 import { StudentModule } from './student/student.module';
 import { AdminModule } from './admin/admin.module';
 import { AuthModule } from './auth/auth.module';
-
+import { HrModule } from './hr/hr.module';
 
 @Module({
   imports: [
@@ -17,7 +17,8 @@ import { AuthModule } from './auth/auth.module';
     }),
     forwardRef(() => StudentModule),
     forwardRef(() => AdminModule),
-    AuthModule,
+    forwardRef(() => HrModule),
+    forwardRef(() => AuthModule),
   ],
   controllers: [AppController],
   providers: [AppService],
