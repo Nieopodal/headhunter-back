@@ -1,4 +1,5 @@
-import { BaseEntity, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { InitStudentData } from 'src/init-student-data/entities/init-student-data.entity';
+import { BaseEntity, Column, CreateDateColumn, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
 export enum ExpectedTypeWork {
   office = 'Na miejscu',
@@ -100,4 +101,9 @@ export class Student extends BaseEntity {
 
   @Column({ nullable: true, default: null, length: 255 })
   refreshToken: string;
+
+  @OneToOne((type) => InitStudentData, (entity) => entity.id)
+  @JoinColumn()
+  initStudentData: InitStudentData;
+
 }
