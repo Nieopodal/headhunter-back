@@ -6,13 +6,14 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
 import { Tokens } from '@Types';
+import { HrService } from '../hr/hr.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private adminService: AdminService,
     private studentService: StudentService,
-    private hrService: StudentService,
+    private hrService: HrService,
     private jwtService: JwtService,
     private configService: ConfigService,
   ) {}
@@ -54,7 +55,7 @@ export class AuthService {
 
     const student = await this.studentService.getUserByEmail(email);
 
-    return admin ? admin : student ? student : hr ? hr : null;
+    return hr ? hr : student ? student : admin ? admin : null;
   }
 
   async checkUserById(id: string) {
@@ -69,10 +70,13 @@ export class AuthService {
 
   async login(login: LoginUserDto): Promise<Tokens> {
     const user = await this.checkUserByEmail(login.email);
-
+    console.log(user);
+    console.log(login);
     if (!user) throw new UnauthorizedException('Access Denied');
 
-    const passwordMatches = await bcrypt.compare(login.password, user.password);
+    const passwordHash = await bcrypt.hash(user.password, 10); //Todo usunąć linie
+
+    const passwordMatches = await bcrypt.compare(login.password, passwordHash);
 
     if (!passwordMatches) throw new UnauthorizedException('Access Denied');
 

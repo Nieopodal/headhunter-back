@@ -5,6 +5,7 @@ import { AdminModule } from '../admin/admin.module';
 import { HrModule } from '../hr/hr.module';
 import { StudentModule } from '../student/student.module';
 import { JwtModule } from '@nestjs/jwt';
+import { AtStrategy, RtStrategy } from './strategies';
 
 @Module({
   imports: [
@@ -14,6 +15,6 @@ import { JwtModule } from '@nestjs/jwt';
     forwardRef(() => JwtModule.register({})),
   ],
   controllers: [AuthController],
-  providers: [AuthService],
+  providers: [AuthService, AtStrategy, RtStrategy],
 })
 export class AuthModule {}

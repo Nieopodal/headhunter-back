@@ -8,6 +8,8 @@ import { StudentModule } from './student/student.module';
 import { AdminModule } from './admin/admin.module';
 import { AuthModule } from './auth/auth.module';
 import { HrModule } from './hr/hr.module';
+import { AtGuard } from './common/guards';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -21,6 +23,6 @@ import { HrModule } from './hr/hr.module';
     forwardRef(() => AuthModule),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [{ provide: APP_GUARD, useClass: AtGuard }, AppService],
 })
 export class AppModule {}

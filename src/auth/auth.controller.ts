@@ -2,7 +2,7 @@ import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { LoginUserDto } from './dto';
 import { AuthService } from './auth.service';
 import { Tokens } from '@Types';
-import { GetCurrentUser, GetCurrentUserId, Public } from "../common/decorators";
+import { GetCurrentUser, GetCurrentUserId, Public } from '../common/decorators';
 
 @Controller('auth')
 export class AuthController {
