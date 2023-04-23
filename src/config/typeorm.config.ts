@@ -21,6 +21,10 @@ export class DatabaseConfiguration implements TypeOrmOptionsFactory {
       logging: true,
       synchronize: true,
       namingStrategy: new SnakeNamingStrategy(),
+      extra: {
+        connectionLimit: 5,
+      },
+      connectTimeout: 30000,
     };
   }
 }
