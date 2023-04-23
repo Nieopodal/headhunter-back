@@ -1,4 +1,4 @@
-export type TokensType = {
+export type Tokens = {
   access_token: string;
   refresh_token: string;
   role?: string;
