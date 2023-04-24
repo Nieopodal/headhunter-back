@@ -8,6 +8,7 @@ import { ConfigService } from '@nestjs/config';
 import { Tokens } from '@Types';
 import { HrService } from '../hr/hr.service';
 import { ResponseData } from '../types/auth/response-data.type';
+import { response } from 'express';
 
 @Injectable()
 export class AuthService {
@@ -82,8 +83,9 @@ export class AuthService {
     const data = await this.getTokens(user.id, user.email, user.role);
 
     await this.updateRtHash(user.id, data.refresh_token);
-
-    return { ...data, name: user };
+    const { id, email, role } = user;
+    const { access_token } = data;
+    return { id, email, role, access_token };
   }
 
   async refreshTokens(id: string, rt: string) {

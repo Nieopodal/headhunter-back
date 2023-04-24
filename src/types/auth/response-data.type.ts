@@ -1,8 +1,10 @@
 export type ResponseData = {
-  access_token: string;
-  role: string;
+  id: string;
   name: string;
-  fullName?: string;
-  firstName?: string;
-  lastName?: string;
+  email: string;
+  role: string;
+  access_token: string;
+  // fullName: string;
+  // firstName: string;
+  // lastName: string;
 };
