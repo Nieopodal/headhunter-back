@@ -7,6 +7,7 @@ import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
 import { Tokens } from '@Types';
 import { HrService } from '../hr/hr.service';
+import { ResponseData } from '../types/auth/response-data.type';
 
 @Injectable()
 export class AuthService {
@@ -28,24 +29,24 @@ export class AuthService {
     await user.save();
   }
 
-  async getTokens(id: string, email: string, role: string): Promise<Tokens> {
+  async getTokens(id: string, email: string, role: string): Promise<any> {
     const [at, rt] = await Promise.all([
       this.jwtService.signAsync(
         { id, email, role },
         {
           secret: this.configService.get('SECRET_KEY_AT'),
-          expiresIn: 60 * 15,
+          expiresIn: this.configService.get('EXPIRES_IN_AT'),
         },
       ),
       this.jwtService.signAsync(
         { id, email, role },
         {
           secret: this.configService.get('SECRET_KEY_RT'),
-          expiresIn: 60 * 60 * 24 * 7,
+          expiresIn: this.configService.get('EXPIRES_IN_RT'),
         },
       ),
     ]);
-    return { role, access_token: at, refresh_token: rt };
+    return { access_token: at, refresh_token: rt };
   }
 
   async checkUserByEmail(email: string) {
@@ -68,10 +69,8 @@ export class AuthService {
     return admin ? admin : student ? student : hr ? hr : null;
   }
 
-  async login(login: LoginUserDto): Promise<Tokens> {
+  async login(login: LoginUserDto): Promise<ResponseData> {
     const user = await this.checkUserByEmail(login.email);
-    console.log(user);
-    console.log(login);
     if (!user) throw new UnauthorizedException('Access Denied');
 
     const passwordHash = await bcrypt.hash(user.password, 10); //Todo usunąć linie
@@ -80,11 +79,11 @@ export class AuthService {
 
     if (!passwordMatches) throw new UnauthorizedException('Access Denied');
 
-    const tokens = await this.getTokens(user.id, user.email, user.role);
+    const data = await this.getTokens(user.id, user.email, user.role);
 
-    await this.updateRtHash(user.id, tokens.refresh_token);
+    await this.updateRtHash(user.id, data.refresh_token);
 
-    return tokens;
+    return { ...data, name: user };
   }
 
   async refreshTokens(id: string, rt: string) {
