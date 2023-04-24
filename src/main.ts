@@ -9,11 +9,9 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
   app.useGlobalPipes(new ValidationPipe());
   app.enableCors({
-    origin: ['http://localhost:8000'],
+    origin: 'http://localhost:3000', // [FE] port: 3000
     credentials: true,
   });
-
-  await app.listen(configService.get('PORT') ? parseInt(configService.get('PORT')) : 3000);
+  await app.listen(configService.get('PORT') ? parseInt(configService.get('PORT')) : 3001); // [BE] port: 3001
 }
-
 bootstrap();
