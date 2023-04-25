@@ -26,7 +26,7 @@ export class InitStudentData extends BaseEntity {
   teamProjectDegree: number;
 
   @Column({ nullable: true, default: null })
-  bonusProjectUrls: Url[];
+  bonusProjectUrls: string;
 
   @Column({ default: '', length: 255, nullable: true })
   @Index()

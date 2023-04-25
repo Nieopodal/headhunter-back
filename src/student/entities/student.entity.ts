@@ -1,4 +1,5 @@
-import { InitStudentData } from 'src/init-student-data/entities/init-student-data.entity';
+import { timeStamp } from 'console';
+import { InitStudentData } from 'src/init-student-data/entity/init-student-data.entity';
 import { BaseEntity, Column, CreateDateColumn, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
 export enum ExpectedTypeWork {
@@ -93,10 +94,10 @@ export class Student extends BaseEntity {
   @Column({ default: 'student', length: 20 })
   role: string;
 
-  @CreateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
+  @CreateDateColumn({ /* default: () => '(CURRENT_TIMESTAMP)', */ type: 'datetime' })
   createdAt: Date;
 
-  @UpdateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
+  @UpdateDateColumn({ /* default: () => '(CURRENT_TIMESTAMP)', */ type: 'datetime' })
   updatedAt: Date;
 
   @Column({ nullable: true, default: null, length: 255 })

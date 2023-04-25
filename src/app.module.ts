@@ -19,7 +19,8 @@ import { InitStudentDataModule } from './init-student-data/init-student-data.mod
     forwardRef(() => StudentModule),
     forwardRef(() => AdminModule),
     forwardRef(() => HrModule),
-    InitStudentDataModule,
+    forwardRef(() => InitStudentDataModule),
+    
   ],
   controllers: [AppController],
   providers: [AppService],
