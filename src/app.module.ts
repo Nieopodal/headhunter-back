@@ -7,6 +7,7 @@ import { DatabaseConfiguration } from './config/typeorm.config';
 import { StudentModule } from './student/student.module';
 import { AdminModule } from './admin/admin.module';
 import { HrModule } from './hr/hr.module';
+import {MailModule} from "./mail/mail.module";
 import { InitStudentDataModule } from './init-student-data/init-student-data.module';
 
 
@@ -21,6 +22,7 @@ import { InitStudentDataModule } from './init-student-data/init-student-data.mod
     forwardRef(() => HrModule),
     forwardRef(() => InitStudentDataModule),
     
+    forwardRef(() => MailModule),
   ],
   controllers: [AppController],
   providers: [AppService],
