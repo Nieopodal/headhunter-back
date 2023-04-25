@@ -1,14 +1,14 @@
-import { ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { LoginUserDto } from './dto';
 import { AdminService } from '../admin/admin.service';
 import { StudentService } from '../student/student.service';
 import { JwtService } from '@nestjs/jwt';
+import { Request, Response } from 'express';
 import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
 import { Tokens } from '@Types';
 import { HrService } from '../hr/hr.service';
-import { ResponseData } from '../types/auth/response-data.type';
-import { response } from 'express';
+import { ResponseDataToFront } from '../types/auth/response-data.type';
 
 @Injectable()
 export class AuthService {
@@ -30,17 +30,17 @@ export class AuthService {
     await user.save();
   }
 
-  async getTokens(id: string, email: string, role: string): Promise<any> {
+  async getTokens(id: string, email: string): Promise<Tokens> {
     const [at, rt] = await Promise.all([
       this.jwtService.signAsync(
-        { id, email, role },
+        { id, email },
         {
           secret: this.configService.get('SECRET_KEY_AT'),
           expiresIn: this.configService.get('EXPIRES_IN_AT'),
         },
       ),
       this.jwtService.signAsync(
-        { id, email, role },
+        { id, email },
         {
           secret: this.configService.get('SECRET_KEY_RT'),
           expiresIn: this.configService.get('EXPIRES_IN_RT'),
@@ -70,32 +70,39 @@ export class AuthService {
     return admin ? admin : student ? student : hr ? hr : null;
   }
 
-  async login(login: LoginUserDto): Promise<ResponseData> {
+  async login(login: LoginUserDto, response: Response): Promise<ResponseDataToFront> {
     const user = await this.checkUserByEmail(login.email);
     if (!user) throw new UnauthorizedException('Access Denied');
-
     const passwordHash = await bcrypt.hash(user.password, 10); //Todo usunąć linie
-
     const passwordMatches = await bcrypt.compare(login.password, passwordHash);
-
     if (!passwordMatches) throw new UnauthorizedException('Access Denied');
-
-    const data = await this.getTokens(user.id, user.email, user.role);
-
+    const data = await this.getTokens(user.id, user.email);
     await this.updateRtHash(user.id, data.refresh_token);
-    const { id, email, role } = user;
-    const { access_token } = data;
-    return { id, email, role, access_token };
+    response.cookie('jwt-refresh', data.refresh_token, { httpOnly: true });
+
+    return { ...user, access_token: data.access_token };
   }
 
-  async refreshTokens(id: string, rt: string) {
+  async logout(id: string): Promise<void> {
     const user = await this.checkUserById(id);
+    if (!user) throw new NotFoundException('User not found');
+    if (user.refreshToken !== null) {
+      user.refreshToken = null;
+      await user.save();
+    }
+  }
+
+  async refreshTokens(id: string, request: Request) {
+    const user = await this.checkUserById(id);
+    const rt = request.cookies['jwt-refresh'];
+    console.log(rt);
+
     if (!user || !user.refreshToken) throw new ForbiddenException('Access Denied');
 
     const rtMatches = await bcrypt.compare(rt, user.refreshToken);
     if (!rtMatches) throw new ForbiddenException('Access Denied');
 
-    const tokens = await this.getTokens(user.id, user.email, user.role);
+    const tokens = await this.getTokens(user.id, user.email);
     await this.updateRtHash(user.id, tokens.refresh_token);
     return tokens;
   }
