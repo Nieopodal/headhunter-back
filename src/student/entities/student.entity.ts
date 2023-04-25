@@ -1,6 +1,5 @@
-import { timeStamp } from 'console';
-import { InitStudentData } from 'src/init-student-data/entity/init-student-data.entity';
 import { BaseEntity, Column, CreateDateColumn, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { InitStudentData } from 'src/init-student-data/entity/init-student-data.entity';
 
 export enum ExpectedTypeWork {
   office = 'Na miejscu',
@@ -94,10 +93,10 @@ export class Student extends BaseEntity {
   @Column({ default: 'student', length: 20 })
   role: string;
 
-  @CreateDateColumn({ default: () => '(CURRENT_TIMESTAMP)' })
+  @CreateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 
-  @UpdateDateColumn({ default: () => '(CURRENT_TIMESTAMP)' })
+  @UpdateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
   updatedAt: Date;
 
   @Column({ nullable: true, default: null, length: 255 })
