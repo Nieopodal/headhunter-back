@@ -1,7 +1,7 @@
-import { BaseEntity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-export class HeadHunter extends BaseEntity {
-
+@Entity()
+export class Hr extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
