@@ -8,5 +8,5 @@
   "bracketSpacing": true,
   "arrowParens": "always",
   "proseWrap": "always",
-  "endOfLine": "auto"
+  "endOfLine": "lf"
 }
