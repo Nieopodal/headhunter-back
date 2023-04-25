@@ -15,16 +15,12 @@ export class DatabaseConfiguration implements TypeOrmOptionsFactory {
       username: this.configService.get('DB_USERNAME'),
       password: this.configService.get('DB_PASSWORD'),
       database: this.configService.get('DB_NAME'),
-      entities: ["dist/**/**.entity{.ts,.js}"],
+      entities: [this.configService.get('TYPEORM_ENTITIES')],
       autoLoadEntities: true,
       bigNumberStrings: false,
       logging: true,
       synchronize: true,
       namingStrategy: new SnakeNamingStrategy(),
-      extra: {
-        connectionLimit: 5,
-      },
-      connectTimeout: 30000,
     };
   }
 }
