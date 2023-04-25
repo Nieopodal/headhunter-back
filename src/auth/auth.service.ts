@@ -50,6 +50,11 @@ export class AuthService {
     return { access_token: at, refresh_token: rt };
   }
 
+  async getDecodedToken(rt: string) {
+    const decodedJwt = await this.jwtService.decode(rt);
+    return decodedJwt;
+  }
+
   async checkUserByEmail(email: string) {
     const admin = await this.adminService.getUserByEmail(email);
 
@@ -92,9 +97,10 @@ export class AuthService {
     }
   }
 
-  async refreshTokens(id: string, request: Request) {
-    const user = await this.checkUserById(id);
-    const rt = request.cookies['jwt-refresh'];
+  async refreshTokens(rt: string) {
+    const decodedJwt = await this.getDecodedToken(rt);
+    console.log(decodedJwt);
+    const user = await this.checkUserById(decodedJwt.sub);
     console.log(rt);
 
     if (!user || !user.refreshToken) throw new ForbiddenException('Access Denied');

@@ -6,6 +6,7 @@ import { Tokens } from '@Types';
 import { GetCurrentUser, GetCurrentUserId, Public } from '../common/decorators';
 import { ResponseDataToFront } from '../types/auth/response-data.type';
 import { RtGuard } from '../common/guards';
+import { Cookies } from '../common/decorators/cookie.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -41,11 +42,7 @@ export class AuthController {
   // @UseGuards(RtGuard)
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
-  refreshTokens(
-    // @GetCurrentUserId() id: string,
-    // @GetCurrentUser('refreshToken') refreshToken: string,
-    @Req() request: Request,
-  ): Promise<Tokens> {
-    return this.authService.refreshTokens(request);
+  refreshTokens(@Cookies('jwt-refresh') rt: string): Promise<Tokens> {
+    return this.authService.refreshTokens(rt);
   }
 }
