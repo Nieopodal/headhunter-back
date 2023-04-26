@@ -3,10 +3,10 @@ import { LoginUserDto } from './dto';
 import { AdminService } from '../admin/admin.service';
 import { StudentService } from '../student/student.service';
 import { JwtService } from '@nestjs/jwt';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
-import { Tokens } from '@Types';
+import { ApiResponse, Tokens } from '@Types';
 import { HrService } from '../hr/hr.service';
 import { ResponseDataToFront } from '../types/auth/response-data.type';
 
@@ -51,8 +51,7 @@ export class AuthService {
   }
 
   async getDecodedToken(rt: string) {
-    const decodedJwt = await this.jwtService.decode(rt);
-    return decodedJwt;
+    return this.jwtService.decode(rt);
   }
 
   async checkUserByEmail(email: string) {
@@ -81,27 +80,31 @@ export class AuthService {
     const passwordHash = await bcrypt.hash(user.password, 10); //Todo usunąć linie
     const passwordMatches = await bcrypt.compare(login.password, passwordHash);
     if (!passwordMatches) throw new UnauthorizedException('Access Denied');
-    const data = await this.getTokens(user.id, user.email);
-    await this.updateRtHash(user.id, data.refresh_token);
-    response.cookie('jwt-refresh', data.refresh_token, { httpOnly: true });
+    const tokens = await this.getTokens(user.id, user.email);
+    await this.updateRtHash(user.id, tokens.refresh_token);
+    response.cookie('jwt-refresh', tokens.refresh_token, { httpOnly: true });
 
-    return { ...user, access_token: data.access_token };
+    return { ...user, access_token: tokens.access_token };
   }
 
-  async logout(id: string): Promise<void> {
+  async logout(id: string): Promise<ApiResponse<any>> {
     const user = await this.checkUserById(id);
-    if (!user) throw new NotFoundException('User not found');
-    if (user.refreshToken !== null) {
+    if (!user) {
+      throw new NotFoundException('User not found');
+    } else if (user.refreshToken !== null) {
       user.refreshToken = null;
       await user.save();
     }
+    return {
+      isSuccess: true,
+      payload: null,
+    };
   }
 
-  async refreshTokens(rt: string) {
+  async refreshTokens(rt: string, response: Response) {
     const decodedJwt = await this.getDecodedToken(rt);
     console.log(decodedJwt);
-    const user = await this.checkUserById(decodedJwt.sub);
-    console.log(rt);
+    const user = await this.checkUserById(decodedJwt['id']);
 
     if (!user || !user.refreshToken) throw new ForbiddenException('Access Denied');
 
@@ -110,6 +113,7 @@ export class AuthService {
 
     const tokens = await this.getTokens(user.id, user.email);
     await this.updateRtHash(user.id, tokens.refresh_token);
+    response.cookie('jwt-refresh', tokens.refresh_token, { httpOnly: true });
     return tokens;
   }
 }
