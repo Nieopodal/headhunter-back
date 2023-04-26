@@ -12,9 +12,6 @@ export class Hr extends BaseEntity {
   email: string;
 
   @Column({ length: 255 })
-  fullName: string;
-
-  @Column({ length: 255 })
   password: string;
 
   @Column({ length: 255 })
