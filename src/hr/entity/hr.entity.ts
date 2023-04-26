@@ -17,6 +17,9 @@ export class Hr extends BaseEntity {
   @Column({ length: 255 })
   password: string;
 
+  @Column({ length: 255 })
+  fullName: string;
+
   @Column({ default: 'hr', length: 20 })
   role: string;
 
