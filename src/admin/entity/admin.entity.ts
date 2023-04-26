@@ -8,7 +8,7 @@ export class Admin extends BaseEntity {
   @Column({ length: 255 })
   name: string;
 
-  @Column({ length: 50 })
+  @Column({ length: 255 })
   email: string;
 
   @Column({ length: 255 })

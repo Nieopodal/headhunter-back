@@ -20,7 +20,7 @@ export class Student extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ length: 50, unique: true })
+  @Column({ length: 255, unique: true })
   email: string;
 
   @Column({ length: 255 })

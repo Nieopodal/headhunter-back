@@ -6,4 +6,8 @@ export class AdminService {
   async getUserByEmail(email: string): Promise<Admin> {
     return await Admin.findOneBy({ email });
   }
+
+  async getUserById(id: string): Promise<Admin> {
+    return await Admin.findOneBy({ id });
+  }
 }
