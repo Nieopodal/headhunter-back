@@ -19,3 +19,11 @@ EXPIRES_IN_RT=7d
 
 # Cors
 CORS_CLIENTS_URL=[http://localhost:3001, http://localhost:8000]
+
+# Email
+EMAIL_USERNAME=admin123
+EMAIL_PASSWORD=admin456
+EMAIL_HOST=localhost
+EMAIL_PORT=2500
+EMAIL_FROM=admin@test.example.com
+EMAIL_SECURE=false
