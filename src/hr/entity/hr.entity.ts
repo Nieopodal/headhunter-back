@@ -7,7 +7,7 @@ export class Hr extends BaseEntity {
 
   @Column({
     unique: true,
-    length: 50,
+    length: 255,
   })
   email: string;
 
