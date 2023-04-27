@@ -12,5 +12,7 @@ export function passwordResetTemplate(configService: ConfigService, id: string, 
     <p>Kliknij w link <a href="${striptags(passwordResetUrl)}">tutaj</a> aby zresetować hasło.</p>
     <p>Link ważny przez: ${expiresIn}.</p>
     <p>Jeśli to nie Ty prosiłeś o resetowanie hasła, zignoruj tę wiadomość.</p>
+    <p>Pozdrawiamy,</p>
+    <p>Support MegaK</p>
   `;
 }
