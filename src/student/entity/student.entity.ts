@@ -4,10 +4,10 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
-  OneToOne,
+  OneToOne, PrimaryColumn,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+  UpdateDateColumn
+} from "typeorm";
 import { InitStudentData } from './init-student-data.entity';
 
 export enum ExpectedTypeWork {
@@ -27,7 +27,7 @@ export enum ExpectedContractType {
 
 @Entity()
 export class Student extends BaseEntity {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryColumn('uuid')
   id: string;
 
   @Column({ length: 255, unique: true })
