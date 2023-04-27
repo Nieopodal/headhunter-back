@@ -1,14 +1,4 @@
-import { Student } from 'src/student/entity/student.entity';
-import {
-  BaseEntity,
-  Column,
-  Index,
-  CreateDateColumn,
-  Entity,
-  PrimaryGeneratedColumn,
-  JoinColumn,
-  OneToOne,
-} from 'typeorm';
+import { BaseEntity, Column, Index, CreateDateColumn, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class InitStudentData extends BaseEntity {
@@ -22,7 +12,7 @@ export class InitStudentData extends BaseEntity {
   courseCompletion: number;
 
   @Column()
-  courseEngagment: number;
+  courseEngagement: number;
 
   @Column()
   projectDegree: number;
@@ -33,14 +23,9 @@ export class InitStudentData extends BaseEntity {
   @Column({ nullable: true, default: null })
   bonusProjectUrls: string;
 
-  @Column({ default: '', length: 255, nullable: true })
-  @Index()
+  @Column({ default: null, length: 255, nullable: true })
   emailToken: string;
 
   @CreateDateColumn()
   createdAt: Date;
-
-  @OneToOne((type) => Student, (entity) => entity.id)
-  @JoinColumn()
-  student: Student;
 }

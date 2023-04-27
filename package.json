@@ -33,6 +33,7 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
     "cookie-parser": "^1.4.6",
+    "csv-parse": "^5.3.8",
     "mysql2": "^2.3.3",
     "nodemailer": "^6.9.1",
     "passport": "^0.6.0",

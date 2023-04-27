@@ -1,16 +1,11 @@
 import { Controller, Get, Patch } from '@nestjs/common';
 import { Student } from './entity/student.entity';
-
-// import { StudentService } from './student.service';
+import { StudentService } from './student.service';
+import { Public } from '../common/decorators';
 
 @Controller('student')
 export class StudentController {
-  // constructor(private readonly studentService: StudentService) {}
-
-  @Get('/all')
-  getAllStudents(): Student[] {
-    return null; //this.studentService.get()
-  }
+  constructor(private studentService: StudentService) {}
 
   @Get('/one')
   getOneStudent(): Student {
@@ -25,5 +20,10 @@ export class StudentController {
   @Get('/deactivate')
   deactivate(): void {
     return null; //this.studentService.deactivate()
+  }
+  @Public()
+  @Get('all')
+  getAllStudents(): Promise<Student[]> {
+    return this.studentService.get();
   }
 }

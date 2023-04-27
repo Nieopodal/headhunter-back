@@ -4,15 +4,15 @@ import { Public } from '../common/decorators';
 import { UploadFileService } from './upload-file.service';
 import { Express } from 'express';
 
-@Public()
-@Controller('uploads')
+@Controller('upload')
 export class UploadFileController {
   constructor(private uploadFileService: UploadFileService) {}
 
+  @Public()
   @Post('file')
   @HttpCode(HttpStatus.OK)
   @UseInterceptors(FileInterceptor('file'))
-  uploadFile(@UploadedFile() file: Express.Multer.File) {
+  async uploadFile(@UploadedFile() file: Express.Multer.File) {
     return this.uploadFileService.uploadFile(file);
   }
 }
