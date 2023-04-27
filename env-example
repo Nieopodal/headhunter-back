@@ -1,0 +1,29 @@
+# Server run
+PORT=3000
+
+# Connection database
+DB_PORT=3310
+DB_HOST=localhost
+DB_USERNAME=username
+DB_PASSWORD=password
+DB_NAME=db_name
+
+# Migrations
+TYPEORM_ENTITIES=dist/**/*.entity.js
+
+# Token
+SECRET_KEY_AT='at-secret'
+SECRET_KEY_RT='rt-secret'
+EXPIRES_IN_AT=15s
+EXPIRES_IN_RT=7d
+
+# Cors
+CORS_CLIENTS_URL=[http://localhost:3001, http://localhost:8000]
+
+# Email
+EMAIL_USERNAME=admin123
+EMAIL_PASSWORD=admin456
+EMAIL_HOST=localhost
+EMAIL_PORT=2500
+EMAIL_FROM=admin@test.example.com
+EMAIL_SECURE=false
