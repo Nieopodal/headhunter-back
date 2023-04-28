@@ -65,11 +65,11 @@ export class AuthService {
   }
 
   async checkUserByEmail(email: string) {
-    const admin = await this.adminService.getUserByEmail(email);
+    const admin = await this.adminService.getAdminByEmail(email);
 
-    const hr = await this.hrService.getUserByEmail(email);
+    const hr = await this.hrService.getHrByEmail(email);
 
-    const student = await this.studentService.getUserByEmail(email);
+    const student = await this.studentService.getStudentByEmail(email);
 
     return hr ? hr : student ? student : admin ? admin : null;
   }
@@ -79,7 +79,7 @@ export class AuthService {
 
     const hr = await this.hrService.getUserById(id);
 
-    const student = await this.studentService.getUserById(id);
+    const student = await this.studentService.getStudentById(id);
 
     return admin ? admin : student ? student : hr ? hr : null;
   }
@@ -128,8 +128,8 @@ export class AuthService {
   }
 
   async updateStudent(registerData): Promise<ApiResponse<ResponseDataToFront>> {
-    const { id, projectDegree, teamProjectDegree, bonusProjectUrls, courseCompletion, courseEngagement, email } =
-      await this.initStudentDataService.getInitStudentById(registerData.id);
+    const { projectDegree, teamProjectDegree, bonusProjectUrls, courseCompletion, courseEngagement, email } =
+      await this.studentService.getStudentById(registerData.id);
 
     const {
       password,
@@ -138,6 +138,7 @@ export class AuthService {
       lastName,
       githubUsername,
       portfolioUrls,
+      projectUrls,
       bio,
       expectedTypeWork,
       targetWorkCity,
@@ -151,7 +152,6 @@ export class AuthService {
     } = registerData;
     const newStudent = new Student();
 
-    newStudent.id = id;
     newStudent.email = email;
     newStudent.password = password;
     newStudent.contactNumber = contactNumber;
@@ -159,6 +159,7 @@ export class AuthService {
     newStudent.lastName = lastName;
     newStudent.githubUsername = githubUsername;
     newStudent.portfolioUrls = [portfolioUrls];
+    newStudent.projectUrls = [projectUrls];
     newStudent.courseCompletion = courseCompletion;
     newStudent.courseEngagement = courseEngagement;
     newStudent.projectDegree = projectDegree;

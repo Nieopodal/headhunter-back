@@ -1,15 +1,4 @@
-import {
-  BaseEntity,
-  Column,
-  CreateDateColumn,
-  Entity,
-  JoinColumn,
-  OneToOne,
-  PrimaryColumn,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
-import { InitStudentData } from './init-student-data.entity';
+import { BaseEntity, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
 export enum ExpectedTypeWork {
   office = 'Na miejscu',
@@ -28,49 +17,34 @@ export enum ExpectedContractType {
 
 @Entity()
 export class Student extends BaseEntity {
-  @PrimaryColumn('uuid')
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column({ length: 255, unique: true })
   email: string;
 
-  @Column({ length: 255 })
+  @Column({ length: 255, default: '' })
   password: string;
 
   @Column({ length: 20, nullable: true })
   contactNumber: string;
 
-  @Column({ length: 50 })
+  @Column({ length: 50, default: '' })
   firstName: string;
 
-  @Column({ length: 70 })
+  @Column({ length: 70, default: '' })
   lastName: string;
 
-  @Column({ unique: true })
+  @Column({ default: '' })
   githubUsername: string;
 
   @Column('simple-array', { nullable: true })
   portfolioUrls: string[];
 
-  @Column('simple-array', { default: [] })
+  @Column('simple-array', { default: '' })
   projectUrls: string[];
 
-  @Column({ default: 0 })
-  courseCompletion: number;
-
-  @Column({ default: 0 })
-  courseEngagement: number;
-
-  @Column({ default: 0 })
-  projectDegree: number;
-
-  @Column({ default: 0 })
-  teamProjectDegree: number;
-
-  @Column('simple-array', { default: [] })
-  bonusProjectUrls: string[];
-
-  @Column({ length: 400, nullable: true })
+  @Column({ length: 255, nullable: true })
   bio: string;
 
   @Column({ type: 'enum', enum: ExpectedTypeWork, default: ExpectedTypeWork.DM })
@@ -100,18 +74,36 @@ export class Student extends BaseEntity {
   @Column({ type: 'text', nullable: true })
   courses: string;
 
+  @Column({ default: 0 })
+  courseCompletion: number;
+
+  @Column({ default: 0 })
+  courseEngagement: number;
+
+  @Column({ default: 0 })
+  projectDegree: number;
+
+  @Column({ default: 0 })
+  teamProjectDegree: number;
+
+  @Column('simple-array', { default: '' })
+  bonusProjectUrls: string[];
+
   @Column({ default: false })
   active: boolean;
 
   @Column({ default: 'student', length: 20 })
   role: string;
 
+  @Column({ nullable: true, default: null, length: 255 })
+  refreshToken: string;
+
+  @Column({ nullable: true, default: null, length: 255 })
+  verificationToken: string;
+
   @CreateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 
   @UpdateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
   updatedAt: Date;
-
-  @Column({ nullable: true, default: null, length: 255 })
-  refreshToken: string;
 }

@@ -3,7 +3,7 @@ import { Student } from './entity/student.entity';
 import { StudentService } from './student.service';
 import { Public } from '../common/decorators';
 import { InitStudentDataService } from './init-student-data.service';
-import { InitStudentData } from './entity/init-student-data.entity';
+// import { InitStudentData } from './entity/init-student-data.entity';
 import { UpdateStudentDto } from './dto';
 import { AuthService } from '../auth/auth.service';
 import { ApiResponse } from '@Types';
@@ -25,11 +25,11 @@ export class StudentController {
     return this.authService.updateStudent(registerData);
   }
 
-  @Public()
-  @Get('confirm')
-  getInitStudents(): Promise<InitStudentData[]> {
-    return this.initStudentDataService.getInitStudents();
-  }
+  // @Public()
+  // @Get('confirm')
+  // getInitStudents(): Promise<InitStudentData[]> {
+  //   return this.initStudentDataService.getInitStudents();
+  // }
 
   @Public()
   @Get('all')
@@ -52,10 +52,10 @@ export class StudentController {
     return null; //this.studentService.deactivate()
   }
 
-  @Public()
-  @Get('confirm/:id')
-  @HttpCode(HttpStatus.FOUND)
-  getInitStudentData(@Param() param: any): Promise<InitStudentData> {
-    return this.initStudentDataService.getInitStudentById(param.id);
-  }
+  // @Public()
+  // @Get('confirm/:id')
+  // @HttpCode(HttpStatus.FOUND)
+  // getInitStudentData(@Param() param: any): Promise<InitStudentData> {
+  //   return this.initStudentDataService.getInitStudentById(param.id);
+  // }
 }
