@@ -20,11 +20,11 @@ export class InitStudentData extends BaseEntity {
   @Column()
   teamProjectDegree: number;
 
-  @Column({ nullable: true, default: null })
-  bonusProjectUrls: string;
+  @Column('simple-array', { default: [] })
+  bonusProjectUrls: string[];
 
   @Column({ default: null, length: 255, nullable: true })
-  emailToken: string;
+  verifyToken: string;
 
   @CreateDateColumn()
   createdAt: Date;

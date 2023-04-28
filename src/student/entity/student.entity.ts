@@ -4,10 +4,11 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
-  OneToOne, PrimaryColumn,
+  OneToOne,
+  PrimaryColumn,
   PrimaryGeneratedColumn,
-  UpdateDateColumn
-} from "typeorm";
+  UpdateDateColumn,
+} from 'typeorm';
 import { InitStudentData } from './init-student-data.entity';
 
 export enum ExpectedTypeWork {
@@ -48,8 +49,11 @@ export class Student extends BaseEntity {
   @Column({ unique: true })
   githubUsername: string;
 
-  @Column({ type: 'simple-array', nullable: true })
+  @Column('simple-array', { nullable: true })
   portfolioUrls: string[];
+
+  @Column('simple-array', { default: [] })
+  projectUrls: string[];
 
   @Column({ default: 0 })
   courseCompletion: number;
@@ -63,7 +67,7 @@ export class Student extends BaseEntity {
   @Column({ default: 0 })
   teamProjectDegree: number;
 
-  @Column('simple-array', { nullable: true })
+  @Column('simple-array', { default: [] })
   bonusProjectUrls: string[];
 
   @Column({ length: 400, nullable: true })

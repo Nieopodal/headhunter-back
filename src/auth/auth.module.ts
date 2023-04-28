@@ -6,15 +6,18 @@ import { HrModule } from '../hr/hr.module';
 import { StudentModule } from '../student/student.module';
 import { JwtModule } from '@nestjs/jwt';
 import { AtStrategy, RtStrategy } from './strategies';
+import { InitStudentDataModule } from '../student/init-student-data.module';
 
 @Module({
   imports: [
     forwardRef(() => AdminModule),
+    forwardRef(() => InitStudentDataModule),
     forwardRef(() => StudentModule),
     forwardRef(() => HrModule),
     forwardRef(() => JwtModule.register({})),
   ],
   controllers: [AuthController],
   providers: [AuthService, AtStrategy, RtStrategy],
+  exports: [AuthService],
 })
 export class AuthModule {}

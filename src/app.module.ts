@@ -11,7 +11,7 @@ import { HrModule } from './hr/hr.module';
 import { AtGuard } from './common/guards';
 import { APP_GUARD } from '@nestjs/core';
 import { MailModule } from './mail/mail.module';
-import { UploadFileModule } from './admin/upload-file.module';
+import { InitStudentDataModule } from './student/init-student-data.module';
 
 @Module({
   imports: [
@@ -20,7 +20,7 @@ import { UploadFileModule } from './admin/upload-file.module';
       useClass: DatabaseConfiguration,
     }),
     forwardRef(() => StudentModule),
-    forwardRef(() => UploadFileModule),
+    forwardRef(() => InitStudentDataModule),
     forwardRef(() => AdminModule),
     forwardRef(() => HrModule),
     forwardRef(() => AuthModule),

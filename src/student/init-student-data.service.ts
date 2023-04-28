@@ -2,11 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { parse } from 'csv-parse';
 import { Readable } from 'stream';
-import { InitStudentData } from '../student/entity/init-student-data.entity';
-import { Student } from '../student/entity/student.entity';
+import { InitStudentData } from './entity/init-student-data.entity';
 
 @Injectable()
-export class UploadFileService {
+export class InitStudentDataService {
   constructor(private configService: ConfigService) {}
 
   async uploadFile(file) {
@@ -31,7 +30,6 @@ export class UploadFileService {
         data.teamProjectDegree = Number(record.teamProjectDegree);
         data.save();
         records.push(data);
-        console.log(record);
       }
     });
     parser.on('error', function (err) {
@@ -47,7 +45,11 @@ export class UploadFileService {
     return await Promise.all(records);
   }
 
-  async getStudentById(id: string): Promise<InitStudentData> {
+  async getInitStudentById(id: string): Promise<InitStudentData> {
     return await InitStudentData.findOneBy({ id });
+  }
+
+  async getInitStudents(): Promise<InitStudentData[]> {
+    return await InitStudentData.find();
   }
 }

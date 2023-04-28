@@ -9,12 +9,15 @@ import { ConfigService } from '@nestjs/config';
 import { ApiResponse, Tokens } from '@Types';
 import { HrService } from '../hr/hr.service';
 import { ResponseDataToFront } from '../types/auth/response-data.type';
+import { Student } from '../student/entity/student.entity';
+import { InitStudentDataService } from '../student/init-student-data.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private adminService: AdminService,
     private studentService: StudentService,
+    private initStudentDataService: InitStudentDataService,
     private hrService: HrService,
     private jwtService: JwtService,
     private configService: ConfigService,
@@ -31,7 +34,7 @@ export class AuthService {
   }
 
   async getTokens(id: string, email: string): Promise<Tokens> {
-    const [at, rt] = await Promise.all([
+    const [at, rt, vt] = await Promise.all([
       this.jwtService.signAsync(
         { id, email },
         {
@@ -46,8 +49,15 @@ export class AuthService {
           expiresIn: this.configService.get('EXPIRES_IN_RT'),
         },
       ),
+      this.jwtService.signAsync(
+        { id, email },
+        {
+          secret: this.configService.get('SECRET_KEY_VT'),
+          expiresIn: this.configService.get('EXPIRES_IN_VT'),
+        },
+      ),
     ]);
-    return { access_token: at, refresh_token: rt };
+    return { access_token: at, refresh_token: rt, verify_token: vt };
   }
 
   async getDecodedToken(rt: string) {
@@ -115,5 +125,63 @@ export class AuthService {
     await this.updateRtHash(user.id, tokens.refresh_token);
     response.cookie('jwt-refresh', tokens.refresh_token, { httpOnly: true });
     return tokens;
+  }
+
+  async updateStudent(registerData): Promise<ApiResponse<ResponseDataToFront>> {
+    const { id, projectDegree, teamProjectDegree, bonusProjectUrls, courseCompletion, courseEngagement, email } =
+      await this.initStudentDataService.getInitStudentById(registerData.id);
+
+    const {
+      password,
+      contactNumber,
+      firstName,
+      lastName,
+      githubUsername,
+      portfolioUrls,
+      bio,
+      expectedTypeWork,
+      targetWorkCity,
+      expectedContractType,
+      expectedSalary,
+      canTakeApprenticeship,
+      monthsOfCommercialExp,
+      education,
+      workExperience,
+      course,
+    } = registerData;
+    const newStudent = new Student();
+
+    newStudent.id = id;
+    newStudent.email = email;
+    newStudent.password = password;
+    newStudent.contactNumber = contactNumber;
+    newStudent.firstName = firstName;
+    newStudent.lastName = lastName;
+    newStudent.githubUsername = githubUsername;
+    newStudent.portfolioUrls = [portfolioUrls];
+    newStudent.courseCompletion = courseCompletion;
+    newStudent.courseEngagement = courseEngagement;
+    newStudent.projectDegree = projectDegree;
+    newStudent.teamProjectDegree = teamProjectDegree;
+    newStudent.bonusProjectUrls = bonusProjectUrls;
+    newStudent.bio = bio;
+    newStudent.expectedTypeWork = expectedTypeWork;
+    newStudent.targetWorkCity = targetWorkCity;
+    newStudent.expectedContractType = expectedContractType;
+    newStudent.expectedSalary = expectedSalary;
+    newStudent.canTakeApprenticeship = canTakeApprenticeship;
+    newStudent.monthsOfCommercialExp = monthsOfCommercialExp;
+    newStudent.education = education;
+    newStudent.workExperience = workExperience;
+    newStudent.courses = course;
+    newStudent.active = true;
+    await newStudent.save();
+
+    return {
+      isSuccess: true,
+      payload: {
+        ...newStudent,
+      },
+    };
   }
 }

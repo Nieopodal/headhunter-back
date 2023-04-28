@@ -33,5 +33,5 @@ export type ResponseDataToFront = {
   fullName?: string;
   firstName?: string;
   lastName?: string;
-  access_token: string;
+  access_token?: string;
 };
