@@ -2,6 +2,7 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
 import { MailerOptionsFactory, MailerOptions } from '@nestjs-modules/mailer';
 import { ConfigService } from '@nestjs/config';
 import { Injectable } from '@nestjs/common';
+import {configMailer} from "./config";
 
 @Injectable()
 export class MailerConfiguration implements MailerOptionsFactory {
@@ -10,16 +11,16 @@ export class MailerConfiguration implements MailerOptionsFactory {
     createMailerOptions(): MailerOptions | Promise<MailerOptions> {
         return {
             transport: {
-                host: this.configService.get('EMAIL_HOST'),
-                port: parseInt(this.configService.get('EMAIL_PORT')),
-                secure: this.configService.get('EMAIL_SECURE') === 'true',
+                host: configMailer.emailHost,
+                port: configMailer.emailPort,
+                secure: configMailer.emailSecure,
                 auth: {
-                    user: this.configService.get('EMAIL_USERNAME'),
-                    pass: this.configService.get('EMAIL_PASSWORD'),
+                    user: configMailer.emailUserName,
+                    pass: configMailer.emailPass,
                 },
             },
             defaults: {
-                from: this.configService.get('EMAIL_FROM'),
+                from: configMailer.emailFrom,
             },
             template: {
                 dir: './templates/email',

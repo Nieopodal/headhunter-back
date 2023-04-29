@@ -9,6 +9,7 @@ import { ConfigService } from '@nestjs/config';
 import { ApiResponse, Tokens } from '@Types';
 import { HrService } from '../hr/hr.service';
 import { ResponseDataToFront } from '../types/auth/response-data.type';
+import {configToken} from "../config/config";
 
 @Injectable()
 export class AuthService {
@@ -35,15 +36,15 @@ export class AuthService {
       this.jwtService.signAsync(
         { id, email },
         {
-          secret: this.configService.get('SECRET_KEY_AT'),
-          expiresIn: this.configService.get('EXPIRES_IN_AT'),
+          secret: configToken.secretKeyAt,
+          expiresIn: configToken.expiresInAt,
         },
       ),
       this.jwtService.signAsync(
         { id, email },
         {
-          secret: this.configService.get('SECRET_KEY_RT'),
-          expiresIn: this.configService.get('EXPIRES_IN_RT'),
+          secret: configToken.secretKeyRt,
+          expiresIn: configToken.expiresInRt,
         },
       ),
     ]);
