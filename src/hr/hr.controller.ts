@@ -21,4 +21,13 @@ export class HrController {
     return this.hrService.setToInterview(id, hrId);
   }
 
+  @UseGuards(UserRoleGuard)
+  @Role('hr')
+  @Patch('/withdraw/:id')
+  async setDisinterest(
+    @Param('id') id: string,
+    @GetCurrentUserId() hrId: string,
+  ) {
+    return this.hrService.setDisinterest(id, hrId);
+  }
 }

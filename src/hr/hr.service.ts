@@ -70,6 +70,39 @@ export class HrService {
     foundStudent.status = StudentStatus.INTERVIEW;
     foundStudent.interviewBy = hr;
     await foundStudent.save();
+
+    return {
+      isSuccess: true,
+      payload: null,
+    };
+  }
+
+  async setDisinterest(id: string, hrId: string) {
+
+    const foundStudent = await Student.findOne({
+      relations: ['interviewBy'],
+      where: {
+        id,
+        status: StudentStatus.INTERVIEW,
+        interviewBy: {
+          id: hrId,
+        },
+      },
+    });
+
+    if (!foundStudent) {
+      throw new HttpException(
+        {
+          isSuccess: false,
+          status: HttpStatus.BAD_REQUEST,
+          error: `This student is not available!`,
+        }, HttpStatus.BAD_REQUEST);
+    }
+
+    foundStudent.status = StudentStatus.AVAILABLE;
+    foundStudent.interviewBy = null;
+    await foundStudent.save();
+
     return {
       isSuccess: true,
       payload: null,
