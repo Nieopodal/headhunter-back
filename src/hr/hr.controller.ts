@@ -11,6 +11,18 @@ export class HrController {
   ) {
   }
 
+  // @Get('/students')
+  // async showAvailableStudents() {
+  //   return this.hrService.showAvailableStudents();
+  // }
+  //
+  // @Get('/interview')
+  // async showStudentsToInterview(
+  //   @GetCurrentUserId() hrId: string,
+  // ){
+  //   return this.hrService.showStudentsToInterview(hrId)
+  // }
+
   @UseGuards(UserRoleGuard)
   @Role('hr')
   @Patch('/interview/:id')
@@ -29,5 +41,15 @@ export class HrController {
     @GetCurrentUserId() hrId: string,
   ) {
     return this.hrService.setDisinterest(id, hrId);
+  }
+
+  @UseGuards(UserRoleGuard)
+  @Role('hr')
+  @Patch('/employed/:id')
+  async setEmployed(
+    @Param('id') id: string,
+    @GetCurrentUserId() hrId: string,
+  ) {
+    return this.hrService.setEmployed(id, hrId);
   }
 }

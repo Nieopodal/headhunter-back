@@ -77,7 +77,7 @@ export class HrService {
     };
   }
 
-  async setDisinterest(id: string, hrId: string) {
+  async setDisinterest(id: string, hrId: string): Promise<ApiResponse<ResponseDataToFront>> {
 
     const foundStudent = await Student.findOne({
       relations: ['interviewBy'],
@@ -108,4 +108,60 @@ export class HrService {
       payload: null,
     };
   }
+
+  async setEmployed(id: string, hrId: string): Promise<ApiResponse<ResponseDataToFront>> {
+    const foundStudent = await Student.findOne({
+      relations: ['interviewBy'],
+      where: {
+        id,
+        status: StudentStatus.INTERVIEW,
+        active: true,
+        interviewBy: {
+          id: hrId,
+        },
+      },
+    });
+
+    if (!foundStudent) {
+      throw new HttpException(
+        {
+          isSuccess: false,
+          status: HttpStatus.BAD_REQUEST,
+          error: `This student is not available!`,
+        }, HttpStatus.BAD_REQUEST);
+    }
+
+    foundStudent.status = StudentStatus.EMPLOYED;
+    foundStudent.interviewBy = null;
+    foundStudent.active = false;
+    await foundStudent.save();
+
+    return {
+      isSuccess: true,
+      payload: null,
+    };
+  }
+
+  // async showAvailableStudents() {
+  //   return await Student.find({
+  //     relations: ['interviewBy'],
+  //     where: {
+  //       status: StudentStatus.AVAILABLE,
+  //       active: true,
+  //     },
+  //   });
+  // }
+  //
+  // async showStudentsToInterview(id: string) {
+  //   return await Student.find({
+  //     relations: ['interviewBy'],
+  //     where: {
+  //       status: StudentStatus.INTERVIEW,
+  //       active: true,
+  //       interviewBy: {
+  //         id,
+  //       },
+  //     },
+  //   });
+  // }
 }
