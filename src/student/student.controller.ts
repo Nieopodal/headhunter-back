@@ -1,29 +1,37 @@
-import { Controller, Get, Patch } from '@nestjs/common';
-import { Student } from './entity/student.entity';
-
-// import { StudentService } from './student.service';
+import { Body, Controller, Get, Param, Patch } from '@nestjs/common';
+import { StudentService, UpdateStudentResponse } from './student.service';
+import { UpdateStudentDto } from './dto';
+import { ApiResponse, SimpleStudentData, StudentCv } from '@Types';
 
 @Controller('student')
 export class StudentController {
-  // constructor(private readonly studentService: StudentService) {}
+  constructor(private readonly studentService: StudentService) {}
 
-  @Get('/all')
-  getAllStudents(): Student[] {
-    return null; //this.studentService.get()
+  @Get('/simple/:id')
+  async getSimpleStudentData(@Param('id') id: string): Promise<ApiResponse<SimpleStudentData>> {
+    return await this.studentService.simpleStudentData(id);
   }
 
-  @Get('/one')
-  getOneStudent(): Student {
-    return null; //this.studentService.getOne()
+  @Get('/cv/:id')
+  async getStudentCv(@Param('id') id: string): Promise<ApiResponse<StudentCv>> {
+    return await this.studentService.getStudentCv(id);
   }
 
-  @Patch('/update')
-  updateUserData(): Student {
-    return null; //this.studentService.update()
+  @Get('/free')
+  async getFreeStudents(): Promise<ApiResponse<SimpleStudentData[]>> {
+    return await this.studentService.getFreeStudents();
   }
 
-  @Get('/deactivate')
-  deactivate(): void {
-    return null; //this.studentService.deactivate()
+  @Patch('/update/:id')
+  async updateUserData(
+    @Param('id') id: string,
+    @Body() updateStudentDto: UpdateStudentDto,
+  ): Promise<ApiResponse<UpdateStudentResponse>> {
+    return await this.studentService.update(id, updateStudentDto);
+  }
+
+  @Patch('/deactivate/:id')
+  deactivate(@Param('id') id: string): Promise<ApiResponse<any>> {
+    return this.studentService.deactivate(id);
   }
 }

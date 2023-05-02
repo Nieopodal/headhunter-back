@@ -15,6 +15,17 @@ export enum ExpectedContractType {
   none = 'Brak preferencji',
 }
 
+export enum AvailabilityOption {
+  free = 'Available to add',
+  reserved = 'Talk in progress',
+  deactivated = 'Hired',
+}
+
+export enum Active {
+  active = 'active',
+  inActive = 'inActive',
+}
+
 @Entity()
 export class Student extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
@@ -25,6 +36,9 @@ export class Student extends BaseEntity {
 
   @Column({ length: 255 })
   password: string;
+
+  @Column({ length: 255 })
+  avatar: string;
 
   @Column({ length: 20, nullable: true })
   contactNumber: string;
@@ -40,6 +54,15 @@ export class Student extends BaseEntity {
 
   @Column({ type: 'simple-array', nullable: true })
   portfolioUrls: string[];
+
+  @Column({ type: 'simple-array', nullable: true })
+  teamProjectUrls: string[];
+
+  @Column({ type: 'simple-array', nullable: true })
+  teamProjectPR: string[];
+
+  @Column({ type: 'simple-array', nullable: true })
+  projectUrls: string[];
 
   @Column({ default: 0 })
   courseCompletion: number;
@@ -86,8 +109,8 @@ export class Student extends BaseEntity {
   @Column({ type: 'text', nullable: true })
   courses: string;
 
-  @Column({ default: false })
-  active: boolean;
+  @Column({ type: 'enum', enum: Active, default: Active.inActive })
+  active: Active;
 
   @Column({ default: 'student', length: 20 })
   role: string;
@@ -97,6 +120,9 @@ export class Student extends BaseEntity {
 
   @UpdateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
   updatedAt: Date;
+
+  @Column({ nullable: true, default: null, length: 255 })
+  accessToken: string;
 
   @Column({ nullable: true, default: null, length: 255 })
   refreshToken: string;
