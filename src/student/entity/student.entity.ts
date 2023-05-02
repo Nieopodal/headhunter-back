@@ -15,12 +15,6 @@ export enum ExpectedContractType {
   none = 'Brak preferencji',
 }
 
-export enum AvailabilityOption {
-  free = 'Available to add',
-  reserved = 'Talk in progress',
-  deactivated = 'Hired',
-}
-
 export enum Active {
   active = 'active',
   inActive = 'inActive',
