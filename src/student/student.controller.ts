@@ -17,7 +17,7 @@ export class StudentController {
     return await this.studentService.getStudentCv(id);
   }
 
-  @Get('/free')
+  @Get('/available')
   async getFreeStudents(): Promise<ApiResponse<SimpleStudentData[]>> {
     return await this.studentService.getFreeStudents();
   }
@@ -30,7 +30,7 @@ export class StudentController {
     return await this.studentService.update(id, updateStudentDto);
   }
 
-  @Patch('/deactivate/:id')
+  @Patch('/employed/:id')
   deactivate(@Param('id') id: string): Promise<ApiResponse<any>> {
     return this.studentService.deactivate(id);
   }
