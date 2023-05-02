@@ -1,15 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { parse } from 'csv-parse';
 import { Readable } from 'stream';
 import { Student } from './entity/student.entity';
+import { StudentService } from './student.service';
 
 @Injectable()
-export class InitStudentDataService {
-  constructor(private configService: ConfigService) {}
+export class UploadStudentDataService {
+  constructor(private studentService: StudentService) {}
 
   async uploadFile(file) {
     const records = [];
+    const student = await this.studentService.get();
     const parser = parse({
       delimiter: ';',
       trim: true,
@@ -26,8 +27,10 @@ export class InitStudentDataService {
         data.projectDegree = Number(record.projectDegree);
         data.teamProjectDegree = Number(record.teamProjectDegree);
         data.bonusProjectUrls = record.bonusProjectUrls;
-        data.save();
-        records.push(data);
+        if (!student.some((std) => std.email == record.email)) {
+          records.push(data);
+          data.save();
+        }
       }
     });
     parser.on('error', function (err) {
@@ -39,11 +42,5 @@ export class InitStudentDataService {
       stream.on('error', reject);
     });
     return await Promise.all(records);
-  }
-  async getStudentById(id: string): Promise<Student> {
-    return await Student.findOneBy({ id });
-  }
-  async getStudents(): Promise<Student[]> {
-    return await Student.find();
   }
 }

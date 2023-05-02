@@ -10,14 +10,14 @@ import { ApiResponse, Tokens } from '@Types';
 import { HrService } from '../hr/hr.service';
 import { ResponseDataToFront } from '../types/auth/response-data.type';
 import { Student } from '../student/entity/student.entity';
-import { InitStudentDataService } from '../student/init-student-data.service';
+import { UploadStudentDataService } from '../student/upload-student-data.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private adminService: AdminService,
     private studentService: StudentService,
-    private initStudentDataService: InitStudentDataService,
+    private initStudentDataService: UploadStudentDataService,
     private hrService: HrService,
     private jwtService: JwtService,
     private configService: ConfigService,
@@ -125,64 +125,5 @@ export class AuthService {
     await this.updateRtHash(user.id, tokens.refresh_token);
     response.cookie('jwt-refresh', tokens.refresh_token, { httpOnly: true });
     return tokens;
-  }
-
-  async updateStudent(registerData): Promise<ApiResponse<ResponseDataToFront>> {
-    const { projectDegree, teamProjectDegree, bonusProjectUrls, courseCompletion, courseEngagement, email } =
-      await this.studentService.getStudentById(registerData.id);
-
-    const {
-      password,
-      contactNumber,
-      firstName,
-      lastName,
-      githubUsername,
-      portfolioUrls,
-      projectUrls,
-      bio,
-      expectedTypeWork,
-      targetWorkCity,
-      expectedContractType,
-      expectedSalary,
-      canTakeApprenticeship,
-      monthsOfCommercialExp,
-      education,
-      workExperience,
-      course,
-    } = registerData;
-    const newStudent = new Student();
-
-    newStudent.email = email;
-    newStudent.password = password;
-    newStudent.contactNumber = contactNumber;
-    newStudent.firstName = firstName;
-    newStudent.lastName = lastName;
-    newStudent.githubUsername = githubUsername;
-    newStudent.portfolioUrls = [portfolioUrls];
-    newStudent.projectUrls = [projectUrls];
-    newStudent.courseCompletion = courseCompletion;
-    newStudent.courseEngagement = courseEngagement;
-    newStudent.projectDegree = projectDegree;
-    newStudent.teamProjectDegree = teamProjectDegree;
-    newStudent.bonusProjectUrls = bonusProjectUrls;
-    newStudent.bio = bio;
-    newStudent.expectedTypeWork = expectedTypeWork;
-    newStudent.targetWorkCity = targetWorkCity;
-    newStudent.expectedContractType = expectedContractType;
-    newStudent.expectedSalary = expectedSalary;
-    newStudent.canTakeApprenticeship = canTakeApprenticeship;
-    newStudent.monthsOfCommercialExp = monthsOfCommercialExp;
-    newStudent.education = education;
-    newStudent.workExperience = workExperience;
-    newStudent.courses = course;
-    newStudent.active = true;
-    await newStudent.save();
-
-    return {
-      isSuccess: true,
-      payload: {
-        ...newStudent,
-      },
-    };
   }
 }

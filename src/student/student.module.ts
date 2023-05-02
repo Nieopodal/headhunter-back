@@ -2,10 +2,10 @@ import { forwardRef, Module } from '@nestjs/common';
 import { StudentService } from './student.service';
 import { StudentController } from './student.controller';
 import { AuthModule } from '../auth/auth.module';
-import { InitStudentDataModule } from './init-student-data.module';
+import { UploadStudentDataModule } from './upload-student-data.module';
 
 @Module({
-  imports: [forwardRef(() => AuthModule), forwardRef(() => InitStudentDataModule)],
+  imports: [forwardRef(() => AuthModule), forwardRef(() => UploadStudentDataModule)],
   controllers: [StudentController],
   providers: [StudentService],
   exports: [StudentService],
