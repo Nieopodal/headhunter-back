@@ -1,6 +1,3 @@
-import {Admin} from "../admin/entity/admin.entity";
-import {Hr} from "../hr/entity/hr.entity";
-import {Student} from "../student/entity/student.entity";
 
 export const configDb = {
     dbHost: 'localhost',
