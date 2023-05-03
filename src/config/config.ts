@@ -7,7 +7,6 @@ export const configDb = {
     dbUser: 'root',
     dbPassword: '',
     dbDatabase: 'megak_hh',
-    dbEntities: [Admin, Hr, Student],
     corsOrigin: 'http://localhost:3001',
 };
 
