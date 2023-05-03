@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ApiResponse, SimpleStudentData, StudentCv } from '@Types';
 
-import { Active, Student, StudentStatus } from './entity/student.entity';
+import { Student } from './entity/student.entity';
 import { UpdateStudentDto } from './dto';
 
 export interface UpdateStudentResponse {
@@ -130,7 +130,6 @@ export class StudentService {
     }
     return { isSuccess: true, payload: studentData };
   }
-
   //Metody do logowania
   async getUserByEmail(email: string): Promise<Student> {
     return await Student.findOneBy({ email });

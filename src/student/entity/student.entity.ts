@@ -1,39 +1,5 @@
-import {
-  BaseEntity,
-  Column,
-  CreateDateColumn,
-  Entity,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
-import { Hr } from '../../hr/entity/hr.entity';
-
-export enum ExpectedTypeWork {
-  office = 'Na miejscu',
-  move = 'Przeprowadzka',
-  remote = 'Praca zdalna',
-  hybrid = 'Praca hybrydowa',
-  DM = 'Nie ma znaczenia',
-}
-
-export enum ExpectedContractType {
-  B2B = 'Możliwe B2B',
-  employ = 'Tylko umowa o pracę',
-  contract = 'Umowa zlecenie / dzieło',
-  none = 'Brak preferencji',
-}
-
-export enum StudentStatus {
-  AVAILABLE = 'available',
-  INTERVIEW = 'interview',
-  EMPLOYED = 'employed'
-}
-
-export enum Active {
-  ACTIVE = 'active',
-  INACTIVE = 'inActive'
-}
+import { Active, ExpectedContractType, ExpectedTypeWork } from '@Types';
+import { BaseEntity, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity()
 export class Student extends BaseEntity {
