@@ -95,7 +95,7 @@ export class HrService {
       ? 'https://www.deviantart.com/karmaanddestiny/art/Default-user-icon-4-858661084'
       : `https://github.com/${foundStudent.githubUsername}.png`;
     foundStudent.fullName = `${foundStudent.firstName} ${foundStudent.lastName}`;
-    const reservationTime = new Date(+new Date() + (1000 * 60 * 60 * 24 * 10)).setHours(23, 59, 59, 999);
+    const reservationTime = +new Date().setHours(23, 59, 59, 99) + (1000 * 60 * 60 * 24 * 10);
     foundStudent.reservationTime = new Date(reservationTime);
     await foundStudent.save();
 
