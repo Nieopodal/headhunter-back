@@ -1,4 +1,5 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Student } from '../../student/entity/student.entity';
 
 @Entity()
 export class Hr extends BaseEntity {
@@ -30,4 +31,7 @@ export class Hr extends BaseEntity {
 
   @Column({ default: '', length: 255, nullable: true })
   refreshToken: string;
+
+  @OneToMany(type => Student, entity => entity.interviewBy)
+  hr: Student[];
 }

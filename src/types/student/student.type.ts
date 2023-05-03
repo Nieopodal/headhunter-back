@@ -1,6 +1,7 @@
 import { ExpectedContractType, ExpectedTypeWork } from '../../student/entity/student.entity';
 
 export type StudentPartialData = {
+
   id: string;
 
   email: string;
@@ -39,4 +40,23 @@ export type SimpleStudentData = {
   commercialExp: number;
 };
 
+
+export type StudentToInterview = {
+  id: string;
+  fullName: string;
+  avatar: string;
+  reservationTime: Date;
+  courseCompletion: number;
+  courseEngagement: number;
+  projectDegree: number;
+  teamProjectDegree: number;
+  expectedTypeWork: ExpectedTypeWork;
+  targetWorkCity: string;
+  expectedContractType: ExpectedContractType;
+  expectedSalary: string;
+  canTakeApprenticeship: boolean;
+  monthsOfCommercialExp: number;
+}
+
 export type StudentCv = StudentPartialData & SimpleStudentData;
+
