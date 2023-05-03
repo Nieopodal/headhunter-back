@@ -116,6 +116,9 @@ export class Student extends BaseEntity {
   @Column({ nullable: true, default: null, length: 255 })
   refreshToken: string;
 
+  @Column({ nullable: true, default: null, length: 255 })
+  verificationToken: string;
+
   @Column({ length: 255, nullable: true, default: null })
   avatar: string | null;
 
@@ -128,7 +131,7 @@ export class Student extends BaseEntity {
     type: 'enum',
     enum: StudentStatus,
   })
-  status: string;
+  status: StudentStatus | null;
 
   @ManyToOne(type => Hr, entity => entity.hr)
   interviewBy: Hr;
