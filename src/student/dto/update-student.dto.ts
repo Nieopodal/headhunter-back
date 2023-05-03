@@ -1,4 +1,4 @@
-import { ExpectedContractType, ExpectedTypeWork } from '../entity/student.entity';
+import { ExpectedContractType, ExpectedTypeWork } from '@Types';
 
 export class UpdateStudentDto {
   email: string;

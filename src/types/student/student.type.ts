@@ -1,5 +1,3 @@
-import { ExpectedContractType, ExpectedTypeWork } from '../../student/entity/student.entity';
-
 export type StudentPartialData = {
   id: string;
 
@@ -40,3 +38,23 @@ export type SimpleStudentData = {
 };
 
 export type StudentCv = StudentPartialData & SimpleStudentData;
+
+export enum ExpectedTypeWork {
+  office = 'Na miejscu',
+  move = 'Przeprowadzka',
+  remote = 'Praca zdalna',
+  hybrid = 'Praca hybrydowa',
+  DM = 'Nie ma znaczenia',
+}
+
+export enum ExpectedContractType {
+  B2B = 'Możliwe B2B',
+  employ = 'Tylko umowa o pracę',
+  contract = 'Umowa zlecenie / dzieło',
+  none = 'Brak preferencji',
+}
+
+export enum Active {
+  active = 'active',
+  inActive = 'inActive',
+}

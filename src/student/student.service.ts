@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { ApiResponse, SimpleStudentData, StudentCv } from '@Types';
+import { Active, ApiResponse, SimpleStudentData, StudentCv } from '@Types';
 
-import { Active, Student } from './entity/student.entity';
+import { Student } from './entity/student.entity';
 import { UpdateStudentDto } from './dto';
 
 export interface UpdateStudentResponse {

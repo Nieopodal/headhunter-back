@@ -1,24 +1,5 @@
+import { Active, ExpectedContractType, ExpectedTypeWork } from '@Types';
 import { BaseEntity, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
-
-export enum ExpectedTypeWork {
-  office = 'Na miejscu',
-  move = 'Przeprowadzka',
-  remote = 'Praca zdalna',
-  hybrid = 'Praca hybrydowa',
-  DM = 'Nie ma znaczenia',
-}
-
-export enum ExpectedContractType {
-  B2B = 'Możliwe B2B',
-  employ = 'Tylko umowa o pracę',
-  contract = 'Umowa zlecenie / dzieło',
-  none = 'Brak preferencji',
-}
-
-export enum Active {
-  active = 'active',
-  inActive = 'inActive',
-}
 
 @Entity()
 export class Student extends BaseEntity {
