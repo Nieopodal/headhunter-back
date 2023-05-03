@@ -10,6 +10,14 @@ export interface UpdateStudentResponse {
 
 @Injectable()
 export class StudentService {
+  async getAvatar(id: string): Promise<ApiResponse<string>> {
+    const studentAvatar: Student = await Student.findOneBy({ id });
+    if (!studentAvatar) {
+      return { isSuccess: false, error: 'Nie znaleziono użytkownika' };
+    }
+    return { isSuccess: true, payload: studentAvatar.avatar };
+  }
+
   async getStudentCv(id: string): Promise<ApiResponse<StudentCv>> {
     const studentCv: StudentCv = await Student.createQueryBuilder('student')
       .select([
