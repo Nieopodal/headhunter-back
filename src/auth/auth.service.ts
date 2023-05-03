@@ -4,7 +4,7 @@ import { AdminService } from '../admin/admin.service';
 import { StudentService } from '../student/student.service';
 import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
-import * as bcrypt from 'bcrypt';
+import * as bcryptjs from 'bcryptjs';
 import { ConfigService } from '@nestjs/config';
 import { ApiResponse, Tokens } from '@Types';
 import { HrService } from '../hr/hr.service';
@@ -21,7 +21,7 @@ export class AuthService {
   ) {}
 
   async hashData(data: string): Promise<string> {
-    return bcrypt.hash(data, 10);
+    return bcryptjs.hash(data, 10);
   }
 
   async updateRtHash(id, rt: string): Promise<void> {
@@ -77,8 +77,8 @@ export class AuthService {
   async login(login: LoginUserDto, response: Response): Promise<ResponseDataToFront> {
     const user = await this.checkUserByEmail(login.email);
     if (!user) throw new UnauthorizedException('Access Denied');
-    const passwordHash = await bcrypt.hash(user.password, 10); //Todo usunąć linie
-    const passwordMatches = await bcrypt.compare(login.password, passwordHash);
+    const passwordHash = await bcryptjs.hash(user.password, 10); //Todo usunąć linie
+    const passwordMatches = await bcryptjs.compare(login.password, passwordHash);
     if (!passwordMatches) throw new UnauthorizedException('Access Denied');
     const tokens = await this.getTokens(user.id, user.email);
     await this.updateRtHash(user.id, tokens.refresh_token);
@@ -108,7 +108,7 @@ export class AuthService {
 
     if (!user || !user.refreshToken) throw new ForbiddenException('Access Denied');
 
-    const rtMatches = await bcrypt.compare(rt, user.refreshToken);
+    const rtMatches = await bcryptjs.compare(rt, user.refreshToken);
     if (!rtMatches) throw new ForbiddenException('Access Denied');
 
     const tokens = await this.getTokens(user.id, user.email);
