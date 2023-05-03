@@ -71,7 +71,7 @@ export class StudentService {
   async deactivate(id: string): Promise<ApiResponse<UpdateStudentResponse>> {
     const student = await Student.findOneBy({ id });
     try {
-      student.active = Active.inActive;
+      student.active = Active.INACTIVE;
       await Student.save(student);
       return { isSuccess: true, payload: { id } };
     } catch {

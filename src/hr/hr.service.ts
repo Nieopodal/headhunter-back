@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Hr } from './entity/hr.entity';
-import { Student, StudentStatus } from '../student/entity/student.entity';
+import { Active, Student, StudentStatus } from '../student/entity/student.entity';
 import { ApiResponse, StudentToInterview } from '@Types';
 import { getAvatar } from './utils/get-avatar';
 
@@ -76,7 +76,7 @@ export class HrService {
     const foundStudent = await Student.findOne({
       where: {
         id,
-        active: true,
+        active: Active.ACTIVE,
         status: StudentStatus.AVAILABLE,
       },
     });
@@ -145,7 +145,7 @@ export class HrService {
       where: {
         id,
         status: StudentStatus.INTERVIEW,
-        active: true,
+        active: Active.ACTIVE,
         interviewBy: {
           id: hrId,
         },
@@ -161,7 +161,7 @@ export class HrService {
     }
 
     foundStudent.status = StudentStatus.EMPLOYED;
-    foundStudent.active = false;
+    foundStudent.active = Active.INACTIVE;
     foundStudent.interviewBy = null;
     foundStudent.reservationTime = null;
     foundStudent.fullName = null;
@@ -179,7 +179,7 @@ export class HrService {
       relations: ['interviewBy'],
       where: {
         status: StudentStatus.INTERVIEW,
-        active: true,
+        active: Active.ACTIVE,
         interviewBy: {
           id,
         },

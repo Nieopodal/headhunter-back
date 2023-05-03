@@ -24,7 +24,6 @@ export enum ExpectedContractType {
   none = 'Brak preferencji',
 }
 
-
 export enum StudentStatus {
   AVAILABLE = 'available',
   INTERVIEW = 'interview',
@@ -119,7 +118,7 @@ export class Student extends BaseEntity {
   @Column({ type: 'text', nullable: true })
   courses: string;
 
-  @Column({ type: 'enum', enum: Active, default: Active.inActive })
+  @Column({ type: 'enum', enum: Active, default: Active.INACTIVE })
   active: Active;
 
   @Column({ default: 'student', length: 20 })
@@ -132,16 +131,10 @@ export class Student extends BaseEntity {
   updatedAt: Date;
 
   @Column({ nullable: true, default: null, length: 255 })
-  accessToken: string;
-
-  @Column({ nullable: true, default: null, length: 255 })
   refreshToken: string;
 
   @Column({ nullable: true, default: null, length: 255 })
   verificationToken: string;
-
-  @Column({ length: 255, nullable: true, default: null })
-  avatar: string | null;
 
   @Column({ length: 255, nullable: true, default: null })
   fullName: string | null;
