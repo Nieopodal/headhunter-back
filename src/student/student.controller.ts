@@ -7,6 +7,11 @@ import { ApiResponse, SimpleStudentData, StudentCv } from '@Types';
 export class StudentController {
   constructor(private readonly studentService: StudentService) {}
 
+  @Get('/avatar/:id')
+  async getAvatar(@Param('id') id: string): Promise<ApiResponse<string>> {
+    return await this.studentService.getAvatar(id);
+  }
+
   @Get('/simple/:id')
   async getSimpleStudentData(@Param('id') id: string): Promise<ApiResponse<SimpleStudentData>> {
     return await this.studentService.simpleStudentData(id);

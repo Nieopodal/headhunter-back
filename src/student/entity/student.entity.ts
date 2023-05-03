@@ -9,7 +9,7 @@ export class Student extends BaseEntity {
   @Column({ length: 255, unique: true })
   email: string;
 
-  @Column({ length: 255 })
+  @Column({ length: 255, default: '' })
   password: string;
 
   @Column({ length: 255, nullable: true, default: null })
@@ -24,7 +24,7 @@ export class Student extends BaseEntity {
   @Column({ length: 70 })
   lastName: string;
 
-  @Column({ unique: true })
+  @Column({ default: '' })
   githubUsername: string;
 
   @Column({ type: 'simple-array', nullable: true })
@@ -78,7 +78,7 @@ export class Student extends BaseEntity {
   @Column({ type: 'text', nullable: true })
   courses: string;
 
-  @Column({ type: 'enum', enum: Active, default: Active.INACTIVE })
+  @Column({ type: 'enum', enum: Active, default: Active.inActive })
   active: Active;
 
   @Column({ default: 'student', length: 20 })
@@ -89,9 +89,6 @@ export class Student extends BaseEntity {
 
   @UpdateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
   updatedAt: Date;
-
-  @Column({ nullable: true, default: null, length: 255 })
-  accessToken: string;
 
   @Column({ nullable: true, default: null, length: 255 })
   refreshToken: string;
