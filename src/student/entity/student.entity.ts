@@ -1,4 +1,13 @@
-import { BaseEntity, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import {
+  BaseEntity,
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { Hr } from '../../hr/entity/hr.entity';
 
 export enum ExpectedTypeWork {
   office = 'Na miejscu',
@@ -13,6 +22,12 @@ export enum ExpectedContractType {
   employ = 'Tylko umowa o pracę',
   contract = 'Umowa zlecenie / dzieło',
   none = 'Brak preferencji',
+}
+
+export enum StudentStatus {
+  AVAILABLE = 'available',
+  INTERVIEW = 'interview',
+  EMPLOYED = 'employed'
 }
 
 @Entity()
@@ -100,4 +115,24 @@ export class Student extends BaseEntity {
 
   @Column({ nullable: true, default: null, length: 255 })
   refreshToken: string;
+
+  @Column({ length: 255, nullable: true, default: null })
+  avatar: string | null;
+
+  @Column({ length: 255, nullable: true, default: null })
+  fullName: string | null;
+
+  @Column({
+    default: null,
+    nullable: true,
+    type: 'enum',
+    enum: StudentStatus,
+  })
+  status: string;
+
+  @ManyToOne(type => Hr, entity => entity.hr)
+  interviewBy: Hr;
+
+  @Column({ default: null, nullable: true })
+  reservationTime: Date | null;
 }

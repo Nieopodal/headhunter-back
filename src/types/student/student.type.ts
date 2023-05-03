@@ -1,3 +1,5 @@
+import { ExpectedContractType, ExpectedTypeWork } from '../../student/entity/student.entity';
+
 export type Student = {
   id: string;
 
@@ -51,3 +53,20 @@ export type Student = {
 
   refreshToken: string;
 };
+
+export type StudentToInterview = {
+  id: string;
+  fullName: string;
+  avatar: string;
+  reservationTime: Date;
+  courseCompletion: number;
+  courseEngagement: number;
+  projectDegree: number;
+  teamProjectDegree: number;
+  expectedTypeWork: ExpectedTypeWork;
+  targetWorkCity: string;
+  expectedContractType: ExpectedContractType;
+  expectedSalary: string;
+  canTakeApprenticeship: boolean;
+  monthsOfCommercialExp: number;
+}
