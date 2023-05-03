@@ -95,7 +95,7 @@ export class HrService {
       ? 'https://www.deviantart.com/karmaanddestiny/art/Default-user-icon-4-858661084'
       : `https://github.com/${foundStudent.githubUsername}.png`;
     foundStudent.fullName = `${foundStudent.firstName} ${foundStudent.lastName}`;
-    const reservationTime = new Date().setHours(23, 59, 59) + (1000 * 60 * 60 * 24 * 10);
+    const reservationTime = new Date(+new Date() + (1000 * 60 * 60 * 24 * 10)).setHours(23, 59, 59, 999);
     foundStudent.reservationTime = new Date(reservationTime);
     await foundStudent.save();
 
@@ -139,7 +139,7 @@ export class HrService {
     };
   }
 
-  async setEmployed(id: string, hrId: string): Promise<ApiResponse<null>> {
+  async setEmployed(id: string, hrId?: string): Promise<ApiResponse<null>> {
     const foundStudent = await Student.findOne({
       relations: ['interviewBy'],
       where: {
