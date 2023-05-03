@@ -14,8 +14,8 @@ export const configDb = {
 export const configToken = {
     secretKeyAt: 'at-secret',
     secretKeyRt: 'rt-secret',
-    expiresInAt: '15s',
-    expiresInRt: '7d',
+    expiresInAt: '900000',
+    expiresInRt: '604800000',
 };
 export const configMailer = {
     emailUserName: 'admin123',
