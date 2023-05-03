@@ -1,11 +1,10 @@
 import { ExpectedContractType, ExpectedTypeWork } from '../../student/entity/student.entity';
 
-export type Student = {
+export type StudentPartialData = {
+
   id: string;
 
   email: string;
-
-  password: string;
 
   contactNumber: string;
 
@@ -17,42 +16,30 @@ export type Student = {
 
   portfolioUrls: string[];
 
-  courseCompletion: number;
-
-  courseEngagement: number;
-
-  projectDegree: number;
-
-  teamProjectDegree: number;
-
   bonusProjectUrls: string[];
 
   bio: string;
-
-  expectedTypeWork: string;
-
-  targetWorkCity: string;
-
-  expectedContractType: string;
-
-  expectedSalary: string;
-
-  canTakeApprenticeship: boolean;
-
-  monthsOfCommercialExp: number;
 
   education: string;
 
   workExperience: string;
 
   courses: string;
-
-  active: boolean;
-
-  role: string;
-
-  refreshToken: string;
 };
+
+export type SimpleStudentData = {
+  courseCompletion: number;
+  courseEngagement: number;
+  projectDegree: number;
+  teamProjectDegree: number;
+  expectedTypeWork: ExpectedTypeWork;
+  targetWorkCity: string;
+  expectedContractType: ExpectedContractType;
+  expectedSalary: string;
+  canTakeApprenticeship: boolean;
+  commercialExp: number;
+};
+
 
 export type StudentToInterview = {
   id: string;
@@ -70,3 +57,6 @@ export type StudentToInterview = {
   canTakeApprenticeship: boolean;
   monthsOfCommercialExp: number;
 }
+
+export type StudentCv = StudentPartialData & SimpleStudentData;
+
