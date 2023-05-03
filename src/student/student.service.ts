@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { ApiResponse, SimpleStudentData, StudentCv } from '@Types';
+import { Active, ApiResponse, SimpleStudentData, StudentCv } from '@Types';
 
 import { Student } from './entity/student.entity';
 import { UpdateStudentDto } from './dto';
@@ -11,11 +11,13 @@ export interface UpdateStudentResponse {
 @Injectable()
 export class StudentService {
   async getStudentCv(id: string): Promise<ApiResponse<StudentCv>> {
-    const studentCv = await Student.createQueryBuilder('student')
+    const studentCv: StudentCv = await Student.createQueryBuilder('student')
       .select([
         'student.id',
         'student.firstName',
         'student.lastName',
+        'student.email',
+        'student.contactNumber',
         'student.bio',
         'student.githubUsername',
         'student.courseCompletion',
@@ -27,11 +29,13 @@ export class StudentService {
         'student.teamProjectPR',
         'student.projectUrls',
         'student.expectedTypeWork',
+        'student.expectedContractType',
         'student.targetWorkCity',
         'student.expectedSalary',
         'student.canTakeApprenticeship',
         'student.monthsOfCommercialExp',
         'student.education',
+        'student.courses',
         'student.workExperience',
       ])
       .where('student.id = :id', { id })
@@ -45,7 +49,7 @@ export class StudentService {
   }
 
   async simpleStudentData(id: string): Promise<ApiResponse<SimpleStudentData>> {
-    const studentData = await Student.createQueryBuilder('student')
+    const studentData: SimpleStudentData = await Student.createQueryBuilder('student')
       .select([
         'student.id',
         'student.firstName',
@@ -69,7 +73,7 @@ export class StudentService {
   }
 
   async deactivate(id: string): Promise<ApiResponse<UpdateStudentResponse>> {
-    const student = await Student.findOneBy({
+    const student: Student = await Student.findOneBy({
       id,
       active: Active.ACTIVE,
     });
@@ -88,7 +92,7 @@ export class StudentService {
   }
 
   async update(id: string, updateStudentDto: UpdateStudentDto): Promise<ApiResponse<UpdateStudentResponse>> {
-    const student = await Student.findOneBy({ id });
+    const student: Student = await Student.findOneBy({ id });
 
     try {
       await Student.createQueryBuilder('student')
@@ -106,7 +110,7 @@ export class StudentService {
   //Metody dla hr
 
   async getFreeStudents(): Promise<ApiResponse<SimpleStudentData[]>> {
-    const studentData = await Student.createQueryBuilder('student')
+    const studentData: SimpleStudentData[] = await Student.createQueryBuilder('student')
       .select([
         'student.id',
         'student.firstName',
