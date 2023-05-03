@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ApiResponse, SimpleStudentData, StudentCv } from '@Types';
 
-import { Active, Student } from './entity/student.entity';
+import { Active, Student, StudentStatus } from './entity/student.entity';
 import { UpdateStudentDto } from './dto';
 
 export interface UpdateStudentResponse {
@@ -69,9 +69,17 @@ export class StudentService {
   }
 
   async deactivate(id: string): Promise<ApiResponse<UpdateStudentResponse>> {
-    const student = await Student.findOneBy({ id });
+    const student = await Student.findOneBy({
+      id,
+      active: Active.ACTIVE,
+    });
     try {
-      student.active = Active.inActive;
+      student.active = Active.INACTIVE;
+      student.status = StudentStatus.EMPLOYED;
+      student.interviewBy = null;
+      student.reservationTime = null;
+      student.fullName = null;
+      student.avatar = null;
       await Student.save(student);
       return { isSuccess: true, payload: { id } };
     } catch {
@@ -113,13 +121,16 @@ export class StudentService {
         'student.canTakeApprenticeship',
         'student.monthsOfCommercialExp',
       ])
-      .where('student.hr = NULL')
+      .where('student.interviewBy IS NULL')
+      .andWhere('student.active = "active"')
+      .andWhere('student.status = "available"')
       .getRawMany();
     if (!studentData) {
       return { isSuccess: false, error: 'Nie znaleziono studenta' };
     }
     return { isSuccess: true, payload: studentData };
   }
+
   //Metody do logowania
   async getUserByEmail(email: string): Promise<Student> {
     return await Student.findOneBy({ email });

@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Hr } from './entity/hr.entity';
-import { Student, StudentStatus } from '../student/entity/student.entity';
+import { Active, Student, StudentStatus } from '../student/entity/student.entity';
 import { ApiResponse, StudentToInterview } from '@Types';
 import { getAvatar } from './utils/get-avatar';
 
@@ -76,7 +76,7 @@ export class HrService {
     const foundStudent = await Student.findOne({
       where: {
         id,
-        active: true,
+        active: Active.ACTIVE,
         status: StudentStatus.AVAILABLE,
       },
     });
@@ -95,7 +95,7 @@ export class HrService {
       ? 'https://www.deviantart.com/karmaanddestiny/art/Default-user-icon-4-858661084'
       : `https://github.com/${foundStudent.githubUsername}.png`;
     foundStudent.fullName = `${foundStudent.firstName} ${foundStudent.lastName}`;
-    const reservationTime = new Date().setHours(23, 59, 59) + (1000 * 60 * 60 * 24 * 10);
+    const reservationTime = +new Date().setHours(23, 59, 59, 99) + (1000 * 60 * 60 * 24 * 10);
     foundStudent.reservationTime = new Date(reservationTime);
     await foundStudent.save();
 
@@ -139,13 +139,13 @@ export class HrService {
     };
   }
 
-  async setEmployed(id: string, hrId: string): Promise<ApiResponse<null>> {
+  async setEmployed(id: string, hrId?: string): Promise<ApiResponse<null>> {
     const foundStudent = await Student.findOne({
       relations: ['interviewBy'],
       where: {
         id,
         status: StudentStatus.INTERVIEW,
-        active: true,
+        active: Active.ACTIVE,
         interviewBy: {
           id: hrId,
         },
@@ -161,7 +161,7 @@ export class HrService {
     }
 
     foundStudent.status = StudentStatus.EMPLOYED;
-    foundStudent.active = false;
+    foundStudent.active = Active.INACTIVE;
     foundStudent.interviewBy = null;
     foundStudent.reservationTime = null;
     foundStudent.fullName = null;
@@ -179,7 +179,7 @@ export class HrService {
       relations: ['interviewBy'],
       where: {
         status: StudentStatus.INTERVIEW,
-        active: true,
+        active: Active.ACTIVE,
         interviewBy: {
           id,
         },
