@@ -31,13 +31,10 @@ export class Student extends BaseEntity {
   portfolioUrls: string[];
 
   @Column({ type: 'simple-array', nullable: true })
-  teamProjectUrls: string[];
-
-  @Column({ type: 'simple-array', nullable: true })
-  teamProjectPR: string[];
-
-  @Column({ type: 'simple-array', nullable: true })
   projectUrls: string[];
+
+  @Column({ type: 'simple-array', nullable: true })
+  scrumProjectUrls: string[];
 
   @Column({ default: 0 })
   courseCompletion: number;
@@ -50,9 +47,6 @@ export class Student extends BaseEntity {
 
   @Column({ default: 0 })
   teamProjectDegree: number;
-
-  @Column('simple-array', { nullable: true })
-  bonusProjectUrls: string[];
 
   @Column({ length: 400, nullable: true })
   bio: string;
@@ -95,9 +89,6 @@ export class Student extends BaseEntity {
 
   @UpdateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
   updatedAt: Date;
-
-  @Column({ nullable: true, default: null, length: 255 })
-  accessToken: string;
 
   @Column({ nullable: true, default: null, length: 255 })
   refreshToken: string;
