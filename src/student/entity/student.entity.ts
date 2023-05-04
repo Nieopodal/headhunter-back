@@ -35,7 +35,7 @@ export class Student extends BaseEntity {
   @Column({ length: 70, default: '' })
   lastName: string;
 
-  @Column({ default: '' })
+  @Column({ default: 'dupa' })
   githubUsername: string;
 
   @Column('simple-array', { nullable: true })
@@ -57,7 +57,7 @@ export class Student extends BaseEntity {
   expectedContractType: ExpectedContractType;
 
   @Column({ type: 'numeric', precision: 9, scale: 2, nullable: true })
-  expectedSalary: string;
+  expectedSalary: number;
 
   @Column({ default: false })
   canTakeApprenticeship: boolean;
@@ -101,9 +101,9 @@ export class Student extends BaseEntity {
   @Column({ nullable: true, default: null, length: 255 })
   verificationToken: string;
 
-  @CreateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
+  @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
 
-  @UpdateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
+  @UpdateDateColumn({ type: 'timestamp' })
   updatedAt: Date;
 }

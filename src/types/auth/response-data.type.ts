@@ -20,7 +20,7 @@ export type Student = {
   firstName?: string;
   lastName?: string;
   role: string;
-  access_token: string;
+  access_token?: string;
 };
 
 // export type ResponseDataLogin = Admin | Hr | Student;

@@ -9,15 +9,12 @@ import { ConfigService } from '@nestjs/config';
 import { ApiResponse, Tokens } from '@Types';
 import { HrService } from '../hr/hr.service';
 import { ResponseDataToFront } from '../types/auth/response-data.type';
-import { Student } from '../student/entity/student.entity';
-import { UploadStudentDataService } from '../student/upload-student-data.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private adminService: AdminService,
     private studentService: StudentService,
-    private initStudentDataService: UploadStudentDataService,
     private hrService: HrService,
     private jwtService: JwtService,
     private configService: ConfigService,
@@ -33,8 +30,19 @@ export class AuthService {
     await user.save();
   }
 
+  async getVerificationHashToken(id: string, email: string): Promise<string> {
+    const token = await this.jwtService.signAsync(
+      { id, email },
+      {
+        secret: this.configService.get('SECRET_KEY_VT'),
+        expiresIn: this.configService.get('EXPIRES_IN_VT'),
+      },
+    );
+    return await this.hashData(token);
+  }
+
   async getTokens(id: string, email: string): Promise<Tokens> {
-    const [at, rt, vt] = await Promise.all([
+    const [at, rt] = await Promise.all([
       this.jwtService.signAsync(
         { id, email },
         {
@@ -49,15 +57,8 @@ export class AuthService {
           expiresIn: this.configService.get('EXPIRES_IN_RT'),
         },
       ),
-      this.jwtService.signAsync(
-        { id, email },
-        {
-          secret: this.configService.get('SECRET_KEY_VT'),
-          expiresIn: this.configService.get('EXPIRES_IN_VT'),
-        },
-      ),
     ]);
-    return { access_token: at, refresh_token: rt, verify_token: vt };
+    return { access_token: at, refresh_token: rt };
   }
 
   async getDecodedToken(rt: string) {
@@ -113,7 +114,6 @@ export class AuthService {
 
   async refreshTokens(rt: string, response: Response) {
     const decodedJwt = await this.getDecodedToken(rt);
-    console.log(decodedJwt);
     const user = await this.checkUserById(decodedJwt['id']);
 
     if (!user || !user.refreshToken) throw new ForbiddenException('Access Denied');

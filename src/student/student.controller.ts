@@ -6,18 +6,11 @@ import { UpdateStudentDto } from './dto';
 import { AuthService } from '../auth/auth.service';
 import { ApiResponse } from '@Types';
 import { ResponseDataToFront } from '../types/auth/response-data.type';
-import { RtGuard, VtGuard } from '../common/guards';
+import { ConfirmStudentDto } from './dto/confirm-student.dto';
 
 @Controller('student')
 export class StudentController {
   constructor(private studentService: StudentService, private authService: AuthService) {}
-
-  @UseGuards(VtGuard)
-  @Post('update')
-  @HttpCode(HttpStatus.ACCEPTED)
-  updateStudent(@Body() registerData: UpdateStudentDto): Promise<ApiResponse<ResponseDataToFront>> {
-    return this.studentService.updateStudent(registerData);
-  }
 
   @Public()
   @Get('all')
@@ -29,16 +22,18 @@ export class StudentController {
   getOneStudent(): Student {
     return null; //this.studentService.getOne()
   }
-
-  // @Get('/deactivate')
-  // deactivate(): void {
-  //   return null; //this.studentService.deactivate()
-  // }
+  // @UseGuards(VtGuard)
+  @Public()
+  @Post('update')
+  @HttpCode(HttpStatus.ACCEPTED)
+  updateStudent(@Body() registerData: UpdateStudentDto): Promise<ApiResponse<ResponseDataToFront>> {
+    return this.studentService.updateStudent(registerData);
+  }
 
   @Public()
   @Post('confirm/:id/:token')
-  @HttpCode(HttpStatus.FOUND)
-  confirmAccount(@Param() param: any): Promise<ApiResponse<ResponseDataToFront>> {
+  @HttpCode(HttpStatus.OK)
+  confirmAccount(@Param() param: ConfirmStudentDto): Promise<ApiResponse<ResponseDataToFront>> {
     return this.studentService.confirmStudentAccount(param);
   }
 }

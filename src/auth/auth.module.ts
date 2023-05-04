@@ -6,12 +6,10 @@ import { HrModule } from '../hr/hr.module';
 import { StudentModule } from '../student/student.module';
 import { JwtModule } from '@nestjs/jwt';
 import { AtStrategy, RtStrategy } from './strategies';
-import { UploadStudentDataModule } from '../student/upload-student-data.module';
 
 @Module({
   imports: [
     forwardRef(() => AdminModule),
-    forwardRef(() => UploadStudentDataModule),
     forwardRef(() => StudentModule),
     forwardRef(() => HrModule),
     forwardRef(() => JwtModule.register({})),

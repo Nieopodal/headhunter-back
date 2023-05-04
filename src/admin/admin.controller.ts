@@ -3,6 +3,7 @@ import { Public } from '../common/decorators';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Express } from 'express';
 import { UploadStudentDataService } from '../student/upload-student-data.service';
+import { UploadStudentDataDto } from '../student/dto';
 
 @Controller('admin')
 export class AdminController {
@@ -12,7 +13,7 @@ export class AdminController {
   @Post('upload/file')
   @HttpCode(HttpStatus.OK)
   @UseInterceptors(FileInterceptor('file'))
-  async uploadFile(@UploadedFile() file: Express.Multer.File) {
+  async uploadFile(@UploadedFile() file: Express.Multer.File): Promise<UploadStudentDataDto[]> {
     return this.uploadStudentDataService.uploadFile(file);
   }
 }

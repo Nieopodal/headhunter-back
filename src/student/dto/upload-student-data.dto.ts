@@ -1,4 +1,4 @@
-export class InitStudentDataDto {
+export class UploadStudentDataDto {
   email: string;
   courseCompletion: number;
   courseEngagement: number;
