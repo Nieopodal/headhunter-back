@@ -35,15 +35,15 @@ export class AuthService {
       this.jwtService.signAsync(
         { id, email },
         {
-          secret: this.configService.get('SECRET_KEY_AT'),
-          expiresIn: this.configService.get('EXPIRES_IN_AT'),
+          secret: 'at-secret',
+          expiresIn: 900000,
         },
       ),
       this.jwtService.signAsync(
         { id, email },
         {
-          secret: this.configService.get('SECRET_KEY_RT'),
-          expiresIn: this.configService.get('EXPIRES_IN_RT'),
+          secret: 'rt-secret',
+          expiresIn: 604800000,
         },
       ),
     ]);
@@ -82,7 +82,11 @@ export class AuthService {
     if (!passwordMatches) throw new UnauthorizedException('Access Denied');
     const tokens = await this.getTokens(user.id, user.email);
     await this.updateRtHash(user.id, tokens.refresh_token);
-    response.cookie('jwt-refresh', tokens.refresh_token, { httpOnly: true });
+    response.cookie('jwt-refresh', tokens.refresh_token, {
+      httpOnly: true,
+      domain: 'mwyso.usermd.net',
+      secure: true,
+    });
 
     return { ...user, access_token: tokens.access_token };
   }
@@ -113,7 +117,11 @@ export class AuthService {
 
     const tokens = await this.getTokens(user.id, user.email);
     await this.updateRtHash(user.id, tokens.refresh_token);
-    response.cookie('jwt-refresh', tokens.refresh_token, { httpOnly: true });
+    response.cookie('jwt-refresh', tokens.refresh_token, {
+      httpOnly: true,
+      domain: 'mwyso.usermd.net',
+      secure: true,
+    });
     return tokens;
   }
 }

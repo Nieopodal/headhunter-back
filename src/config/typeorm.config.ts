@@ -13,10 +13,10 @@ export class DatabaseConfiguration implements TypeOrmOptionsFactory {
   createTypeOrmOptions(): TypeOrmModuleOptions | Promise<TypeOrmModuleOptions> {
     return {
       type: 'mysql',
-      host: this.configService.get('DB_HOST'),
-      username: this.configService.get('DB_USERNAME'),
-      password: this.configService.get('DB_PASSWORD'),
-      database: this.configService.get('DB_NAME'),
+      host: 'mysql58.mydevil.net',
+      username: 'm1073',
+      password: 'yW*l*uTp4ODbPyYoqy4V',
+      database: 'm1073_megak_hh',
       entities: [Admin, Hr, Student],
       autoLoadEntities: true,
       bigNumberStrings: false,

@@ -92,11 +92,12 @@ export class Student extends BaseEntity {
   @Column({ default: 'student', length: 20 })
   role: string;
 
-  @CreateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
+  @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
 
-  @UpdateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
+  @UpdateDateColumn({ type: 'timestamp' })
   updatedAt: Date;
+
 
   @Column({ nullable: true, default: null, length: 255 })
   refreshToken: string;
