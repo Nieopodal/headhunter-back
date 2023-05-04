@@ -5,6 +5,7 @@ import { Injectable } from '@nestjs/common';
 import {Admin} from "../admin/entity/admin.entity";
 import {Hr} from "../hr/entity/hr.entity";
 import {Student} from "../student/entity/student.entity";
+import {configDb} from "./config";
 
 @Injectable()
 export class DatabaseConfiguration implements TypeOrmOptionsFactory {
@@ -13,10 +14,10 @@ export class DatabaseConfiguration implements TypeOrmOptionsFactory {
   createTypeOrmOptions(): TypeOrmModuleOptions | Promise<TypeOrmModuleOptions> {
     return {
       type: 'mysql',
-      host: 'mysql58.mydevil.net',
-      username: 'm1073',
-      password: 'yW*l*uTp4ODbPyYoqy4V',
-      database: 'm1073_megak_hh',
+      host: configDb.dbHost,
+      username: configDb.dbUser,
+      password: configDb.dbPassword,
+      database: configDb.dbDatabase,
       entities: [Admin, Hr, Student],
       autoLoadEntities: true,
       bigNumberStrings: false,

@@ -9,6 +9,7 @@ import { ConfigService } from '@nestjs/config';
 import { ApiResponse, Tokens } from '@Types';
 import { HrService } from '../hr/hr.service';
 import { ResponseDataToFront } from '../types/auth/response-data.type';
+import {configCookie, configToken} from "../config/config";
 
 @Injectable()
 export class AuthService {
@@ -35,15 +36,15 @@ export class AuthService {
       this.jwtService.signAsync(
         { id, email },
         {
-          secret: 'at-secret',
-          expiresIn: 900000,
+          secret: configToken.secretKeyAt,
+          expiresIn: configToken.expiresInAt,
         },
       ),
       this.jwtService.signAsync(
         { id, email },
         {
-          secret: 'rt-secret',
-          expiresIn: 604800000,
+          secret: configToken.secretKeyRt,
+          expiresIn: configToken.expiresInRt,
         },
       ),
     ]);
@@ -83,9 +84,9 @@ export class AuthService {
     const tokens = await this.getTokens(user.id, user.email);
     await this.updateRtHash(user.id, tokens.refresh_token);
     response.cookie('jwt-refresh', tokens.refresh_token, {
-      httpOnly: true,
-      domain: 'mwyso.usermd.net',
-      secure: true,
+      httpOnly: configCookie.httpOnly,
+      domain: configCookie.domain,
+      secure: configCookie.secure,
     });
 
     return { ...user, access_token: tokens.access_token };
@@ -118,9 +119,9 @@ export class AuthService {
     const tokens = await this.getTokens(user.id, user.email);
     await this.updateRtHash(user.id, tokens.refresh_token);
     response.cookie('jwt-refresh', tokens.refresh_token, {
-      httpOnly: true,
-      domain: 'mwyso.usermd.net',
-      secure: true,
+      httpOnly: configCookie.httpOnly,
+      domain: configCookie.domain,
+      secure: configCookie.secure,
     });
     return tokens;
   }
