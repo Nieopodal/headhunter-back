@@ -1,5 +1,14 @@
-import { Active, ExpectedContractType, ExpectedTypeWork } from '@Types';
-import { BaseEntity, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { ExpectedContractType, ExpectedTypeWork, StudentStatus } from '@Types';
+import {
+  BaseEntity,
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { Hr } from '../../hr/entity/hr.entity';
 
 @Entity()
 export class Student extends BaseEntity {
@@ -78,8 +87,8 @@ export class Student extends BaseEntity {
   @Column({ type: 'text', nullable: true })
   courses: string;
 
-  @Column({ type: 'enum', enum: Active, default: Active.inActive })
-  active: Active;
+  @Column({ type: 'boolean', default: false })
+  active: boolean;
 
   @Column({ default: 'student', length: 20 })
   role: string;
@@ -96,9 +105,6 @@ export class Student extends BaseEntity {
   @Column({ nullable: true, default: null, length: 255 })
   verificationToken: string;
 
-  @Column({ length: 255, nullable: true, default: null })
-  fullName: string | null;
-
   @Column({
     default: null,
     nullable: true,
@@ -107,7 +113,7 @@ export class Student extends BaseEntity {
   })
   status: StudentStatus | null;
 
-  @ManyToOne(type => Hr, entity => entity.hr)
+  @ManyToOne((type) => Hr, (entity) => entity.hr)
   interviewBy: Hr;
 
   @Column({ default: null, nullable: true })

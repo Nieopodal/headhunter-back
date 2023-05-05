@@ -10,7 +10,7 @@ import { AuthModule } from './auth/auth.module';
 import { HrModule } from './hr/hr.module';
 import { AtGuard } from './common/guards';
 import { APP_GUARD } from '@nestjs/core';
-import {MailModule} from "./mail/mail.module";
+import { MailModule } from './mail/mail.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),

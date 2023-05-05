@@ -14,5 +14,4 @@ import { StudentModule } from '../student/student.module';
   providers: [HrService, AuthService, AdminService, StudentService, JwtService],
   exports: [HrService],
 })
-export class HrModule {
-}
+export class HrModule {}

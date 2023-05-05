@@ -39,13 +39,13 @@ export type SimpleStudentData = {
 
 export type StudentToInterview = SimpleStudentData & {
   id: string;
-  fullName: string;
+  firstName: string;
+  lastName: string;
   avatar: string;
   reservationTime: Date;
 };
 
 export type StudentCv = StudentPartialData & SimpleStudentData;
-
 export enum ExpectedTypeWork {
   office = 'Na miejscu',
   move = 'Przeprowadzka',
@@ -61,7 +61,8 @@ export enum ExpectedContractType {
   none = 'Brak preferencji',
 }
 
-export enum Active {
-  active = 'active',
-  inActive = 'inActive',
+export enum StudentStatus {
+  AVAILABLE = 'available',
+  INTERVIEW = 'interview',
+  EMPLOYED = 'employed',
 }

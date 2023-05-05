@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Active, ApiResponse, SimpleStudentData, StudentCv } from '@Types';
+import { ApiResponse, SimpleStudentData, StudentCv, StudentStatus } from '@Types';
 
 import { Student } from './entity/student.entity';
 import { UpdateStudentDto } from './dto';
@@ -83,14 +83,15 @@ export class StudentService {
   async deactivate(id: string): Promise<ApiResponse<UpdateStudentResponse>> {
     const student: Student = await Student.findOneBy({
       id,
-      active: Active.ACTIVE,
+      active: true,
     });
     try {
-      student.active = Active.INACTIVE;
+      student.active = true;
       student.status = StudentStatus.EMPLOYED;
       student.interviewBy = null;
       student.reservationTime = null;
-      student.fullName = null;
+      student.firstName = null;
+      student.lastName = null;
       student.avatar = null;
       await Student.save(student);
       return { isSuccess: true, payload: { id } };
