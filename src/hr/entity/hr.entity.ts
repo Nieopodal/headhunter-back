@@ -32,6 +32,6 @@ export class Hr extends BaseEntity {
   @Column({ default: '', length: 255, nullable: true })
   refreshToken: string;
 
-  @OneToMany((type) => Student, (entity) => entity.interviewBy)
+  @OneToMany((type) => Student, (entity) => entity.hr)
   hr: Student[];
 }

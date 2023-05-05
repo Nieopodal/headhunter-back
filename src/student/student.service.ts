@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { ApiResponse, SimpleStudentData, StudentCv } from '@Types';
+import { ApiResponse, SimpleStudentData, StudentCv, StudentStatus } from '@Types';
 
 import { Student } from './entity/student.entity';
 import { UpdateStudentDto } from './dto';
@@ -88,7 +88,7 @@ export class StudentService {
     try {
       student.active = true;
       student.status = StudentStatus.EMPLOYED;
-      student.interviewBy = null;
+      student.hr = null;
       student.reservationTime = null;
       student.firstName = null;
       student.lastName = null;
@@ -116,8 +116,6 @@ export class StudentService {
     }
   }
 
-  //Metody dla hr
-
   async getFreeStudents(): Promise<ApiResponse<SimpleStudentData[]>> {
     const studentData: SimpleStudentData[] = await Student.createQueryBuilder('student')
       .select([
@@ -134,16 +132,16 @@ export class StudentService {
         'student.canTakeApprenticeship',
         'student.monthsOfCommercialExp',
       ])
-      .where('student.interviewBy IS NULL')
-      .andWhere('student.active = "active"')
-      .andWhere('student.status = "available"')
+      .where('student.hr IS NULL')
+      .andWhere('student.active = :active', { active: true })
+      .andWhere('student.status = :status', { status: StudentStatus.AVAILABLE })
       .getRawMany();
     if (!studentData) {
       return { isSuccess: false, error: 'Nie znaleziono studenta' };
     }
     return { isSuccess: true, payload: studentData };
   }
-  //Metody do logowania
+
   async getUserByEmail(email: string): Promise<Student> {
     return await Student.findOneBy({ email });
   }

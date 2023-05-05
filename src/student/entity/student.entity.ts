@@ -114,7 +114,7 @@ export class Student extends BaseEntity {
   status: StudentStatus | null;
 
   @ManyToOne((type) => Hr, (entity) => entity.hr)
-  interviewBy: Hr;
+  hr: Hr;
 
   @Column({ default: null, nullable: true })
   reservationTime: Date | null;

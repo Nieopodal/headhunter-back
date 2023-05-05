@@ -1,26 +1,15 @@
 export type StudentPartialData = {
   id: string;
-
   email: string;
-
   contactNumber: string;
-
   firstName: string;
-
   lastName: string;
-
   githubUsername: string;
-
   portfolioUrls: string[];
-
   bonusProjectUrls: string[];
-
   bio: string;
-
   education: string;
-
   workExperience: string;
-
   courses: string;
 };
 
