@@ -6,7 +6,6 @@ import { getAvatar } from './utils/get-avatar';
 
 @Injectable()
 export class HrService {
-
   filter(data: Student): StudentToInterview {
     const {
       firstName,
@@ -41,7 +40,6 @@ export class HrService {
   }
 
   async setToInterview(id: string, hrId: string): Promise<ApiResponse<null>> {
-
     const hr = await this.getUserById(hrId);
     const bookedStudents = await Student.count({
       relations: ['interviewBy'],
@@ -54,8 +52,12 @@ export class HrService {
       throw new HttpException(
         {
           isSuccess: false,
-          error: `Możesz zaprosić do rozmowy tylko ${hr.maxReservedStudents} ${hr.maxReservedStudents === 1 ? 'studenta' : 'studentów'}!`,
-        }, HttpStatus.BAD_REQUEST);
+          error: `Możesz zaprosić do rozmowy tylko ${hr.maxReservedStudents} ${
+            hr.maxReservedStudents === 1 ? 'studenta' : 'studentów'
+          }!`,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     const isBooked = await Student.findOne({
@@ -70,7 +72,9 @@ export class HrService {
         {
           isSuccess: false,
           error: `Ten student jest już zapisany na rozmowę!`,
-        }, HttpStatus.BAD_REQUEST);
+        },
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     const foundStudent = await Student.findOne({
@@ -86,16 +90,18 @@ export class HrService {
         {
           isSuccess: false,
           error: `Ten student jest niedostępny!`,
-        }, HttpStatus.BAD_REQUEST);
+        },
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     foundStudent.status = StudentStatus.INTERVIEW;
     foundStudent.interviewBy = hr;
-    foundStudent.avatar = await getAvatar(foundStudent.githubUsername)
+    foundStudent.avatar = (await getAvatar(foundStudent.githubUsername))
       ? 'https://www.deviantart.com/karmaanddestiny/art/Default-user-icon-4-858661084'
       : `https://github.com/${foundStudent.githubUsername}.png`;
     foundStudent.fullName = `${foundStudent.firstName} ${foundStudent.lastName}`;
-    const reservationTime = +new Date().setHours(23, 59, 59, 99) + (1000 * 60 * 60 * 24 * 10);
+    const reservationTime = +new Date().setHours(23, 59, 59, 99) + 1000 * 60 * 60 * 24 * 10;
     foundStudent.reservationTime = new Date(reservationTime);
     await foundStudent.save();
 
@@ -106,7 +112,6 @@ export class HrService {
   }
 
   async setDisinterest(id: string, hrId: string): Promise<ApiResponse<null>> {
-
     const foundStudent = await Student.findOne({
       relations: ['interviewBy'],
       where: {
@@ -123,7 +128,9 @@ export class HrService {
         {
           isSuccess: false,
           error: `Ten student jest niedostępny!`,
-        }, HttpStatus.BAD_REQUEST);
+        },
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     foundStudent.status = StudentStatus.AVAILABLE;
@@ -157,7 +164,9 @@ export class HrService {
         {
           isSuccess: false,
           error: `Ten student jest niedostępny!`,
-        }, HttpStatus.BAD_REQUEST);
+        },
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     foundStudent.status = StudentStatus.EMPLOYED;
@@ -191,12 +200,14 @@ export class HrService {
         {
           isSuccess: false,
           error: `Coś poszło nie tak!`,
-        }, HttpStatus.INTERNAL_SERVER_ERROR);
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
 
     return {
       isSuccess: true,
-      payload: studentsToInterview.map(student => this.filter(student)),
+      payload: studentsToInterview.map((student) => this.filter(student)),
     };
   }
 }
