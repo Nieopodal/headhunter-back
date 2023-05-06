@@ -27,10 +27,10 @@ export class Student extends BaseEntity {
   @Column({ length: 20, nullable: true })
   contactNumber: string;
 
-  @Column({ length: 50 })
+  @Column({ length: 50, default: '' })
   firstName: string;
 
-  @Column({ length: 70 })
+  @Column({ length: 70, default: '' })
   lastName: string;
 
   @Column({ default: '' })
