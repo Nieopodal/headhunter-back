@@ -40,12 +40,15 @@ export class Hr extends BaseEntity {
   @Column({ default: '', length: 255, nullable: true })
   refreshToken: string;
 
-  @OneToMany(() => Student, (student) => student.hr)
-  students: Student[];
+  @Column({ nullable: true, default: null, length: 255 })
+  verificationToken: string;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
 
   @UpdateDateColumn({ type: 'timestamp' })
   updatedAt: Date;
+
+  @OneToMany(() => Student, (student) => student.hr)
+  students: Student[];
 }

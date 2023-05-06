@@ -2,23 +2,24 @@ import { Body, Controller, Get, Param, Patch } from '@nestjs/common';
 import { StudentService, UpdateStudentResponse } from './student.service';
 import { UpdateStudentDto } from './dto';
 import { ApiResponse, SimpleStudentData, StudentCv } from '@Types';
+import { GetCurrentUserId } from '../common/decorators';
 
 @Controller('student')
 export class StudentController {
   constructor(private readonly studentService: StudentService) {}
 
-  @Get('/avatar/:id')
-  async getAvatar(@Param('id') id: string): Promise<ApiResponse<string>> {
+  @Get('/avatar')
+  async getAvatar(@GetCurrentUserId() id: string): Promise<ApiResponse<string>> {
     return await this.studentService.getAvatar(id);
   }
 
-  @Get('/simple/:id')
-  async getSimpleStudentData(@Param('id') id: string): Promise<ApiResponse<SimpleStudentData>> {
+  @Get('/simple')
+  async getSimpleStudentData(@GetCurrentUserId() id: string): Promise<ApiResponse<SimpleStudentData>> {
     return await this.studentService.simpleStudentData(id);
   }
 
-  @Get('/cv/:id')
-  async getStudentCv(@Param('id') id: string): Promise<ApiResponse<StudentCv>> {
+  @Get('/cv')
+  async getStudentCv(@GetCurrentUserId() id: string): Promise<ApiResponse<StudentCv>> {
     return await this.studentService.getStudentCv(id);
   }
 
@@ -27,16 +28,16 @@ export class StudentController {
     return await this.studentService.getFreeStudents();
   }
 
-  @Patch('/update/:id')
+  @Patch('/update')
   async updateUserData(
-    @Param('id') id: string,
+    @GetCurrentUserId() id: string,
     @Body() updateStudentDto: UpdateStudentDto,
   ): Promise<ApiResponse<UpdateStudentResponse>> {
     return await this.studentService.update(id, updateStudentDto);
   }
 
-  @Patch('/employed/:id')
-  deactivate(@Param('id') id: string): Promise<ApiResponse<any>> {
+  @Patch('/employed')
+  deactivate(@GetCurrentUserId() id: string): Promise<ApiResponse<any>> {
     return this.studentService.deactivate(id);
   }
 }

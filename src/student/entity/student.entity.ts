@@ -93,18 +93,6 @@ export class Student extends BaseEntity {
   @Column({ default: 'student', length: 20 })
   role: string;
 
-  @CreateDateColumn({ type: 'timestamp' })
-  createdAt: Date;
-
-  @UpdateDateColumn({ type: 'timestamp' })
-  updatedAt: Date;
-
-  @Column({ nullable: true, default: null, length: 255 })
-  refreshToken: string;
-
-  @Column({ nullable: true, default: null, length: 255 })
-  verificationToken: string;
-
   @Column({
     default: null,
     nullable: true,
@@ -113,9 +101,20 @@ export class Student extends BaseEntity {
   })
   status: StudentStatus | null;
 
-  @ManyToOne(() => Hr, (hr) => hr.students)
-  hr: Hr;
-
   @Column({ default: null, nullable: true })
   reservationTime: Date | null;
+
+  @CreateDateColumn({ type: 'timestamp' })
+  createdAt: Date;
+
+  @Column({ nullable: true, default: null, length: 255 })
+  refreshToken: string;
+
+  @Column({ nullable: true, default: null, length: 255 })
+  verificationToken: string;
+  @UpdateDateColumn({ type: 'timestamp' })
+  updatedAt: Date;
+
+  @ManyToOne(() => Hr, (hr) => hr.students)
+  hr: Hr;
 }

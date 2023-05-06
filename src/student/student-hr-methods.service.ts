@@ -1,11 +1,12 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Student } from './entity/student.entity';
 import { ApiResponse, StudentStatus, StudentToInterview } from '@Types';
-import { Hr } from '../hr/entity/hr.entity';
 import { getAvatar } from '../hr/utils/get-avatar';
+import { HrService } from '../hr/hr.service';
 
 @Injectable()
 export class StudentHrMethodsService {
+  constructor(private readonly hrService: HrService) {}
   filter(data: Student): StudentToInterview {
     const {
       education,
@@ -31,17 +32,8 @@ export class StudentHrMethodsService {
     } = data;
     return rest;
   }
-
-  async getUserByEmail(email: string): Promise<Hr> {
-    return await Hr.findOneBy({ email });
-  }
-
-  async getUserById(id: string): Promise<Hr> {
-    return await Hr.findOneBy({ id });
-  }
-
   async setToInterview(id: string, hrId: string): Promise<ApiResponse<null>> {
-    const hr = await this.getUserById(hrId);
+    const hr = await this.hrService.getUserById(hrId);
     const bookedStudents = await Student.count({
       relations: ['hr'],
       where: {
