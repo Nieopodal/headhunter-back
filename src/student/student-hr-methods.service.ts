@@ -5,7 +5,7 @@ import { Hr } from '../hr/entity/hr.entity';
 import { getAvatar } from '../hr/utils/get-avatar';
 
 @Injectable()
-export class StudentHrService {
+export class StudentHrMethodsService {
   filter(data: Student): StudentToInterview {
     const {
       education,

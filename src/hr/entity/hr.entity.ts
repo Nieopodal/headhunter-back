@@ -1,4 +1,12 @@
-import { BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  BaseEntity,
+  Column,
+  CreateDateColumn,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { Student } from '../../student/entity/student.entity';
 
 @Entity()
@@ -32,6 +40,12 @@ export class Hr extends BaseEntity {
   @Column({ default: '', length: 255, nullable: true })
   refreshToken: string;
 
-  @OneToMany((type) => Student, (entity) => entity.hr)
-  hr: Student[];
+  @OneToMany(() => Student, (student) => student.hr)
+  students: Student[];
+
+  @CreateDateColumn({ type: 'timestamp' })
+  createdAt: Date;
+
+  @UpdateDateColumn({ type: 'timestamp' })
+  updatedAt: Date;
 }

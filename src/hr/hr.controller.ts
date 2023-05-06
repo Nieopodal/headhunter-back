@@ -3,12 +3,14 @@ import { GetCurrentUserId, Role } from '../common/decorators';
 import { UserRoleGuard } from '../common/guards';
 import { ApiResponse, SimpleStudentData, StudentCv, StudentToInterview } from '@Types';
 import { StudentService } from '../student/student.service';
-import { StudentHrService } from '../student/student-hr.service';
+import { StudentHrMethodsService } from '../student/student-hr-methods.service';
 
 @Controller('hr')
 export class HrController {
-  constructor(private readonly studentHrService: StudentHrService, private readonly studentService: StudentService) {
-  }
+  constructor(
+    private readonly studentHrService: StudentHrMethodsService,
+    private readonly studentService: StudentService,
+  ) {}
 
   @UseGuards(UserRoleGuard)
   @Role('hr')
