@@ -7,12 +7,12 @@ import { AdminService } from '../admin/admin.service';
 import { StudentService } from '../student/student.service';
 import { JwtService } from '@nestjs/jwt';
 import { StudentModule } from '../student/student.module';
+import { StudentHrMethodsService } from '../student/student-hr-methods.service';
 
 @Module({
   imports: [forwardRef(() => AuthModule), forwardRef(() => StudentModule)],
   controllers: [HrController],
-  providers: [HrService, AuthService, AdminService, StudentService, JwtService],
+  providers: [HrService, AuthService, AdminService, StudentHrMethodsService, StudentService, JwtService],
   exports: [HrService],
 })
-export class HrModule {
-}
+export class HrModule {}

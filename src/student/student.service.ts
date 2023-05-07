@@ -1,11 +1,8 @@
 import { Injectable } from '@nestjs/common';
+import { ApiResponse, SimpleStudentData, ResponseUpdateStudent, StudentCv, StudentStatus } from '@Types';
 import { Student } from './entity/student.entity';
-import { ApiResponse, ResponseUpdateStudent } from '@Types';
 import { ResponseUserData } from '../types/auth/response-data.type';
-
-import { ApiResponse, SimpleStudentData, StudentCv } from '@Types';
-
-import { Active, Student, StudentStatus } from './entity/student.entity';
+import { Student } from './entity/student.entity';
 import { UpdateStudentDto } from './dto';
 
 export interface UpdateStudentResponse {
@@ -14,12 +11,22 @@ export interface UpdateStudentResponse {
 
 @Injectable()
 export class StudentService {
+  async getAvatar(id: string): Promise<ApiResponse<string>> {
+    const studentAvatar: Student = await Student.findOneBy({ id });
+    if (!studentAvatar) {
+      return { isSuccess: false, error: 'Nie znaleziono użytkownika' };
+    }
+    return { isSuccess: true, payload: studentAvatar.avatar };
+  }
+
   async getStudentCv(id: string): Promise<ApiResponse<StudentCv>> {
-    const studentCv = await Student.createQueryBuilder('student')
+    const studentCv: StudentCv = await Student.createQueryBuilder('student')
       .select([
         'student.id',
         'student.firstName',
         'student.lastName',
+        'student.email',
+        'student.contactNumber',
         'student.bio',
         'student.githubUsername',
         'student.courseCompletion',
@@ -31,11 +38,13 @@ export class StudentService {
         'student.teamProjectPR',
         'student.projectUrls',
         'student.expectedTypeWork',
+        'student.expectedContractType',
         'student.targetWorkCity',
         'student.expectedSalary',
         'student.canTakeApprenticeship',
         'student.monthsOfCommercialExp',
         'student.education',
+        'student.courses',
         'student.workExperience',
       ])
       .where('student.id = :id', { id })
@@ -49,7 +58,7 @@ export class StudentService {
   }
 
   async simpleStudentData(id: string): Promise<ApiResponse<SimpleStudentData>> {
-    const studentData = await Student.createQueryBuilder('student')
+    const studentData: SimpleStudentData = await Student.createQueryBuilder('student')
       .select([
         'student.id',
         'student.firstName',
@@ -73,16 +82,17 @@ export class StudentService {
   }
 
   async deactivate(id: string): Promise<ApiResponse<UpdateStudentResponse>> {
-    const student = await Student.findOneBy({
+    const student: Student = await Student.findOneBy({
       id,
-      active: Active.ACTIVE,
+      active: true,
     });
     try {
-      student.active = Active.INACTIVE;
+      student.active = true;
       student.status = StudentStatus.EMPLOYED;
-      student.interviewBy = null;
+      student.hr = null;
       student.reservationTime = null;
-      student.fullName = null;
+      student.firstName = null;
+      student.lastName = null;
       student.avatar = null;
       await Student.save(student);
       return { isSuccess: true, payload: { id } };
@@ -92,7 +102,7 @@ export class StudentService {
   }
 
   async update(id: string, updateStudentDto: UpdateStudentDto): Promise<ApiResponse<UpdateStudentResponse>> {
-    const student = await Student.findOneBy({ id });
+    const student: Student = await Student.findOneBy({ id });
 
     try {
       await Student.createQueryBuilder('student')
@@ -107,10 +117,8 @@ export class StudentService {
     }
   }
 
-  //Metody dla hr
-
   async getFreeStudents(): Promise<ApiResponse<SimpleStudentData[]>> {
-    const studentData = await Student.createQueryBuilder('student')
+    const studentData: SimpleStudentData[] = await Student.createQueryBuilder('student')
       .select([
         'student.id',
         'student.firstName',
@@ -125,9 +133,9 @@ export class StudentService {
         'student.canTakeApprenticeship',
         'student.monthsOfCommercialExp',
       ])
-      .where('student.interviewBy IS NULL')
-      .andWhere('student.active = "active"')
-      .andWhere('student.status = "available"')
+      .where('student.hr IS NULL')
+      .andWhere('student.active = :active', { active: true })
+      .andWhere('student.status = :status', { status: StudentStatus.AVAILABLE })
       .getRawMany();
     if (!studentData) {
       return { isSuccess: false, error: 'Nie znaleziono studenta' };
@@ -135,7 +143,6 @@ export class StudentService {
     return { isSuccess: true, payload: studentData };
   }
 
-  //Metody do logowania
   async getUserByEmail(email: string): Promise<Student> {
     return await Student.findOneBy({ email });
   }

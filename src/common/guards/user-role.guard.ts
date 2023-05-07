@@ -4,17 +4,10 @@ import { AuthService } from '../../auth/auth.service';
 
 @Injectable()
 export class UserRoleGuard implements CanActivate {
-  constructor(
-    private reflector: Reflector,
-    private authService: AuthService,
-  ) {
-  }
+  constructor(private reflector: Reflector, private authService: AuthService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const requireRole = this.reflector.getAllAndOverride<string>('role', [
-      context.getHandler(),
-      context.getClass(),
-    ]);
+    const requireRole = this.reflector.getAllAndOverride<string>('role', [context.getHandler(), context.getClass()]);
 
     if (!requireRole) {
       return true;

@@ -1,22 +1,43 @@
-import { Injectable } from '@nestjs/common';
-import { Hr } from './entity/hr.entity';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Student } from './entity/student.entity';
+import { ApiResponse, StudentStatus, StudentToInterview } from '@Types';
+import { getAvatar } from '../hr/utils/get-avatar';
+import { HrService } from '../hr/hr.service';
 
 @Injectable()
-export class HrService {
-  async getUserByEmail(email: string): Promise<Hr> {
-
-    return await Hr.findOneBy({ email });
-  }
-
-  async getUserById(id: string): Promise<Hr> {
-    return await Hr.findOneBy({ id });
+export class StudentHrMethodsService {
+  constructor(private readonly hrService: HrService) {}
+  filter(data: Student): StudentToInterview {
+    const {
+      education,
+      courses,
+      role,
+      createdAt,
+      updatedAt,
+      refreshToken,
+      active,
+      githubUsername,
+      status,
+      hr,
+      bio,
+      contactNumber,
+      portfolioUrls,
+      email,
+      password,
+      verificationToken,
+      scrumProjectUrls,
+      projectUrls,
+      workExperience,
+      ...rest
+    } = data;
+    return rest;
   }
   async setToInterview(id: string, hrId: string): Promise<ApiResponse<null>> {
-    const hr = await this.getUserById(hrId);
+    const hr = await this.hrService.getUserById(hrId);
     const bookedStudents = await Student.count({
-      relations: ['interviewBy'],
+      relations: ['hr'],
       where: {
-        interviewBy: { id: hrId },
+        hr: { id: hrId },
       },
     });
 
@@ -52,7 +73,7 @@ export class HrService {
     const foundStudent = await Student.findOne({
       where: {
         id,
-        active: Active.ACTIVE,
+        active: true,
         status: StudentStatus.AVAILABLE,
       },
     });
@@ -68,11 +89,12 @@ export class HrService {
     }
 
     foundStudent.status = StudentStatus.INTERVIEW;
-    foundStudent.interviewBy = hr;
+    foundStudent.hr = hr;
     foundStudent.avatar = (await getAvatar(foundStudent.githubUsername))
       ? 'https://www.deviantart.com/karmaanddestiny/art/Default-user-icon-4-858661084'
       : `https://github.com/${foundStudent.githubUsername}.png`;
-    foundStudent.fullName = `${foundStudent.firstName} ${foundStudent.lastName}`;
+    foundStudent.firstName = `${foundStudent.firstName}`;
+    foundStudent.lastName = `${foundStudent.lastName}`;
     const reservationTime = +new Date().setHours(23, 59, 59, 99) + 1000 * 60 * 60 * 24 * 10;
     foundStudent.reservationTime = new Date(reservationTime);
     await foundStudent.save();
@@ -85,11 +107,11 @@ export class HrService {
 
   async setDisinterest(id: string, hrId: string): Promise<ApiResponse<null>> {
     const foundStudent = await Student.findOne({
-      relations: ['interviewBy'],
+      relations: ['hr'],
       where: {
         id,
         status: StudentStatus.INTERVIEW,
-        interviewBy: {
+        hr: {
           id: hrId,
         },
       },
@@ -106,9 +128,8 @@ export class HrService {
     }
 
     foundStudent.status = StudentStatus.AVAILABLE;
-    foundStudent.interviewBy = null;
+    foundStudent.hr = null;
     foundStudent.avatar = null;
-    foundStudent.fullName = null;
     foundStudent.reservationTime = null;
     await foundStudent.save();
 
@@ -120,12 +141,12 @@ export class HrService {
 
   async setEmployed(id: string, hrId?: string): Promise<ApiResponse<null>> {
     const foundStudent = await Student.findOne({
-      relations: ['interviewBy'],
+      relations: ['hr'],
       where: {
         id,
         status: StudentStatus.INTERVIEW,
-        active: Active.ACTIVE,
-        interviewBy: {
+        active: true,
+        hr: {
           id: hrId,
         },
       },
@@ -142,10 +163,11 @@ export class HrService {
     }
 
     foundStudent.status = StudentStatus.EMPLOYED;
-    foundStudent.active = Active.INACTIVE;
-    foundStudent.interviewBy = null;
+    foundStudent.active = false;
+    foundStudent.hr = null;
     foundStudent.reservationTime = null;
-    foundStudent.fullName = null;
+    foundStudent.firstName = null;
+    foundStudent.lastName = null;
     foundStudent.avatar = null;
     await foundStudent.save();
 
@@ -157,11 +179,11 @@ export class HrService {
 
   async showStudentsToInterview(id: string): Promise<ApiResponse<StudentToInterview[]>> {
     const studentsToInterview = await Student.find({
-      relations: ['interviewBy'],
+      relations: ['hr'],
       where: {
         status: StudentStatus.INTERVIEW,
-        active: Active.ACTIVE,
-        interviewBy: {
+        active: true,
+        hr: {
           id,
         },
       },

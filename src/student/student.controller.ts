@@ -3,6 +3,7 @@ import { Student } from './entity/student.entity';
 import { StudentService } from './student.service';
 import { Public } from '../common/decorators';
 import { UpdateStudentDto } from './dto';
+import { GetCurrentUserId } from '../common/decorators';
 import { AuthService } from '../auth/auth.service';
 import { ApiResponse, SimpleStudentData, StudentCv, ResponseUpdateStudent } from '@Types';
 import { ResponseUserData } from '../types/auth/response-data.type';
@@ -12,13 +13,18 @@ import { ConfirmStudentDto } from './dto/confirm-student.dto';
 export class StudentController {
   constructor(private studentService: StudentService, private authService: AuthService) {}
 
-  @Get('/simple/:id')
-  async getSimpleStudentData(@Param('id') id: string): Promise<ApiResponse<SimpleStudentData>> {
+  @Get('/avatar')
+  async getAvatar(@GetCurrentUserId() id: string): Promise<ApiResponse<string>> {
+    return await this.studentService.getAvatar(id);
+  }
+
+  @Get('/simple')
+  async getSimpleStudentData(@GetCurrentUserId() id: string): Promise<ApiResponse<SimpleStudentData>> {
     return await this.studentService.simpleStudentData(id);
   }
 
-  @Get('/cv/:id')
-  async getStudentCv(@Param('id') id: string): Promise<ApiResponse<StudentCv>> {
+  @Get('/cv')
+  async getStudentCv(@GetCurrentUserId() id: string): Promise<ApiResponse<StudentCv>> {
     return await this.studentService.getStudentCv(id);
   }
 
@@ -27,7 +33,10 @@ export class StudentController {
     return await this.studentService.getFreeStudents();
   }
 
-   @Public()
+  @Patch('/employed')
+  deactivate(@GetCurrentUserId() id: string): Promise<ApiResponse<any>> {
+
+  @Public()
   @Get('all')
   getAllStudents(): Promise<Student[]> {
     return this.studentService.get();
