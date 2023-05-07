@@ -3,7 +3,6 @@ import { Student } from './entity/student.entity';
 import { StudentService } from './student.service';
 import { Public } from '../common/decorators';
 import { UpdateStudentDto } from './dto';
-import { GetCurrentUserId } from '../common/decorators';
 import { AuthService } from '../auth/auth.service';
 import { ApiResponse, SimpleStudentData, StudentCv, ResponseUpdateStudent } from '@Types';
 import { ResponseUserData } from '../types/auth/response-data.type';
@@ -13,18 +12,13 @@ import { ConfirmStudentDto } from './dto/confirm-student.dto';
 export class StudentController {
   constructor(private studentService: StudentService, private authService: AuthService) {}
 
-  @Get('/avatar')
-  async getAvatar(@GetCurrentUserId() id: string): Promise<ApiResponse<string>> {
-    return await this.studentService.getAvatar(id);
-  }
-
-  @Get('/simple')
-  async getSimpleStudentData(@GetCurrentUserId() id: string): Promise<ApiResponse<SimpleStudentData>> {
+  @Get('/simple/:id')
+  async getSimpleStudentData(@Param('id') id: string): Promise<ApiResponse<SimpleStudentData>> {
     return await this.studentService.simpleStudentData(id);
   }
 
-  @Get('/cv')
-  async getStudentCv(@GetCurrentUserId() id: string): Promise<ApiResponse<StudentCv>> {
+  @Get('/cv/:id')
+  async getStudentCv(@Param('id') id: string): Promise<ApiResponse<StudentCv>> {
     return await this.studentService.getStudentCv(id);
   }
 
@@ -32,9 +26,6 @@ export class StudentController {
   async getFreeStudents(): Promise<ApiResponse<SimpleStudentData[]>> {
     return await this.studentService.getFreeStudents();
   }
-
-  @Patch('/employed')
-  deactivate(@GetCurrentUserId() id: string): Promise<ApiResponse<any>> {
 
   @Public()
   @Get('all')
@@ -46,6 +37,7 @@ export class StudentController {
   getOneStudent(): Student {
     return null; //this.studentService.getOne()
   }
+
   // @UseGuards(VtGuard)
   @Public()
   @Patch('update')
@@ -59,6 +51,7 @@ export class StudentController {
   @HttpCode(HttpStatus.OK)
   confirmAccount(@Param() param: ConfirmStudentDto): Promise<ApiResponse<ResponseUserData>> {
     return this.studentService.confirmStudentAccount(param);
+  }
 
   @Patch('/employed/:id')
   deactivate(@Param('id') id: string): Promise<ApiResponse<any>> {

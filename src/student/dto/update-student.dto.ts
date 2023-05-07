@@ -16,4 +16,4 @@ export class UpdateStudentDto {
   monthsOfCommercialExp: number;
   education?: string | null;
   workExperience?: string | null;
-
+}

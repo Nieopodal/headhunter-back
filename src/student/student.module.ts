@@ -7,9 +7,6 @@ import { StudentHrMethodsService } from './student-hr-methods.service';
 import { HrModule } from '../hr/hr.module';
 
 @Module({
-  imports: [forwardRef(() => AuthModule), forwardRef(() => HrModule)],
-
-@Module({
   imports: [forwardRef(() => AuthModule), forwardRef(() => UploadStudentDataModule), forwardRef(() => HrModule)],
   controllers: [StudentController],
   providers: [StudentService, StudentHrMethodsService],

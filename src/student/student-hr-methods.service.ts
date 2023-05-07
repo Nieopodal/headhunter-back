@@ -33,7 +33,7 @@ export class StudentHrMethodsService {
     return rest;
   }
   async setToInterview(id: string, hrId: string): Promise<ApiResponse<null>> {
-    const hr = await this.hrService.getUserById(hrId);
+    const hr = await this.hrService.getHrById(hrId);
     const bookedStudents = await Student.count({
       relations: ['hr'],
       where: {

@@ -84,7 +84,7 @@ export class AuthService {
   async checkUserById(id: string) {
     const admin = await this.adminService.getUserById(id);
 
-    const hr = await this.hrService.getUserById(id);
+    const hr = await this.hrService.getHrById(id);
 
     const student = await this.studentService.getStudentById(id);
 

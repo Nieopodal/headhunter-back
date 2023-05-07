@@ -2,8 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { ApiResponse, SimpleStudentData, ResponseUpdateStudent, StudentCv, StudentStatus } from '@Types';
 import { Student } from './entity/student.entity';
 import { ResponseUserData } from '../types/auth/response-data.type';
-import { Student } from './entity/student.entity';
-import { UpdateStudentDto } from './dto';
 
 export interface UpdateStudentResponse {
   id: string;
@@ -101,22 +99,6 @@ export class StudentService {
     }
   }
 
-  async update(id: string, updateStudentDto: UpdateStudentDto): Promise<ApiResponse<UpdateStudentResponse>> {
-    const student: Student = await Student.findOneBy({ id });
-
-    try {
-      await Student.createQueryBuilder('student')
-        .update(Student)
-        .set(updateStudentDto)
-        .where('student.id = :id', { id: student.id })
-        .execute();
-
-      return { isSuccess: true, payload: { id } };
-    } catch {
-      return { isSuccess: false, error: 'Ups... coś poszło nie tak.' };
-    }
-  }
-
   async getFreeStudents(): Promise<ApiResponse<SimpleStudentData[]>> {
     const studentData: SimpleStudentData[] = await Student.createQueryBuilder('student')
       .select([
@@ -143,11 +125,11 @@ export class StudentService {
     return { isSuccess: true, payload: studentData };
   }
 
-  async getUserByEmail(email: string): Promise<Student> {
+  async getStudentByEmail(email: string): Promise<Student> {
     return await Student.findOneBy({ email });
   }
 
-  async getUserById(id: string): Promise<Student> {
+  async getStudentById(id: string): Promise<Student> {
     return await Student.findOneBy({ id });
   }
 
