@@ -1,9 +1,9 @@
 import { Controller, Get, Param, Patch, UseGuards } from '@nestjs/common';
 import { GetCurrentUserId, Role } from '../common/decorators';
-import { UserRoleGuard } from '../common/guards';
 import { ApiResponse, SimpleStudentData, StudentCv, StudentToInterview } from '@Types';
 import { StudentService } from '../student/student.service';
 import { StudentHrMethodsService } from '../student/student-hr-methods.service';
+import { UserRoleGuard } from '../common/guards';
 
 @Controller('hr')
 export class HrController {

@@ -3,7 +3,6 @@ import { Hr } from './entity/hr.entity';
 
 @Injectable()
 export class HrService {
-
   async getUserByEmail(email: string): Promise<Hr> {
     return await Hr.findOneBy({ email });
   }
