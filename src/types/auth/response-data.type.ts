@@ -25,7 +25,7 @@ export type Student = {
 
 // export type ResponseDataLogin = Admin | Hr | Student;
 
-export type ResponseDataToFront = {
+export type ResponseUserData = {
   id: string;
   email: string;
   role: string;

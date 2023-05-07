@@ -1,19 +1,14 @@
-import { BaseEntity, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
-
-export enum ExpectedTypeWork {
-  office = 'Na miejscu',
-  move = 'Przeprowadzka',
-  remote = 'Praca zdalna',
-  hybrid = 'Praca hybrydowa',
-  DM = 'Nie ma znaczenia',
-}
-
-export enum ExpectedContractType {
-  B2B = 'Możliwe B2B',
-  employ = 'Tylko umowa o pracę',
-  contract = 'Umowa zlecenie / dzieło',
-  none = 'Brak preferencji',
-}
+import { ExpectedContractType, ExpectedTypeWork, StudentStatus } from '@Types';
+import {
+  BaseEntity,
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { Hr } from '../../hr/entity/hr.entity';
 
 @Entity()
 export class Student extends BaseEntity {
@@ -26,6 +21,9 @@ export class Student extends BaseEntity {
   @Column({ length: 255, default: '' })
   password: string;
 
+  @Column({ length: 255, nullable: true, default: null })
+  avatar: string | null;
+
   @Column({ length: 20, nullable: true })
   contactNumber: string;
 
@@ -35,16 +33,31 @@ export class Student extends BaseEntity {
   @Column({ length: 70, default: '' })
   lastName: string;
 
-  @Column({ default: 'dupa' })
+  @Column({ default: '' })
   githubUsername: string;
 
-  @Column('simple-array', { nullable: true })
+  @Column({ type: 'simple-array', nullable: true })
   portfolioUrls: string[];
 
-  @Column('simple-array', { default: '' })
+  @Column({ type: 'simple-array', nullable: true })
   projectUrls: string[];
 
-  @Column({ length: 255, nullable: true })
+  @Column({ type: 'simple-array', nullable: true })
+  scrumProjectUrls: string[];
+
+  @Column({ default: 0 })
+  courseCompletion: number;
+
+  @Column({ default: 0 })
+  courseEngagement: number;
+
+  @Column({ default: 0 })
+  projectDegree: number;
+
+  @Column({ default: 0 })
+  teamProjectDegree: number;
+
+  @Column({ length: 400, nullable: true })
   bio: string;
 
   @Column({ type: 'enum', enum: ExpectedTypeWork, default: ExpectedTypeWork.DM })
@@ -57,7 +70,7 @@ export class Student extends BaseEntity {
   expectedContractType: ExpectedContractType;
 
   @Column({ type: 'numeric', precision: 9, scale: 2, nullable: true })
-  expectedSalary: number;
+  expectedSalary: string;
 
   @Column({ default: false })
   canTakeApprenticeship: boolean;
@@ -74,26 +87,22 @@ export class Student extends BaseEntity {
   @Column({ type: 'text', nullable: true })
   courses: string;
 
-  @Column({ default: 0 })
-  courseCompletion: number;
-
-  @Column({ default: 0 })
-  courseEngagement: number;
-
-  @Column({ default: 0 })
-  projectDegree: number;
-
-  @Column({ default: 0 })
-  teamProjectDegree: number;
-
-  @Column('simple-array', { default: '' })
-  bonusProjectUrls: string[];
-
-  @Column({ default: false })
+  @Column({ type: 'boolean', default: false })
   active: boolean;
 
   @Column({ default: 'student', length: 20 })
   role: string;
+
+  @Column({
+    default: null,
+    nullable: true,
+    type: 'enum',
+    enum: StudentStatus,
+  })
+  status: StudentStatus | null;
+
+  @Column({ default: null, nullable: true })
+  reservationTime: Date | null;
 
   @Column({ nullable: true, default: null, length: 255 })
   refreshToken: string;
@@ -101,9 +110,15 @@ export class Student extends BaseEntity {
   @Column({ nullable: true, default: null, length: 255 })
   verificationToken: string;
 
+  @Column({ default: '', length: 255 })
+  activationUrl: string;
+
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
 
   @UpdateDateColumn({ type: 'timestamp' })
   updatedAt: Date;
+
+  @ManyToOne(() => Hr, (hr) => hr.students)
+  hr: Hr;
 }

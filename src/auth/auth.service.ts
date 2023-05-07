@@ -8,7 +8,7 @@ import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
 import { ApiResponse, Tokens } from '@Types';
 import { HrService } from '../hr/hr.service';
-import { ResponseDataToFront } from '../types/auth/response-data.type';
+import { ResponseUserData } from '../types/auth/response-data.type';
 
 @Injectable()
 export class AuthService {
@@ -21,7 +21,12 @@ export class AuthService {
   ) {}
 
   async hashData(data: string): Promise<string> {
-    return bcrypt.hash(data, 10);
+    const hashedData = await bcrypt.hash(data, 10);
+    if (!hashedData.includes('/')) {
+      return hashedData;
+    } else {
+      return await this.hashData(data);
+    }
   }
 
   async updateRtHash(id, rt: string): Promise<void> {
@@ -30,7 +35,8 @@ export class AuthService {
     await user.save();
   }
 
-  async getVerificationHashToken(id: string, email: string): Promise<string> {
+  async getVerificationHashToken(email: string): Promise<string> {
+    const id = await this.studentService.getStudentByEmail(email);
     const token = await this.jwtService.signAsync(
       { id, email },
       {
@@ -85,7 +91,7 @@ export class AuthService {
     return admin ? admin : student ? student : hr ? hr : null;
   }
 
-  async login(login: LoginUserDto, response: Response): Promise<ResponseDataToFront> {
+  async login(login: LoginUserDto, response: Response): Promise<ResponseUserData> {
     const user = await this.checkUserByEmail(login.email);
     if (!user) throw new UnauthorizedException('Access Denied');
     const passwordHash = await bcrypt.hash(user.password, 10); //Todo usunąć linie
