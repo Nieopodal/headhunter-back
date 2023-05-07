@@ -104,14 +104,18 @@ export class Student extends BaseEntity {
   @Column({ default: null, nullable: true })
   reservationTime: Date | null;
 
-  @CreateDateColumn({ type: 'timestamp' })
-  createdAt: Date;
-
   @Column({ nullable: true, default: null, length: 255 })
   refreshToken: string;
 
   @Column({ nullable: true, default: null, length: 255 })
   verificationToken: string;
+
+  @Column({ default: '', length: 255 })
+  activationUrl: string;
+
+  @CreateDateColumn({ type: 'timestamp' })
+  createdAt: Date;
+
   @UpdateDateColumn({ type: 'timestamp' })
   updatedAt: Date;
 

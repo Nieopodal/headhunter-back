@@ -20,12 +20,12 @@ export type Student = {
   firstName?: string;
   lastName?: string;
   role: string;
-  access_token: string;
+  access_token?: string;
 };
 
 // export type ResponseDataLogin = Admin | Hr | Student;
 
-export type ResponseDataToFront = {
+export type ResponseUserData = {
   id: string;
   email: string;
   role: string;
@@ -33,5 +33,5 @@ export type ResponseDataToFront = {
   fullName?: string;
   firstName?: string;
   lastName?: string;
-  access_token: string;
+  access_token?: string;
 };

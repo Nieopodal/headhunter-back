@@ -19,7 +19,7 @@ export class DatabaseConfiguration implements TypeOrmOptionsFactory {
       autoLoadEntities: true,
       bigNumberStrings: false,
       logging: true,
-      synchronize: true, // if true to create/update table in db.
+      synchronize: true, // if true to create/update tables in db.
       namingStrategy: new SnakeNamingStrategy(),
     };
   }
