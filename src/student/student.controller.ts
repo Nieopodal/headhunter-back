@@ -4,7 +4,7 @@ import { StudentService } from './student.service';
 import { Public } from '../common/decorators';
 import { UpdateStudentDto } from './dto';
 import { AuthService } from '../auth/auth.service';
-import { ApiResponse, ResponseUpdateStudent } from '@Types';
+import { ApiResponse, SimpleStudentData, StudentCv, ResponseUpdateStudent } from '@Types';
 import { ResponseUserData } from '../types/auth/response-data.type';
 import { ConfirmStudentDto } from './dto/confirm-student.dto';
 
@@ -12,7 +12,22 @@ import { ConfirmStudentDto } from './dto/confirm-student.dto';
 export class StudentController {
   constructor(private studentService: StudentService, private authService: AuthService) {}
 
-  @Public()
+  @Get('/simple/:id')
+  async getSimpleStudentData(@Param('id') id: string): Promise<ApiResponse<SimpleStudentData>> {
+    return await this.studentService.simpleStudentData(id);
+  }
+
+  @Get('/cv/:id')
+  async getStudentCv(@Param('id') id: string): Promise<ApiResponse<StudentCv>> {
+    return await this.studentService.getStudentCv(id);
+  }
+
+  @Get('/available')
+  async getFreeStudents(): Promise<ApiResponse<SimpleStudentData[]>> {
+    return await this.studentService.getFreeStudents();
+  }
+
+   @Public()
   @Get('all')
   getAllStudents(): Promise<Student[]> {
     return this.studentService.get();
@@ -35,5 +50,9 @@ export class StudentController {
   @HttpCode(HttpStatus.OK)
   confirmAccount(@Param() param: ConfirmStudentDto): Promise<ApiResponse<ResponseUserData>> {
     return this.studentService.confirmStudentAccount(param);
+
+  @Patch('/employed/:id')
+  deactivate(@Param('id') id: string): Promise<ApiResponse<any>> {
+    return this.studentService.deactivate(id);
   }
 }
