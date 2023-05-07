@@ -10,7 +10,9 @@ import { AuthModule } from './auth/auth.module';
 import { HrModule } from './hr/hr.module';
 import { AtGuard } from './common/guards';
 import { APP_GUARD } from '@nestjs/core';
-import {MailModule} from "./mail/mail.module";
+import { MailModule } from './mail/mail.module';
+import { UploadStudentDataModule } from './student/upload-student-data.module';
+
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -18,9 +20,9 @@ import {MailModule} from "./mail/mail.module";
       useClass: DatabaseConfiguration,
     }),
     forwardRef(() => StudentModule),
+    forwardRef(() => UploadStudentDataModule),
     forwardRef(() => AdminModule),
     forwardRef(() => HrModule),
-
     forwardRef(() => AuthModule),
     forwardRef(() => MailModule),
   ],

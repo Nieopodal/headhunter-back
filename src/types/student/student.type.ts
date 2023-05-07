@@ -1,7 +1,6 @@
 import { ExpectedContractType, ExpectedTypeWork } from '../../student/entity/student.entity';
 
 export type StudentPartialData = {
-
   id: string;
   email: string;
   contactNumber: string;
@@ -9,7 +8,7 @@ export type StudentPartialData = {
   lastName: string;
   githubUsername: string;
   portfolioUrls: string[];
-  bonusProjectUrls: string[];
+  scrumProjectUrls: string[];
   bio: string;
   education: string;
   workExperience: string;
@@ -31,10 +30,38 @@ export type SimpleStudentData = {
 
 export type StudentToInterview = SimpleStudentData & {
   id: string;
-  fullName: string;
+  firstName: string;
+  lastName: string;
   avatar: string;
   reservationTime: Date;
 };
+
+export type ResponseUpdateStudent = {
+  id: string;
+};
+
+export type StudentCv = StudentPartialData & SimpleStudentData;
+
+export enum ExpectedTypeWork {
+  office = 'Na miejscu',
+  move = 'Przeprowadzka',
+  remote = 'Praca zdalna',
+  hybrid = 'Praca hybrydowa',
+  DM = 'Nie ma znaczenia',
+}
+
+export enum ExpectedContractType {
+  B2B = 'Możliwe B2B',
+  employ = 'Tylko umowa o pracę',
+  contract = 'Umowa zlecenie / dzieło',
+  none = 'Brak preferencji',
+}
+
+export enum StudentStatus {
+  AVAILABLE = 'available',
+  INTERVIEW = 'interview',
+  EMPLOYED = 'employed',
+}
 
 export type StudentCv = StudentPartialData & SimpleStudentData;
 
