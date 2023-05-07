@@ -1,6 +1,7 @@
 import { IsEmail, IsNotEmpty, IsNumber, IsString, Length, Max, Min } from 'class-validator';
 
 export class HrDto {
+
   @IsEmail()
   @IsNotEmpty()
   @Length(3, 255)

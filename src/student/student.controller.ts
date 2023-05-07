@@ -1,16 +1,11 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Patch, Post, UseGuards } from '@nestjs/common';
-import { Student } from './entity/student.entity';
-import { StudentService } from './student.service';
-import { Public } from '../common/decorators';
+import { Body, Controller, Get, Param, Patch } from '@nestjs/common';
+import { StudentService, UpdateStudentResponse } from './student.service';
 import { UpdateStudentDto } from './dto';
-import { AuthService } from '../auth/auth.service';
-import { ApiResponse, SimpleStudentData, StudentCv, ResponseUpdateStudent } from '@Types';
-import { ResponseUserData } from '../types/auth/response-data.type';
-import { ConfirmStudentDto } from './dto/confirm-student.dto';
+import { ApiResponse, SimpleStudentData, StudentCv } from '@Types';
 
 @Controller('student')
 export class StudentController {
-  constructor(private studentService: StudentService, private authService: AuthService) {}
+  constructor(private readonly studentService: StudentService) {}
 
   @Get('/simple/:id')
   async getSimpleStudentData(@Param('id') id: string): Promise<ApiResponse<SimpleStudentData>> {
@@ -27,29 +22,13 @@ export class StudentController {
     return await this.studentService.getFreeStudents();
   }
 
-   @Public()
-  @Get('all')
-  getAllStudents(): Promise<Student[]> {
-    return this.studentService.get();
+  @Patch('/update/:id')
+  async updateUserData(
+    @Param('id') id: string,
+    @Body() updateStudentDto: UpdateStudentDto,
+  ): Promise<ApiResponse<UpdateStudentResponse>> {
+    return await this.studentService.update(id, updateStudentDto);
   }
-
-  @Get('one')
-  getOneStudent(): Student {
-    return null; //this.studentService.getOne()
-  }
-  // @UseGuards(VtGuard)
-  @Public()
-  @Patch('update')
-  @HttpCode(HttpStatus.ACCEPTED)
-  updateStudent(@Body() registerData: UpdateStudentDto): Promise<ApiResponse<ResponseUpdateStudent>> {
-    return this.studentService.updateStudent(registerData);
-  }
-
-  @Public()
-  @Post('confirm/:id/:token')
-  @HttpCode(HttpStatus.OK)
-  confirmAccount(@Param() param: ConfirmStudentDto): Promise<ApiResponse<ResponseUserData>> {
-    return this.studentService.confirmStudentAccount(param);
 
   @Patch('/employed/:id')
   deactivate(@Param('id') id: string): Promise<ApiResponse<any>> {

@@ -6,8 +6,6 @@ import { getAvatar } from './utils/get-avatar';
 
 @Injectable()
 export class HrService {
-
-  async getHrByEmail(email: string): Promise<Hr> {
   filter(data: Student): StudentToInterview {
     const {
       firstName,
@@ -34,7 +32,6 @@ export class HrService {
   }
 
   async getUserByEmail(email: string): Promise<Hr> {
-
     return await Hr.findOneBy({ email });
   }
 

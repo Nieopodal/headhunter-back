@@ -8,7 +8,7 @@ import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
 import { ApiResponse, Tokens } from '@Types';
 import { HrService } from '../hr/hr.service';
-import { ResponseUserData } from '../types/auth/response-data.type';
+import { ResponseDataToFront } from '../types/auth/response-data.type';
 
 @Injectable()
 export class AuthService {
@@ -21,30 +21,13 @@ export class AuthService {
   ) {}
 
   async hashData(data: string): Promise<string> {
-    const hashedData = await bcrypt.hash(data, 10);
-    if (!hashedData.includes('/')) {
-      return hashedData;
-    } else {
-      return await this.hashData(data);
-    }
+    return bcrypt.hash(data, 10);
   }
 
   async updateRtHash(id, rt: string): Promise<void> {
     const user = await this.checkUserById(id);
     user.refreshToken = await this.hashData(rt);
     await user.save();
-  }
-
-  async getVerificationHashToken(email: string): Promise<string> {
-    const id = await this.studentService.getStudentByEmail(email);
-    const token = await this.jwtService.signAsync(
-      { id, email },
-      {
-        secret: this.configService.get('SECRET_KEY_VT'),
-        expiresIn: this.configService.get('EXPIRES_IN_VT'),
-      },
-    );
-    return await this.hashData(token);
   }
 
   async getTokens(id: string, email: string): Promise<Tokens> {
@@ -72,11 +55,11 @@ export class AuthService {
   }
 
   async checkUserByEmail(email: string) {
-    const admin = await this.adminService.getAdminByEmail(email);
+    const admin = await this.adminService.getUserByEmail(email);
 
-    const hr = await this.hrService.getHrByEmail(email);
+    const hr = await this.hrService.getUserByEmail(email);
 
-    const student = await this.studentService.getStudentByEmail(email);
+    const student = await this.studentService.getUserByEmail(email);
 
     return hr ? hr : student ? student : admin ? admin : null;
   }
@@ -86,12 +69,12 @@ export class AuthService {
 
     const hr = await this.hrService.getUserById(id);
 
-    const student = await this.studentService.getStudentById(id);
+    const student = await this.studentService.getUserById(id);
 
     return admin ? admin : student ? student : hr ? hr : null;
   }
 
-  async login(login: LoginUserDto, response: Response): Promise<ResponseUserData> {
+  async login(login: LoginUserDto, response: Response): Promise<ResponseDataToFront> {
     const user = await this.checkUserByEmail(login.email);
     if (!user) throw new UnauthorizedException('Access Denied');
     const passwordHash = await bcrypt.hash(user.password, 10); //Todo usunąć linie
@@ -120,6 +103,7 @@ export class AuthService {
 
   async refreshTokens(rt: string, response: Response) {
     const decodedJwt = await this.getDecodedToken(rt);
+    console.log(decodedJwt);
     const user = await this.checkUserById(decodedJwt['id']);
 
     if (!user || !user.refreshToken) throw new ForbiddenException('Access Denied');
