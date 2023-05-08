@@ -1,8 +1,9 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { ConfigModule } from '@nestjs/config';
 import { MailerConfiguration } from '../config/mailerconfig';
 import { MailService } from './mail.service';
+import { StudentModule } from '../student/student.module';
 
 @Module({
   imports: [
@@ -10,6 +11,7 @@ import { MailService } from './mail.service';
       imports: [ConfigModule],
       useClass: MailerConfiguration,
     }),
+    forwardRef(() => StudentModule),
   ],
   providers: [MailService],
   exports: [MailService],

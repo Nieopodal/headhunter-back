@@ -23,11 +23,10 @@ export type Student = {
   access_token?: string;
 };
 
-// export type ResponseDataLogin = Admin | Hr | Student;
-
 export type UserDataResponse = {
   id: string;
   email: string;
+  password?: string;
   role: string;
   name?: string;
   fullName?: string;

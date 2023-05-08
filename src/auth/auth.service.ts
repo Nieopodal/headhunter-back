@@ -1,4 +1,11 @@
-import { ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { LoginUserDto } from './dto';
 import { AdminService } from '../admin/admin.service';
 import { StudentService } from '../student/student.service';
@@ -36,20 +43,15 @@ export class AuthService {
   }
 
   async getVerificationToken(email: string): Promise<string> {
-    const id = await this.studentService.getStudentByEmail(email);
-    return await this.jwtService.signAsync(
+    const { id } = await this.studentService.getStudentByEmail(email);
+    const token = await this.jwtService.signAsync(
       { id, email },
       {
         secret: this.configService.get('SECRET_KEY_VT'),
         expiresIn: this.configService.get('EXPIRES_IN_VT'),
       },
     );
-  }
-
-  async generateUrl(email): Promise<string> {
-    const { id, verificationToken } = await this.studentService.getStudentByEmail(email);
-    const emailToken = await this.hashData(verificationToken);
-    return `http://localhost:3000/student/confirm/${id}/${emailToken}`;
+    return await this.hashData(token);
   }
 
   async getTokens(id: string, email: string): Promise<Tokens> {
@@ -76,7 +78,7 @@ export class AuthService {
     return this.jwtService.decode(rt);
   }
 
-  async checkUserByEmail(email: string) {
+  async checkUserByEmail(email: string): Promise<UserDataResponse> {
     const admin = await this.adminService.getAdminByEmail(email);
 
     const hr = await this.hrService.getHrByEmail(email);
@@ -96,17 +98,31 @@ export class AuthService {
     return admin ? admin : student ? student : hr ? hr : null;
   }
 
-  async login(login: LoginUserDto, response: Response): Promise<UserDataResponse> {
+  async login(login: LoginUserDto, response: Response): Promise<ApiResponse<UserDataResponse>> {
     const user = await this.checkUserByEmail(login.email);
-    if (!user) throw new UnauthorizedException('Access Denied');
-    const passwordHash = await bcrypt.hash(user.password, 10); //Todo usunąć linie
-    const passwordMatches = await bcrypt.compare(login.password, passwordHash);
-    if (!passwordMatches) throw new UnauthorizedException('Access Denied');
-    const tokens = await this.getTokens(user.id, user.email);
-    await this.updateRtHash(user.id, tokens.refresh_token);
-    response.cookie('jwt-refresh', tokens.refresh_token, { httpOnly: true });
-
-    return { ...user, access_token: tokens.access_token };
+    if (!user) return { isSuccess: false, error: 'Nie znaleziono użytkownika' };
+    try {
+      const passwordMatches = await bcrypt.compare(login.password, user.password);
+      if (!passwordMatches) return { isSuccess: false, error: 'Niepoprawne hasło' };
+      const tokens = await this.getTokens(user.id, user.email);
+      await this.updateRtHash(user.id, tokens.refresh_token);
+      response.cookie('jwt-refresh', tokens.refresh_token, { httpOnly: true });
+      return {
+        isSuccess: true,
+        payload: {
+          id: user.id,
+          email: user.email,
+          role: user.role,
+          name: user.name,
+          fullName: user.fullName,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          access_token: tokens.access_token,
+        },
+      };
+    } catch (e) {
+      return { isSuccess: false, error: 'Ups... coś poszło nie tak.' };
+    }
   }
 
   async logout(id: string): Promise<ApiResponse<any>> {

@@ -1,4 +1,4 @@
-import { Body, Controller, HttpCode, HttpException, HttpStatus, Post, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, HttpCode, HttpStatus, Post, Res, UseGuards } from '@nestjs/common';
 import { Response } from 'express';
 import { LoginUserDto } from './dto';
 import { AuthService } from './auth.service';
@@ -19,31 +19,7 @@ export class AuthController {
     @Body() loginData: LoginUserDto,
     @Res({ passthrough: true }) response: Response,
   ): Promise<ApiResponse<UserDataResponse>> {
-    try {
-      const userData = await this.authService.login(loginData, response);
-      return {
-        isSuccess: true,
-        payload: {
-          id: userData.id,
-          email: userData.email,
-          role: userData.role,
-          name: userData.name,
-          fullName: userData.fullName,
-          firstName: userData.firstName,
-          lastName: userData.lastName,
-          access_token: userData.access_token,
-        },
-      };
-    } catch (error) {
-      throw new HttpException(
-        {
-          isSuccess: false,
-          status: HttpStatus.FORBIDDEN,
-          error: 'Access denied !!!',
-        },
-        HttpStatus.FORBIDDEN,
-      );
-    }
+    return await this.authService.login(loginData, response);
   }
 
   @UseGuards(AtGuard)

@@ -3,15 +3,13 @@ import { Student } from './entity/student.entity';
 import { StudentService } from './student.service';
 import { Public } from '../common/decorators';
 import { UpdateStudentDto } from './dto';
-import { AuthService } from '../auth/auth.service';
 import { ApiResponse, SimpleStudentData, StudentCv, UpdateStudentResponse } from '@Types';
 import { UserDataResponse } from '../types/auth/response-data.type';
 import { ConfirmStudentDto } from './dto/confirm-student.dto';
-import { VtGuard } from '../common/guards';
 
 @Controller('student')
 export class StudentController {
-  constructor(private studentService: StudentService, private authService: AuthService) {}
+  constructor(private studentService: StudentService) {}
 
   @Get('/simple/:id')
   async getSimpleStudentData(@Param('id') id: string): Promise<ApiResponse<SimpleStudentData>> {
@@ -45,7 +43,6 @@ export class StudentController {
     return this.studentService.updateStudent(registerData);
   }
   @Public()
-  // @UseGuards(VtGuard)
   @Post('confirm/:id/:token')
   @HttpCode(HttpStatus.OK)
   confirmAccount(@Param() param: ConfirmStudentDto): Promise<ApiResponse<UserDataResponse>> {

@@ -5,8 +5,6 @@ import { UserDataResponse } from '../types/auth/response-data.type';
 
 @Injectable()
 export class StudentService {
-  // constructor(private authService: AuthService) {}
-
   async getAvatar(id: string): Promise<ApiResponse<string>> {
     const studentAvatar: Student = await Student.findOneBy({ id });
     if (!studentAvatar) {
@@ -134,22 +132,24 @@ export class StudentService {
   async get(): Promise<Student[]> {
     return await Student.find();
   }
-
   async confirmStudentAccount(param): Promise<ApiResponse<UserDataResponse>> {
-    try {
-      await Student.createQueryBuilder('student')
-        .update(Student)
-        .set({ active: true })
-        .where('id=:id', { id: param.id })
-        .execute();
-      console.log(param);
-      return {
-        isSuccess: true,
-        payload: param.id,
-      };
-    } catch (e) {
-      return { isSuccess: false, error: 'Ups... coś poszło nie tak.' };
+    const student = await this.getStudentById(param.id);
+    if (student && param.token === student.verificationToken) {
+      try {
+        await Student.createQueryBuilder('student')
+          .update(Student)
+          .set({ active: true })
+          .where('id=:id', { id: param.id })
+          .execute();
+        return {
+          isSuccess: true,
+          payload: param.id,
+        };
+      } catch (e) {
+        return { isSuccess: false, error: 'Ups... coś poszło nie tak.' };
+      }
     }
+    return { isSuccess: false, error: 'Ups... coś poszło nie tak.' };
   }
 
   async updateStudent(data): Promise<ApiResponse<UpdateStudentResponse>> {
