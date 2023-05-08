@@ -17,7 +17,7 @@ export class Admin extends BaseEntity {
   @Column({ default: 'admin', length: 20 })
   role: string;
 
-  @Column({ default: () => 'CURRENT_TIMESTAMP' })
+  @Column({ type: 'timestamp' })
   createdAt: Date;
 
   @Column({ default: '', length: 255, nullable: true })
