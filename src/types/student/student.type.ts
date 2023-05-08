@@ -1,53 +1,62 @@
-export type Student = {
+export type StudentPartialData = {
   id: string;
-
   email: string;
-
-  password: string;
-
   contactNumber: string;
-
   firstName: string;
-
   lastName: string;
-
   githubUsername: string;
-
   portfolioUrls: string[];
-
-  courseCompletion: number;
-
-  courseEngagement: number;
-
-  projectDegree: number;
-
-  teamProjectDegree: number;
-
-  bonusProjectUrls: string[];
-
+  scrumProjectUrls: string[];
   bio: string;
-
-  expectedTypeWork: string;
-
-  targetWorkCity: string;
-
-  expectedContractType: string;
-
-  expectedSalary: string;
-
-  canTakeApprenticeship: boolean;
-
-  monthsOfCommercialExp: number;
-
   education: string;
-
   workExperience: string;
-
   courses: string;
-
-  active: boolean;
-
-  role: string;
-
-  refreshToken: string;
 };
+
+export type SimpleStudentData = {
+  courseCompletion: number;
+  courseEngagement: number;
+  projectDegree: number;
+  teamProjectDegree: number;
+  expectedTypeWork: ExpectedTypeWork;
+  targetWorkCity: string;
+  expectedContractType: ExpectedContractType;
+  expectedSalary: string;
+  canTakeApprenticeship: boolean;
+  monthsOfCommercialExp: number;
+};
+
+export type StudentToInterview = SimpleStudentData & {
+  id: string;
+  firstName: string;
+  lastName: string;
+  avatar: string;
+  reservationTime: Date;
+};
+
+export type ResponseUpdateStudent = {
+  id: string;
+};
+
+export type StudentCv = StudentPartialData & SimpleStudentData;
+
+export enum ExpectedTypeWork {
+  office = 'Na miejscu',
+  move = 'Przeprowadzka',
+  remote = 'Praca zdalna',
+  hybrid = 'Praca hybrydowa',
+  DM = 'Nie ma znaczenia',
+}
+
+export enum ExpectedContractType {
+  B2B = 'Możliwe B2B',
+  employ = 'Tylko umowa o pracę',
+  contract = 'Umowa zlecenie / dzieło',
+  none = 'Brak preferencji',
+}
+
+export enum StudentStatus {
+  AVAILABLE = 'available',
+  INTERVIEW = 'interview',
+  EMPLOYED = 'employed',
+}

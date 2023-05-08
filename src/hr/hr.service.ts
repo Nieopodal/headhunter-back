@@ -3,10 +3,10 @@ import { Hr } from './entity/hr.entity';
 
 @Injectable()
 export class HrService {
-  async getUserByEmail(email: string): Promise<Hr> {
+  async getHrByEmail(email: string): Promise<Hr> {
     return await Hr.findOneBy({ email });
   }
-  async getUserById(id: string): Promise<Hr> {
+  async getHrById(id: string): Promise<Hr> {
     return await Hr.findOneBy({ id });
   }
 }

@@ -4,7 +4,7 @@ import { LoginUserDto } from './dto';
 import { AuthService } from './auth.service';
 import { ApiResponse, Tokens } from '@Types';
 import { GetCurrentUserId, Public } from '../common/decorators';
-import { ResponseDataToFront } from '../types/auth/response-data.type';
+import { ResponseUserData } from '../types/auth/response-data.type';
 import { RtGuard } from '../common/guards';
 import { Cookies } from '../common/decorators/cookie.decorator';
 
@@ -18,7 +18,7 @@ export class AuthController {
   async login(
     @Body() loginData: LoginUserDto,
     @Res({ passthrough: true }) response: Response,
-  ): Promise<ApiResponse<ResponseDataToFront>> {
+  ): Promise<ApiResponse<ResponseUserData>> {
     try {
       const userData = await this.authService.login(loginData, response);
       return {
