@@ -1,5 +1,7 @@
 import {Injectable} from '@nestjs/common';
 import {MailerService} from "@nestjs-modules/mailer";
+import {ConfigService} from "@nestjs/config";
+import * as nodemailer from 'nodemailer';
 
 
 interface SendMailInfo {
@@ -11,8 +13,9 @@ interface SendMailInfo {
 @Injectable()
 export class MailService {
     constructor(
-        private readonly mailerService: MailerService) {
-    }
+        private readonly mailerService: MailerService,
+        private readonly configService: ConfigService,
+        ) {}
 
     async sendMail(
         to: string,
@@ -27,4 +30,24 @@ export class MailService {
             html,
         });
     };
+
+    async testConnection(): Promise<boolean> {
+        const transportOptions = {
+            service: 'gmail',
+            auth: {
+                user: this.configService.get('EMAIL_USERNAME'),
+                pass: this.configService.get('EMAIL_PASSWORD'),
+            },
+        };
+
+        const transporter = nodemailer.createTransport(transportOptions);
+
+        try {
+            await transporter.verify();
+            return true;
+        } catch (error) {
+            console.error('Error while testing connection to Nodemailer:', error);
+            return false;
+        }
+    }
 }
