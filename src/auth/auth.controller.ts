@@ -4,8 +4,8 @@ import { LoginUserDto } from './dto';
 import { AuthService } from './auth.service';
 import { ApiResponse, Tokens } from '@Types';
 import { GetCurrentUserId, Public } from '../common/decorators';
-import { ResponseUserData } from '../types/auth/response-data.type';
-import { RtGuard } from '../common/guards';
+import { UserDataResponse } from '../types/auth/response-data.type';
+import { AtGuard, RtGuard } from '../common/guards';
 import { Cookies } from '../common/decorators/cookie.decorator';
 
 @Controller('auth')
@@ -18,7 +18,7 @@ export class AuthController {
   async login(
     @Body() loginData: LoginUserDto,
     @Res({ passthrough: true }) response: Response,
-  ): Promise<ApiResponse<ResponseUserData>> {
+  ): Promise<ApiResponse<UserDataResponse>> {
     try {
       const userData = await this.authService.login(loginData, response);
       return {
@@ -46,6 +46,7 @@ export class AuthController {
     }
   }
 
+  @UseGuards(AtGuard)
   @Post('logout')
   @HttpCode(HttpStatus.OK)
   logout(@GetCurrentUserId() id: string): Promise<any> {

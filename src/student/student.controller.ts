@@ -4,9 +4,10 @@ import { StudentService } from './student.service';
 import { Public } from '../common/decorators';
 import { UpdateStudentDto } from './dto';
 import { AuthService } from '../auth/auth.service';
-import { ApiResponse, SimpleStudentData, StudentCv, ResponseUpdateStudent } from '@Types';
-import { ResponseUserData } from '../types/auth/response-data.type';
+import { ApiResponse, SimpleStudentData, StudentCv, UpdateStudentResponse } from '@Types';
+import { UserDataResponse } from '../types/auth/response-data.type';
 import { ConfirmStudentDto } from './dto/confirm-student.dto';
+import { VtGuard } from '../common/guards';
 
 @Controller('student')
 export class StudentController {
@@ -38,18 +39,16 @@ export class StudentController {
     return null; //this.studentService.getOne()
   }
 
-  // @UseGuards(VtGuard)
-  @Public()
   @Patch('update')
   @HttpCode(HttpStatus.ACCEPTED)
-  updateStudent(@Body() registerData: UpdateStudentDto): Promise<ApiResponse<ResponseUpdateStudent>> {
+  updateStudent(@Body() registerData: UpdateStudentDto): Promise<ApiResponse<UpdateStudentResponse>> {
     return this.studentService.updateStudent(registerData);
   }
-
   @Public()
+  // @UseGuards(VtGuard)
   @Post('confirm/:id/:token')
   @HttpCode(HttpStatus.OK)
-  confirmAccount(@Param() param: ConfirmStudentDto): Promise<ApiResponse<ResponseUserData>> {
+  confirmAccount(@Param() param: ConfirmStudentDto): Promise<ApiResponse<UserDataResponse>> {
     return this.studentService.confirmStudentAccount(param);
   }
 

@@ -32,10 +32,10 @@ export class UploadStudentDataService {
           data.teamProjectDegree = Number(record.teamProjectDegree);
           data.scrumProjectUrls = record.scrumProjectUrls;
           if (!students.some((std) => std.email == record.email)) {
-            data.verificationToken = await this.authService.getVerificationHashToken(record.email);
+            data.verificationToken = await this.authService.getVerificationToken(record.email);
             records.push(data);
             await data.save();
-            data.activationUrl = await this.studentService.generateUrl(record.email);
+            data.activationUrl = await this.authService.generateUrl(record.email);
             await data.save();
           }
         }
@@ -49,6 +49,7 @@ export class UploadStudentDataService {
         stream.on('error', reject);
       });
       await Promise.all(records);
+
       return { isSuccess: true, payload: { numberAddedStudents: records.length } };
     } catch (e) {
       return { isSuccess: false, error: 'Ups... coś poszło nie tak.' };

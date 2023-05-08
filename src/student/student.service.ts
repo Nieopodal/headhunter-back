@@ -1,14 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { ApiResponse, SimpleStudentData, ResponseUpdateStudent, StudentCv, StudentStatus } from '@Types';
+import { ApiResponse, SimpleStudentData, UpdateStudentResponse, StudentCv, StudentStatus } from '@Types';
 import { Student } from './entity/student.entity';
-import { ResponseUserData } from '../types/auth/response-data.type';
-
-export interface UpdateStudentResponse {
-  id: string;
-}
+import { UserDataResponse } from '../types/auth/response-data.type';
 
 @Injectable()
 export class StudentService {
+  // constructor(private authService: AuthService) {}
+
   async getAvatar(id: string): Promise<ApiResponse<string>> {
     const studentAvatar: Student = await Student.findOneBy({ id });
     if (!studentAvatar) {
@@ -137,12 +135,7 @@ export class StudentService {
     return await Student.find();
   }
 
-  async generateUrl(email): Promise<string> {
-    const { id, verificationToken } = await this.getStudentByEmail(email);
-    return `http://localhost:3000/student/confirm/${id}/${verificationToken}`;
-  }
-
-  async confirmStudentAccount(param): Promise<ApiResponse<ResponseUserData>> {
+  async confirmStudentAccount(param): Promise<ApiResponse<UserDataResponse>> {
     try {
       await Student.createQueryBuilder('student')
         .update(Student)
@@ -159,7 +152,7 @@ export class StudentService {
     }
   }
 
-  async updateStudent(data): Promise<ApiResponse<ResponseUpdateStudent>> {
+  async updateStudent(data): Promise<ApiResponse<UpdateStudentResponse>> {
     try {
       await Student.createQueryBuilder('student').update(Student).set(data).where('id=:id', { id: data.id }).execute();
       return {

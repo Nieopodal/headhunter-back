@@ -34,7 +34,7 @@ export type StudentToInterview = SimpleStudentData & {
   reservationTime: Date;
 };
 
-export type ResponseUpdateStudent = {
+export type UpdateStudentResponse = {
   id: string;
 };
 
