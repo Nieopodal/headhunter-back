@@ -4,7 +4,7 @@ import { ConfigService } from '@nestjs/config';
 export function hrRegistrationTemplate(configService: ConfigService, id: string, token: string) {
     const appUrl = configService.get<string>('APP_URL');
     const expiresIn = configService.get<string>('EXPIRESIN_IN_RT');
-    const registerUrl = `${appUrl}/register/hr/${id}/${token}`;
+    const registerUrl = `${appUrl}/hr/confirm/${id}/${token}`;
 
     return `
     <h1>Witaj</h1>

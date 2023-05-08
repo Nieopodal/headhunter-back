@@ -4,7 +4,7 @@ import { ConfigService } from '@nestjs/config';
 export function studentRegistrationTemplate(configService: ConfigService, id: string, token: string) {
     const appUrl = configService.get<string>('APP_URL');
     const expiresIn = configService.get<string>('EXPIRESIN_IN_RT');
-    const registerUrl = `${appUrl}/register/student/${id}/${token}`;
+    const registerUrl = `${appUrl}/student/confirm/${id}/${token}`;
 
     return `
     <h1>Witaj</h1>
