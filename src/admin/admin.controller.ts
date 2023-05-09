@@ -3,7 +3,6 @@ import { Public } from '../common/decorators';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Express } from 'express';
 import { UploadStudentDataService } from '../student/upload-student-data.service';
-import { UploadStudentsDto } from '../student/dto';
 import { ApiResponse } from '@Types';
 
 @Controller('admin')
