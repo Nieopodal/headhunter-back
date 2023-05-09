@@ -14,6 +14,7 @@ import { StudentModule } from '../student/student.module';
     forwardRef(() => StudentModule),
   ],
   providers: [MailService],
+  controllers: [MailController],
   exports: [MailService],
 })
 export class MailModule {}
