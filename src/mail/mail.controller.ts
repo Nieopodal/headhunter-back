@@ -22,21 +22,6 @@ export class MailController {
             return 'Nie udało się nawiązać połączenia z Nodemailerem.';
         }
     }
-    @Get('/send-student-registration-email')
-    @SetMetadata('isPublic', true)
-    async sendStudentRegistrationEmail(
-        @Param('id') id: string,
-        @Param('token') token: string,
-
-    ) {
-        const from = this.configService.get<string>('EMAIL_FROM');
-        const subject = 'Rejestracja studenta';
-        const html = studentRegistrationTemplate(this.configService, id, token);
-        const to = 'mateusz.wyso94@gmail.com'
-
-        await this.mailService.sendMail(to, from, subject, html);
-        return { message: 'E-mail z rejestracją wysłany.' };
-    }
 }
 
 

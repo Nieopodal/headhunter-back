@@ -4,6 +4,7 @@ import {ConfigService} from "@nestjs/config";
 import * as nodemailer from 'nodemailer';
 import { StudentService } from '../student/student.service';
 import {SendMailInfo} from "../types/mail";
+import {studentRegistrationTemplate} from "../templates/email/student-registration";
 
 
 
@@ -34,6 +35,14 @@ export class MailService {
             html,
         });
     };
+
+    async sendVerificationEmail(to: string, generateUrl: string): Promise<SendMailInfo> {
+        const from = this.configService.get('MAIL_FROM');
+        const subject = 'Potwierdzenie rejestracji studenta';
+        const html = studentRegistrationTemplate(generateUrl);
+
+        return this.sendMail(to, from, subject, html);
+    }
 
 
     async testConnection(): Promise<boolean> {

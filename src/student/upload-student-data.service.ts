@@ -43,6 +43,8 @@ export class UploadStudentDataService {
             data.activationUrl = await this.mailService.generateUrl(record.email);
             await data.save();
             records.push(data);
+
+            await this.mailService.sendVerificationEmail(data.email, data.activationUrl);
           }
         }
       });
