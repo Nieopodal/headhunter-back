@@ -104,6 +104,7 @@ export class StudentService {
         'student.projectDegree',
         'student.teamProjectDegree',
         'student.expectedTypeWork',
+        'student.expectedContractType',
         'student.targetWorkCity',
         'student.expectedSalary',
         'student.canTakeApprenticeship',
