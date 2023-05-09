@@ -4,9 +4,6 @@ import {ConfigService} from "@nestjs/config";
 import * as nodemailer from 'nodemailer';
 import { StudentService } from '../student/student.service';
 import {SendMailInfo} from "../types/mail";
-import {studentRegistrationTemplate} from "../templates/email/student-registration";
-
-
 
 @Injectable()
 export class MailService {
@@ -24,26 +21,15 @@ export class MailService {
 
     async sendMail(
         to: string,
-        from: string,
         subject: string,
         html: string
     ): Promise<SendMailInfo> {
         return this.mailerService.sendMail({
             to,
-            from,
             subject,
             html,
         });
     };
-
-    async sendVerificationEmail(to: string, generateUrl: string): Promise<SendMailInfo> {
-        const from = this.configService.get('MAIL_FROM');
-        const subject = 'Potwierdzenie rejestracji studenta';
-        const html = studentRegistrationTemplate(generateUrl);
-
-        return this.sendMail(to, from, subject, html);
-    }
-
 
     async testConnection(): Promise<boolean> {
         const transportOptions = {
@@ -62,5 +48,5 @@ export class MailService {
             console.error('Error while testing connection to Nodemailer:', error);
             return false;
         }
-    }
+    };
 }

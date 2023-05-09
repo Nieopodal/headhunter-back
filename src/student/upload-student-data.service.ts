@@ -7,6 +7,7 @@ import { AuthService } from '../auth/auth.service';
 import { UploadStudentsDto } from './dto';
 import { ApiResponse } from '@Types';
 import { MailService } from '../mail/mail.service';
+import {studentRegistrationTemplate} from "../templates/email/student-registration";
 
 @Injectable()
 export class UploadStudentDataService {
@@ -43,8 +44,12 @@ export class UploadStudentDataService {
             data.activationUrl = await this.mailService.generateUrl(record.email);
             await data.save();
             records.push(data);
-
-            await this.mailService.sendVerificationEmail(data.email, data.activationUrl);
+            const emailTemplate = studentRegistrationTemplate(data.activationUrl);
+            await this.mailService.sendMail(
+                data.email,
+                'Potwierdzenie rejestracji',
+                emailTemplate,
+            );
           }
         }
       });
