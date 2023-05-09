@@ -1,11 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { ApiResponse, SimpleStudentData, ResponseUpdateStudent, StudentCv, StudentStatus } from '@Types';
+import { ApiResponse, SimpleStudentData, UpdateStudentResponse, StudentCv, StudentStatus } from '@Types';
 import { Student } from './entity/student.entity';
-import { ResponseUserData } from '../types/auth/response-data.type';
-
-export interface UpdateStudentResponse {
-  id: string;
-}
+import { UserDataResponse } from '../types/auth/response-data.type';
 
 @Injectable()
 export class StudentService {
@@ -136,30 +132,27 @@ export class StudentService {
   async get(): Promise<Student[]> {
     return await Student.find();
   }
-
-  async generateUrl(email): Promise<string> {
-    const { id, verificationToken } = await this.getStudentByEmail(email);
-    return `http://localhost:3000/student/confirm/${id}/${verificationToken}`;
-  }
-
-  async confirmStudentAccount(param): Promise<ApiResponse<ResponseUserData>> {
-    try {
-      await Student.createQueryBuilder('student')
-        .update(Student)
-        .set({ active: true })
-        .where('id=:id', { id: param.id })
-        .execute();
-      console.log(param);
-      return {
-        isSuccess: true,
-        payload: param.id,
-      };
-    } catch (e) {
-      return { isSuccess: false, error: 'Ups... coś poszło nie tak.' };
+  async confirmStudentAccount(param): Promise<ApiResponse<UserDataResponse>> {
+    const student = await this.getStudentById(param.id);
+    if (student && param.token === student.verificationToken) {
+      try {
+        await Student.createQueryBuilder('student')
+          .update(Student)
+          .set({ active: true })
+          .where('id=:id', { id: param.id })
+          .execute();
+        return {
+          isSuccess: true,
+          payload: param.id,
+        };
+      } catch (e) {
+        return { isSuccess: false, error: 'Ups... coś poszło nie tak.' };
+      }
     }
+    return { isSuccess: false, error: 'Ups... coś poszło nie tak.' };
   }
 
-  async updateStudent(data): Promise<ApiResponse<ResponseUpdateStudent>> {
+  async updateStudent(data): Promise<ApiResponse<UpdateStudentResponse>> {
     try {
       await Student.createQueryBuilder('student').update(Student).set(data).where('id=:id', { id: data.id }).execute();
       return {

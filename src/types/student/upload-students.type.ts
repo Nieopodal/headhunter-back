@@ -1,4 +1,4 @@
-export type ResponseUploadStudent = {
+export type UploadStudentResponse = {
   email: string;
   courseCompletion: number;
   courseEngagement: number;

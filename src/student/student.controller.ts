@@ -1,16 +1,15 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Patch, Post } from '@nestjs/common';
 import { Student } from './entity/student.entity';
 import { StudentService } from './student.service';
 import { Public } from '../common/decorators';
 import { UpdateStudentDto } from './dto';
-import { AuthService } from '../auth/auth.service';
-import { ApiResponse, SimpleStudentData, StudentCv, ResponseUpdateStudent } from '@Types';
-import { ResponseUserData } from '../types/auth/response-data.type';
+import { ApiResponse, SimpleStudentData, StudentCv, UpdateStudentResponse } from '@Types';
+import { UserDataResponse } from '../types/auth/response-data.type';
 import { ConfirmStudentDto } from './dto/confirm-student.dto';
 
 @Controller('student')
 export class StudentController {
-  constructor(private studentService: StudentService, private authService: AuthService) {}
+  constructor(private studentService: StudentService) {}
 
   @Get('/simple/:id')
   async getSimpleStudentData(@Param('id') id: string): Promise<ApiResponse<SimpleStudentData>> {
@@ -38,18 +37,15 @@ export class StudentController {
     return null; //this.studentService.getOne()
   }
 
-  // @UseGuards(VtGuard)
-  @Public()
   @Patch('update')
   @HttpCode(HttpStatus.ACCEPTED)
-  updateStudent(@Body() registerData: UpdateStudentDto): Promise<ApiResponse<ResponseUpdateStudent>> {
+  updateStudent(@Body() registerData: UpdateStudentDto): Promise<ApiResponse<UpdateStudentResponse>> {
     return this.studentService.updateStudent(registerData);
   }
-
   @Public()
   @Post('confirm/:id/:token')
   @HttpCode(HttpStatus.OK)
-  confirmAccount(@Param() param: ConfirmStudentDto): Promise<ApiResponse<ResponseUserData>> {
+  confirmAccount(@Param() param: ConfirmStudentDto): Promise<ApiResponse<UserDataResponse>> {
     return this.studentService.confirmStudentAccount(param);
   }
 

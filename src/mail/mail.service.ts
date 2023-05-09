@@ -2,7 +2,7 @@ import {Injectable} from '@nestjs/common';
 import {MailerService} from "@nestjs-modules/mailer";
 import {ConfigService} from "@nestjs/config";
 import * as nodemailer from 'nodemailer';
-
+import { StudentService } from '../student/student.service';
 
 interface SendMailInfo {
     to: string;
@@ -12,6 +12,13 @@ interface SendMailInfo {
 
 @Injectable()
 export class MailService {
+  constructor(private readonly mailerService: MailerService, private readonly studentService: StudentService) {}
+
+  async generateUrl(email): Promise<string> {
+    const { id, verificationToken } = await this.studentService.getStudentByEmail(email);
+    return `http://localhost:3000/student/confirm/${id}/${verificationToken}`;
+  }
+
     constructor(
         private readonly mailerService: MailerService,
         private readonly configService: ConfigService,
@@ -41,7 +48,6 @@ export class MailService {
         };
 
         const transporter = nodemailer.createTransport(transportOptions);
-
         try {
             await transporter.verify();
             return true;

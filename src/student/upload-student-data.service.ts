@@ -6,10 +6,15 @@ import { StudentService } from './student.service';
 import { AuthService } from '../auth/auth.service';
 import { UploadStudentsDto } from './dto';
 import { ApiResponse } from '@Types';
+import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class UploadStudentDataService {
-  constructor(private authService: AuthService, private studentService: StudentService) {}
+  constructor(
+    private authService: AuthService,
+    private studentService: StudentService,
+    private mailService: MailService,
+  ) {}
 
   async uploadFile(file): Promise<ApiResponse<object>> {
     const records = [];
@@ -32,11 +37,12 @@ export class UploadStudentDataService {
           data.teamProjectDegree = Number(record.teamProjectDegree);
           data.scrumProjectUrls = record.scrumProjectUrls;
           if (!students.some((std) => std.email == record.email)) {
-            data.verificationToken = await this.authService.getVerificationHashToken(record.email);
+            await data.save();
+            data.verificationToken = await this.authService.getVerificationToken(record.email);
+            await data.save();
+            data.activationUrl = await this.mailService.generateUrl(record.email);
+            await data.save();
             records.push(data);
-            await data.save();
-            data.activationUrl = await this.studentService.generateUrl(record.email);
-            await data.save();
           }
         }
       });
@@ -49,6 +55,7 @@ export class UploadStudentDataService {
         stream.on('error', reject);
       });
       await Promise.all(records);
+
       return { isSuccess: true, payload: { numberAddedStudents: records.length } };
     } catch (e) {
       return { isSuccess: false, error: 'Ups... coś poszło nie tak.' };
