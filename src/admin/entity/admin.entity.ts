@@ -1,4 +1,5 @@
 import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { UserRole } from '@Types';
 
 @Entity()
 export class Admin extends BaseEntity {
@@ -14,8 +15,8 @@ export class Admin extends BaseEntity {
   @Column({ length: 255 })
   password: string;
 
-  @Column({ default: 'admin', length: 20 })
-  role: string;
+  @Column({ default: UserRole.ADMIN, length: 20, enum: UserRole })
+  role: UserRole;
 
   @Column({ type: 'timestamp' })
   createdAt: Date;
