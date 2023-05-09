@@ -1,5 +1,4 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Param, Patch, Post } from '@nestjs/common';
-import { Student } from './entity/student.entity';
 import { StudentService } from './student.service';
 import { Public } from '../common/decorators';
 import { UpdateStudentDto } from './dto';
@@ -24,17 +23,6 @@ export class StudentController {
   @Get('/available')
   async getFreeStudents(): Promise<ApiResponse<SimpleStudentData[]>> {
     return await this.studentService.getFreeStudents();
-  }
-
-  @Public()
-  @Get('all')
-  getAllStudents(): Promise<Student[]> {
-    return this.studentService.get();
-  }
-
-  @Get('one')
-  getOneStudent(): Student {
-    return null; //this.studentService.getOne()
   }
 
   @Patch('update')

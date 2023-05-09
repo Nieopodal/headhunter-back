@@ -28,8 +28,6 @@ export class StudentService {
         'student.projectDegree',
         'student.teamProjectDegree',
         'student.portfolioUrls',
-        'student.teamProjectUrls',
-        'student.teamProjectPR',
         'student.projectUrls',
         'student.expectedTypeWork',
         'student.expectedContractType',
@@ -39,6 +37,7 @@ export class StudentService {
         'student.monthsOfCommercialExp',
         'student.education',
         'student.courses',
+        'student.scrumProjectUrls',
         'student.workExperience',
       ])
       .where('student.id = :id', { id })
