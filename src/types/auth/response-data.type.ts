@@ -28,9 +28,11 @@ export type UserDataResponse = {
   email: string;
   password?: string;
   role: string;
+  githubUsername?: string;
   name?: string;
   fullName?: string;
   firstName?: string;
   lastName?: string;
   access_token?: string;
+  refreshToken?: string;
 };

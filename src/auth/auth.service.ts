@@ -81,7 +81,7 @@ export class AuthService {
     return hr ? hr : student ? student : admin ? admin : null;
   }
 
-  async checkUserById(id: string) {
+  async checkUserById(id: string): Promise<any> {
     const admin = await this.adminService.getUserById(id);
 
     const hr = await this.hrService.getHrById(id);
@@ -106,6 +106,7 @@ export class AuthService {
           id: user.id,
           email: user.email,
           role: user.role,
+          githubUsername: user.githubUsername,
           name: user.name,
           fullName: user.fullName,
           firstName: user.firstName,
@@ -132,7 +133,29 @@ export class AuthService {
     };
   }
 
-  async refreshTokens(rt: string, response: Response) {
+  async getUserInfo(rt: string): Promise<ApiResponse<UserDataResponse>> {
+    const decodedJwt = await this.getDecodedToken(rt);
+    const user = await this.checkUserByEmail(decodedJwt['email']);
+    if (!user) return { isSuccess: false, error: 'Nie znaleziono użytkownika' };
+    try {
+      return {
+        isSuccess: true,
+        payload: {
+          id: user.id,
+          email: user.email,
+          role: user.role,
+          name: user.name,
+          fullName: user.fullName,
+          firstName: user.firstName,
+          lastName: user.lastName,
+        },
+      };
+    } catch (e) {
+      return { isSuccess: false, error: 'Ups... coś poszło nie tak.' };
+    }
+  }
+
+  async refreshTokens(rt: string, response: Response): Promise<Tokens> {
     const decodedJwt = await this.getDecodedToken(rt);
     const user = await this.checkUserById(decodedJwt['id']);
 
@@ -144,6 +167,6 @@ export class AuthService {
     const tokens = await this.getTokens(user.id, user.email);
     await this.updateRtHash(user.id, tokens.refresh_token);
     response.cookie('jwt-refresh', tokens.refresh_token, { httpOnly: true });
-    return tokens;
+    return { access_token: tokens.access_token };
   }
 }

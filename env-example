@@ -30,6 +30,5 @@ EMAIL_PORT=2500
 EMAIL_FROM=admin@test.example.com
 EMAIL_SECURE=false
 
-# Upload files
-UPLOAD_DIR=./uploads/csv/
-MAX_FILE_SIZE=10MB
+#App URL
+APP_URL=http://localhost:3000/
