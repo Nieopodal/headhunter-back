@@ -1,7 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { ApiResponse, SimpleStudentData, UpdateStudentResponse, StudentCv, StudentStatus } from '@Types';
+import {
+  ApiResponse,
+  SimpleStudentData,
+  UpdateStudentResponse,
+  StudentCv,
+  StudentStatus,
+  UpdateResponse,
+  ConfirmResponse,
+} from '@Types';
 import { Student } from './entity/student.entity';
-import { UserDataResponse } from '../types/auth/response-data.type';
 
 @Injectable()
 export class StudentService {
@@ -132,7 +139,8 @@ export class StudentService {
   async get(): Promise<Student[]> {
     return await Student.find();
   }
-  async confirmStudentAccount(param): Promise<ApiResponse<UserDataResponse>> {
+
+  async confirmStudentAccount(param): Promise<ApiResponse<ConfirmResponse>> {
     const student = await this.getStudentById(param.id);
     if (student && param.token === student.verificationToken) {
       try {
@@ -143,7 +151,7 @@ export class StudentService {
           .execute();
         return {
           isSuccess: true,
-          payload: param.id,
+          payload: { id: param.id },
         };
       } catch (e) {
         return { isSuccess: false, error: 'Ups... coś poszło nie tak.' };
@@ -152,12 +160,12 @@ export class StudentService {
     return { isSuccess: false, error: 'Ups... coś poszło nie tak.' };
   }
 
-  async updateStudent(data): Promise<ApiResponse<UpdateStudentResponse>> {
+  async updateStudent(data): Promise<ApiResponse<UpdateResponse>> {
     try {
       await Student.createQueryBuilder('student').update(Student).set(data).where('id=:id', { id: data.id }).execute();
       return {
         isSuccess: true,
-        payload: data.id,
+        payload: { id: data.id },
       };
     } catch {
       return { isSuccess: false, error: 'Ups... coś poszło nie tak.' };

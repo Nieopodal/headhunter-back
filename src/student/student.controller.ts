@@ -3,8 +3,8 @@ import { Student } from './entity/student.entity';
 import { StudentService } from './student.service';
 import { Public } from '../common/decorators';
 import { UpdateStudentDto } from './dto';
-import { ApiResponse, SimpleStudentData, StudentCv, UpdateStudentResponse } from '@Types';
-import { UserDataResponse } from '../types/auth/response-data.type';
+import { ApiResponse, ConfirmResponse, SimpleStudentData, StudentCv, UpdateStudentResponse } from '@Types';
+import { UserDataResponse } from '../types/auth/response.type';
 import { ConfirmStudentDto } from './dto/confirm-student.dto';
 
 @Controller('student')
@@ -45,7 +45,7 @@ export class StudentController {
   @Public()
   @Post('confirm/:id/:token')
   @HttpCode(HttpStatus.OK)
-  confirmAccount(@Param() param: ConfirmStudentDto): Promise<ApiResponse<UserDataResponse>> {
+  confirmAccount(@Param() param: ConfirmStudentDto): Promise<ApiResponse<ConfirmResponse>> {
     return this.studentService.confirmStudentAccount(param);
   }
 

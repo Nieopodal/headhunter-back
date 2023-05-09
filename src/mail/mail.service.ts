@@ -8,9 +8,9 @@ import { SendMailInfo } from '@Types';
 @Injectable()
 export class MailService {
   constructor(
-    private readonly mailerService: MailerService,
-    private readonly studentService: StudentService,
-    private readonly configService: ConfigService,
+    private mailerService: MailerService,
+    private studentService: StudentService,
+    private configService: ConfigService,
   ) {}
 
   async generateUrl(email): Promise<string> {
