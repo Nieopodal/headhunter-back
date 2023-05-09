@@ -6,11 +6,11 @@ import { UserDataResponse } from '../types/auth/response-data.type';
 @Injectable()
 export class StudentService {
   async getAvatar(id: string): Promise<ApiResponse<string>> {
-    const studentAvatar: Student = await Student.findOneBy({ id });
+    const studentAvatar = await Student.findOneBy({ id });
     if (!studentAvatar) {
       return { isSuccess: false, error: 'Nie znaleziono użytkownika' };
     }
-    return { isSuccess: true, payload: studentAvatar.avatar };
+    return { isSuccess: true, payload: studentAvatar.githubUsername };
   }
 
   async getStudentCv(id: string): Promise<ApiResponse<StudentCv>> {
@@ -86,7 +86,6 @@ export class StudentService {
       student.reservationTime = null;
       student.firstName = null;
       student.lastName = null;
-      student.avatar = null;
       await Student.save(student);
       return { isSuccess: true, payload: { id } };
     } catch {
