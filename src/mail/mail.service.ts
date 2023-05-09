@@ -3,26 +3,23 @@ import {MailerService} from "@nestjs-modules/mailer";
 import {ConfigService} from "@nestjs/config";
 import * as nodemailer from 'nodemailer';
 import { StudentService } from '../student/student.service';
+import {SendMailInfo} from "../types/mail";
 
-interface SendMailInfo {
-    to: string;
-    subject: string;
-    html: string;
-}
+
 
 @Injectable()
 export class MailService {
-  constructor(private readonly mailerService: MailerService, private readonly studentService: StudentService) {}
-
-  async generateUrl(email): Promise<string> {
-    const { id, verificationToken } = await this.studentService.getStudentByEmail(email);
-    return `http://localhost:3000/student/confirm/${id}/${verificationToken}`;
-  }
-
     constructor(
         private readonly mailerService: MailerService,
+        private readonly studentService: StudentService,
         private readonly configService: ConfigService,
-        ) {}
+    ) {};
+
+    async generateUrl(email): Promise<string> {
+        const {id, verificationToken} = await this.studentService.getStudentByEmail(email);
+        const appUrl = this.configService.get('APP_URL');
+        return `${appUrl}/student/confirm/${id}/${verificationToken}`;
+    };
 
     async sendMail(
         to: string,
@@ -37,6 +34,7 @@ export class MailService {
             html,
         });
     };
+
 
     async testConnection(): Promise<boolean> {
         const transportOptions = {
