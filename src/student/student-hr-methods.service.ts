@@ -90,9 +90,6 @@ export class StudentHrMethodsService {
 
     foundStudent.status = StudentStatus.INTERVIEW;
     foundStudent.hr = hr;
-    foundStudent.avatar = (await getAvatar(foundStudent.githubUsername))
-      ? 'https://www.deviantart.com/karmaanddestiny/art/Default-user-icon-4-858661084'
-      : `https://github.com/${foundStudent.githubUsername}.png`;
     foundStudent.firstName = `${foundStudent.firstName}`;
     foundStudent.lastName = `${foundStudent.lastName}`;
     const reservationTime = +new Date().setHours(23, 59, 59, 99) + 1000 * 60 * 60 * 24 * 10;
@@ -129,7 +126,6 @@ export class StudentHrMethodsService {
 
     foundStudent.status = StudentStatus.AVAILABLE;
     foundStudent.hr = null;
-    foundStudent.avatar = null;
     foundStudent.reservationTime = null;
     await foundStudent.save();
 
@@ -168,7 +164,6 @@ export class StudentHrMethodsService {
     foundStudent.reservationTime = null;
     foundStudent.firstName = null;
     foundStudent.lastName = null;
-    foundStudent.avatar = null;
     await foundStudent.save();
 
     return {

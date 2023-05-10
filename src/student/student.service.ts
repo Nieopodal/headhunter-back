@@ -17,7 +17,7 @@ export class StudentService {
     if (!studentAvatar) {
       return { isSuccess: false, error: 'Nie znaleziono użytkownika' };
     }
-    return { isSuccess: true, payload: studentAvatar.avatar };
+    return { isSuccess: true, payload: studentAvatar.githubUsername };
   }
 
   async getStudentCv(id: string): Promise<ApiResponse<StudentCv>> {
@@ -94,7 +94,6 @@ export class StudentService {
       student.reservationTime = null;
       student.firstName = null;
       student.lastName = null;
-      student.avatar = null;
       await Student.save(student);
       return { isSuccess: true, payload: { id } };
     } catch {
