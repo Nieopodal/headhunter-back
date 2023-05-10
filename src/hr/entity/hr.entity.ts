@@ -8,6 +8,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Student } from '../../student/entity/student.entity';
+import { UserRole } from '@Types';
 
 @Entity()
 export class Hr extends BaseEntity {
@@ -26,11 +27,11 @@ export class Hr extends BaseEntity {
   @Column({ length: 255 })
   fullName: string;
 
+  @Column({ default: UserRole.HR, length: 20, enum: UserRole })
+  role: UserRole;
+
   @Column({ type: 'boolean', default: false })
   active: boolean;
-
-  @Column({ length: 20, default: 'hr' })
-  role: string;
 
   @Column({
     length: 150,

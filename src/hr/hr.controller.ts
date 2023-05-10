@@ -30,42 +30,42 @@ export class HrController {
   }
 
   @UseGuards(UserRoleGuard)
-  @Role('hr')
+  @Role(UserRole.HR)
   @Get('/available')
   async showAvailableStudents(): Promise<ApiResponse<SimpleStudentData[]>> {
     return this.studentService.getFreeStudents();
   }
 
   @UseGuards(UserRoleGuard)
-  @Role('hr')
+  @Role(UserRole.HR)
   @Get('/interview')
   async showStudentsToInterview(@GetCurrentUserId() hrId: string): Promise<ApiResponse<StudentToInterview[]>> {
     return this.studentHrService.showStudentsToInterview(hrId);
   }
 
   @UseGuards(UserRoleGuard)
-  @Role('hr')
+  @Role(UserRole.HR)
   @Get('/interview/cv/:id')
   async showStudentCv(@Param('id') id: string): Promise<ApiResponse<StudentCv>> {
     return this.studentService.getStudentCv(id);
   }
 
   @UseGuards(UserRoleGuard)
-  @Role('hr')
+  @Role(UserRole.HR)
   @Patch('/interview/:id')
   async setToInterview(@Param('id') id: string, @GetCurrentUserId() hrId: string): Promise<ApiResponse<null>> {
     return this.studentHrService.setToInterview(id, hrId);
   }
 
   @UseGuards(UserRoleGuard)
-  @Role('hr')
+  @Role(UserRole.HR)
   @Patch('/withdraw/:id')
   async setDisinterest(@Param('id') id: string, @GetCurrentUserId() hrId: string): Promise<ApiResponse<null>> {
     return this.studentHrService.setDisinterest(id, hrId);
   }
 
   @UseGuards(UserRoleGuard)
-  @Role('hr')
+  @Role(UserRole.HR)
   @Patch('/employed/:id')
   async setEmployed(@Param('id') id: string, @GetCurrentUserId() hrId: string): Promise<ApiResponse<null>> {
     return this.studentHrService.setEmployed(id, hrId);
