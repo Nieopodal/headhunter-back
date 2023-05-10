@@ -35,10 +35,9 @@ export class AuthService {
     await user.save();
   }
 
-  async getVerificationToken(email: string): Promise<string> {
-    const { id } = await this.studentService.getStudentByEmail(email);
+  async generateVerifyToken(email: string): Promise<string> {
     const token = await this.jwtService.signAsync(
-      { id, email },
+      { email },
       {
         secret: this.configService.get('SECRET_KEY_VT'),
         expiresIn: this.configService.get('EXPIRES_IN_VT'),

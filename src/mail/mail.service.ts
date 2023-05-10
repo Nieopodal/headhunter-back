@@ -13,10 +13,10 @@ export class MailService {
     private configService: ConfigService,
   ) {}
 
-  async generateUrl(email): Promise<string> {
-    const { id, verificationToken } = await this.studentService.getStudentByEmail(email);
+  async generateUrl(data): Promise<string> {
+    const { id, role, verificationToken } = data;
     const appUrl = this.configService.get('APP_URL');
-    return `${appUrl}/student/confirm/${id}/${verificationToken}`;
+    return `${appUrl}/${role}/confirm/${id}/${verificationToken}`;
   }
 
   async sendMail(to: string, subject: string, html: string): Promise<SendMailInfo> {

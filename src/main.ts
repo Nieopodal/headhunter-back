@@ -11,7 +11,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
   app.use(cookieParser());
   app.enableCors({
-    origin: [configService.get('CORS_CLIENTS_URL')],
+    origin: configService.get('CORS_CLIENTS_URL'),
 
     credentials: true,
   });

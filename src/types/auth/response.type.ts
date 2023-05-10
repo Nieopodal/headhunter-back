@@ -9,7 +9,6 @@ export type UserDataResponse = {
   firstName?: string;
   lastName?: string;
   access_token?: string;
-  refreshToken?: string;
 };
 
 export type CreateResponse = {

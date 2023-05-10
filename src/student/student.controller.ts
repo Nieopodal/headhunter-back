@@ -4,7 +4,6 @@ import { StudentService } from './student.service';
 import { Public } from '../common/decorators';
 import { UpdateStudentDto } from './dto';
 import { ApiResponse, ConfirmResponse, SimpleStudentData, StudentCv, UpdateStudentResponse } from '@Types';
-import { UserDataResponse } from '../types/auth/response.type';
 import { ConfirmStudentDto } from './dto/confirm-student.dto';
 
 @Controller('student')

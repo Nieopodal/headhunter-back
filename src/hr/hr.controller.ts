@@ -6,6 +6,7 @@ import { StudentHrMethodsService } from '../student/student-hr-methods.service';
 import { UserRoleGuard } from '../common/guards';
 import { ConfirmHrDto } from './dto/confirm-hr.dto';
 import { HrService } from './hr.service';
+import { Hr } from './entity/hr.entity';
 
 @Controller('hr')
 export class HrController {
@@ -15,7 +16,13 @@ export class HrController {
     private readonly hrService: HrService,
   ) {}
 
-  // @Public()
+  @Public()
+  @Get('all')
+  getAllHr(): Promise<Hr[]> {
+    return this.hrService.get();
+  }
+
+  @Public()
   @Post('confirm/:id/:token')
   @HttpCode(HttpStatus.OK)
   confirmAccount(@Param() param: ConfirmHrDto): Promise<ApiResponse<ConfirmResponse>> {
