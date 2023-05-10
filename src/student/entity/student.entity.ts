@@ -21,9 +21,6 @@ export class Student extends BaseEntity {
   @Column({ length: 255, default: '' })
   password: string;
 
-  @Column({ length: 255, nullable: true, default: null })
-  avatar: string | null;
-
   @Column({ length: 20, nullable: true })
   contactNumber: string;
 

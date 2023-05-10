@@ -30,7 +30,6 @@ export type StudentToInterview = SimpleStudentData & {
   id: string;
   firstName: string;
   lastName: string;
-  avatar: string;
   reservationTime: Date;
 };
 
