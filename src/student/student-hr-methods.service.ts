@@ -6,7 +6,9 @@ import { HrService } from '../hr/hr.service';
 
 @Injectable()
 export class StudentHrMethodsService {
-  constructor(private readonly hrService: HrService) {}
+  constructor(private readonly hrService: HrService) {
+  }
+
   filter(data: Student): StudentToInterview {
     const {
       education,
@@ -32,6 +34,7 @@ export class StudentHrMethodsService {
     } = data;
     return rest;
   }
+
   async setToInterview(id: string, hrId: string): Promise<ApiResponse<null>> {
     const hr = await this.hrService.getHrById(hrId);
     const bookedStudents = await Student.count({
@@ -95,8 +98,7 @@ export class StudentHrMethodsService {
       : `https://github.com/${foundStudent.githubUsername}.png`;
     foundStudent.firstName = `${foundStudent.firstName}`;
     foundStudent.lastName = `${foundStudent.lastName}`;
-    const reservationTime = +new Date().setHours(23, 59, 59, 99) + 1000 * 60 * 60 * 24 * 10;
-    foundStudent.reservationTime = new Date(reservationTime);
+    foundStudent.reservationTime = new Date(+new Date().setHours(23, 59, 59, 99) + 864000000);
     await foundStudent.save();
 
     return {
