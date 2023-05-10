@@ -36,8 +36,11 @@ export class StudentController {
   @Role('student')
   @Patch('update')
   @HttpCode(HttpStatus.ACCEPTED)
-  updateStudent(@Body() registerData: UpdateStudentDto): Promise<ApiResponse<UpdateStudentResponse>> {
-    return this.studentService.updateStudent(registerData);
+  updateStudent(
+    @GetCurrentUserId() id: string,
+    @Body() registerData: UpdateStudentDto,
+  ): Promise<ApiResponse<UpdateStudentResponse>> {
+    return this.studentService.updateStudent(id, registerData);
   }
 
   @Public()
