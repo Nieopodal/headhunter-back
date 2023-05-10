@@ -1,7 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Student } from './entity/student.entity';
 import { ApiResponse, StudentStatus, StudentToInterview } from '@Types';
-import { getAvatar } from '../hr/utils/get-avatar';
 import { HrService } from '../hr/hr.service';
 
 @Injectable()

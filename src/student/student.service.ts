@@ -13,7 +13,7 @@ import { Student } from './entity/student.entity';
 @Injectable()
 export class StudentService {
   async getAvatar(id: string): Promise<ApiResponse<string>> {
-    const studentAvatar: Student = await Student.findOneBy({ id });
+    const studentAvatar = await Student.findOneBy({ id });
     if (!studentAvatar) {
       return { isSuccess: false, error: 'Nie znaleziono użytkownika' };
     }
@@ -35,8 +35,6 @@ export class StudentService {
         'student.projectDegree',
         'student.teamProjectDegree',
         'student.portfolioUrls',
-        'student.teamProjectUrls',
-        'student.teamProjectPR',
         'student.projectUrls',
         'student.expectedTypeWork',
         'student.expectedContractType',
@@ -46,6 +44,7 @@ export class StudentService {
         'student.monthsOfCommercialExp',
         'student.education',
         'student.courses',
+        'student.scrumProjectUrls',
         'student.workExperience',
       ])
       .where('student.id = :id', { id })
@@ -112,6 +111,7 @@ export class StudentService {
         'student.projectDegree',
         'student.teamProjectDegree',
         'student.expectedTypeWork',
+        'student.expectedContractType',
         'student.targetWorkCity',
         'student.expectedSalary',
         'student.canTakeApprenticeship',
@@ -158,10 +158,9 @@ export class StudentService {
     }
     return { isSuccess: false, error: 'Ups... coś poszło nie tak.' };
   }
-
   async updateStudent(data): Promise<ApiResponse<UpdateResponse>> {
     try {
-      await Student.createQueryBuilder('student').update(Student).set(data).where('id=:id', { id: data.id }).execute();
+      await Student.createQueryBuilder('student').update(Student).set(data).where('id=:id', { id }).execute();
       return {
         isSuccess: true,
         payload: { id: data.id },
