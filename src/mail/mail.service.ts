@@ -8,21 +8,20 @@ import { SendMailInfo } from '@Types';
 @Injectable()
 export class MailService {
   constructor(
-    private readonly mailerService: MailerService,
-    private readonly studentService: StudentService,
-    private readonly configService: ConfigService,
+    private mailerService: MailerService,
+    private studentService: StudentService,
+    private configService: ConfigService,
   ) {}
 
-  async generateUrl(email): Promise<string> {
-    const { id, verificationToken } = await this.studentService.getStudentByEmail(email);
+  async generateUrl(data): Promise<string> {
+    const { id, role, verificationToken } = data;
     const appUrl = this.configService.get('APP_URL');
-    return `${appUrl}/student/confirm/${id}/${verificationToken}`;
+    return `${appUrl}/${role}/confirm/${id}/${verificationToken}`;
   }
 
-  async sendMail(to: string, from: string, subject: string, html: string): Promise<SendMailInfo> {
+  async sendMail(to: string, subject: string, html: string): Promise<SendMailInfo> {
     return this.mailerService.sendMail({
       to,
-      from,
       subject,
       html,
     });

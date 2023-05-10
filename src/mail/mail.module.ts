@@ -4,6 +4,8 @@ import { ConfigModule } from '@nestjs/config';
 import { MailerConfiguration } from '../config/mailerconfig';
 import { MailService } from './mail.service';
 import { StudentModule } from '../student/student.module';
+import { MailController } from './mail.controller';
+import { HrModule } from '../hr/hr.module';
 
 @Module({
   imports: [
@@ -12,9 +14,10 @@ import { StudentModule } from '../student/student.module';
       useClass: MailerConfiguration,
     }),
     forwardRef(() => StudentModule),
+    forwardRef(() => HrModule),
   ],
   providers: [MailService],
-  controllers: [MailService],
+  controllers: [MailController],
   exports: [MailService],
 })
 export class MailModule {}

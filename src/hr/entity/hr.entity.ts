@@ -21,7 +21,7 @@ export class Hr extends BaseEntity {
   })
   email: string;
 
-  @Column({ length: 255 })
+  @Column({ length: 255, default: '' })
   password: string;
 
   @Column({ length: 255 })
@@ -29,6 +29,9 @@ export class Hr extends BaseEntity {
 
   @Column({ default: UserRole.HR, length: 20, enum: UserRole })
   role: UserRole;
+
+  @Column({ type: 'boolean', default: false })
+  active: boolean;
 
   @Column({
     length: 150,
@@ -38,11 +41,14 @@ export class Hr extends BaseEntity {
   @Column({ default: 0 })
   maxReservedStudents: number;
 
-  @Column({ default: '', length: 255, nullable: true })
+  @Column({ length: 255, nullable: true, default: '' })
   refreshToken: string;
 
-  @Column({ nullable: true, default: null, length: 255 })
+  @Column({ length: 255, nullable: true, default: null })
   verificationToken: string;
+
+  @Column({ default: '', length: 255 })
+  activationUrl: string;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;

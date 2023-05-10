@@ -1,10 +1,10 @@
-import { Body, Controller, HttpCode, HttpStatus, Post, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Res, UseGuards } from '@nestjs/common';
 import { Response } from 'express';
 import { LoginUserDto } from './dto';
 import { AuthService } from './auth.service';
 import { ApiResponse, Tokens } from '@Types';
 import { GetCurrentUserId, Public } from '../common/decorators';
-import { UserDataResponse } from '../types/auth/response-data.type';
+import { UserDataResponse } from '../types/auth/response.type';
 import { AtGuard, RtGuard } from '../common/guards';
 import { Cookies } from '../common/decorators/cookie.decorator';
 
@@ -29,6 +29,13 @@ export class AuthController {
     return this.authService.logout(id);
   }
 
+  @Public()
+  @UseGuards(RtGuard)
+  @Get('user')
+  @HttpCode(HttpStatus.FOUND)
+  getUserInfo(@Cookies('jwt-refresh') rt: string): Promise<ApiResponse<UserDataResponse>> {
+    return this.authService.getUserInfo(rt);
+  }
   @Public()
   @UseGuards(RtGuard)
   @Post('refresh')

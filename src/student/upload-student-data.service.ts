@@ -7,6 +7,7 @@ import { AuthService } from '../auth/auth.service';
 import { UploadStudentsDto } from './dto';
 import { ApiResponse } from '@Types';
 import { MailService } from '../mail/mail.service';
+import { studentRegistrationTemplate } from '../templates/email/student-registration';
 
 @Injectable()
 export class UploadStudentDataService {
@@ -37,12 +38,14 @@ export class UploadStudentDataService {
           data.teamProjectDegree = Number(record.teamProjectDegree);
           data.scrumProjectUrls = record.scrumProjectUrls;
           if (!students.some((std) => std.email == record.email)) {
+            data.verificationToken = await this.authService.generateVerifyToken(record.email);
             await data.save();
-            data.verificationToken = await this.authService.getVerificationToken(record.email);
-            await data.save();
-            data.activationUrl = await this.mailService.generateUrl(record.email);
+            data.activationUrl = await this.mailService.generateUrl(data);
             await data.save();
             records.push(data);
+
+            const emailTemplate = studentRegistrationTemplate(data.activationUrl);
+            await this.mailService.sendMail(data.email, 'Potwierdzenie rejestracji', emailTemplate);
           }
         }
       });

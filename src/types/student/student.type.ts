@@ -30,8 +30,11 @@ export type StudentToInterview = SimpleStudentData & {
   id: string;
   firstName: string;
   lastName: string;
-  avatar: string;
   reservationTime: Date;
+};
+
+export type ConfirmStudentResponse = {
+  id: string;
 };
 
 export type UpdateStudentResponse = {

@@ -1,16 +1,23 @@
 import { Injectable } from '@nestjs/common';
-import { ApiResponse, SimpleStudentData, UpdateStudentResponse, StudentCv, StudentStatus } from '@Types';
+import {
+  ApiResponse,
+  SimpleStudentData,
+  UpdateStudentResponse,
+  StudentCv,
+  StudentStatus,
+  UpdateResponse,
+  ConfirmResponse,
+} from '@Types';
 import { Student } from './entity/student.entity';
-import { UserDataResponse } from '../types/auth/response-data.type';
 
 @Injectable()
 export class StudentService {
   async getAvatar(id: string): Promise<ApiResponse<string>> {
-    const studentAvatar: Student = await Student.findOneBy({ id });
+    const studentAvatar = await Student.findOneBy({ id });
     if (!studentAvatar) {
       return { isSuccess: false, error: 'Nie znaleziono użytkownika' };
     }
-    return { isSuccess: true, payload: studentAvatar.avatar };
+    return { isSuccess: true, payload: studentAvatar.githubUsername };
   }
 
   async getStudentCv(id: string): Promise<ApiResponse<StudentCv>> {
@@ -28,8 +35,6 @@ export class StudentService {
         'student.projectDegree',
         'student.teamProjectDegree',
         'student.portfolioUrls',
-        'student.teamProjectUrls',
-        'student.teamProjectPR',
         'student.projectUrls',
         'student.expectedTypeWork',
         'student.expectedContractType',
@@ -39,6 +44,7 @@ export class StudentService {
         'student.monthsOfCommercialExp',
         'student.education',
         'student.courses',
+        'student.scrumProjectUrls',
         'student.workExperience',
       ])
       .where('student.id = :id', { id })
@@ -87,7 +93,6 @@ export class StudentService {
       student.reservationTime = null;
       student.firstName = null;
       student.lastName = null;
-      student.avatar = null;
       await Student.save(student);
       return { isSuccess: true, payload: { id } };
     } catch {
@@ -106,6 +111,7 @@ export class StudentService {
         'student.projectDegree',
         'student.teamProjectDegree',
         'student.expectedTypeWork',
+        'student.expectedContractType',
         'student.targetWorkCity',
         'student.expectedSalary',
         'student.canTakeApprenticeship',
@@ -132,7 +138,8 @@ export class StudentService {
   async get(): Promise<Student[]> {
     return await Student.find();
   }
-  async confirmStudentAccount(param): Promise<ApiResponse<UserDataResponse>> {
+
+  async confirmStudentAccount(param): Promise<ApiResponse<ConfirmResponse>> {
     const student = await this.getStudentById(param.id);
     if (student && param.token === student.verificationToken) {
       try {
@@ -143,7 +150,7 @@ export class StudentService {
           .execute();
         return {
           isSuccess: true,
-          payload: param.id,
+          payload: { id: param.id },
         };
       } catch (e) {
         return { isSuccess: false, error: 'Ups... coś poszło nie tak.' };
@@ -151,13 +158,12 @@ export class StudentService {
     }
     return { isSuccess: false, error: 'Ups... coś poszło nie tak.' };
   }
-
-  async updateStudent(data): Promise<ApiResponse<UpdateStudentResponse>> {
+  async updateStudent(data): Promise<ApiResponse<UpdateResponse>> {
     try {
-      await Student.createQueryBuilder('student').update(Student).set(data).where('id=:id', { id: data.id }).execute();
+      await Student.createQueryBuilder('student').update(Student).set(data).where('id=:id', { id }).execute();
       return {
         isSuccess: true,
-        payload: data.id,
+        payload: { id: data.id },
       };
     } catch {
       return { isSuccess: false, error: 'Ups... coś poszło nie tak.' };
