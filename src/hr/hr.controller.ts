@@ -1,6 +1,6 @@
 import { Controller, Get, HttpCode, HttpStatus, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { GetCurrentUserId, Public, Role } from '../common/decorators';
-import { ApiResponse, ConfirmResponse, SimpleStudentData, StudentCv, StudentToInterview } from '@Types';
+import { ApiResponse, ConfirmResponse, SimpleStudentData, StudentCv, StudentToInterview, UserRole } from '@Types';
 import { StudentService } from '../student/student.service';
 import { StudentHrMethodsService } from '../student/student-hr-methods.service';
 import { UserRoleGuard } from '../common/guards';
