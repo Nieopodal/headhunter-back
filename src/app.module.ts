@@ -12,6 +12,8 @@ import { AtGuard } from './common/guards';
 import { APP_GUARD } from '@nestjs/core';
 import { MailModule } from './mail/mail.module';
 import { UploadStudentDataModule } from './student/upload-student-data.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { CronService } from './cron/cron.service';
 
 @Module({
   imports: [
@@ -19,6 +21,7 @@ import { UploadStudentDataModule } from './student/upload-student-data.module';
     TypeOrmModule.forRootAsync({
       useClass: DatabaseConfiguration,
     }),
+    ScheduleModule.forRoot(),
     forwardRef(() => StudentModule),
     forwardRef(() => UploadStudentDataModule),
     forwardRef(() => AdminModule),
@@ -27,6 +30,6 @@ import { UploadStudentDataModule } from './student/upload-student-data.module';
     forwardRef(() => MailModule),
   ],
   controllers: [AppController],
-  providers: [{ provide: APP_GUARD, useClass: AtGuard }, AppService],
+  providers: [{ provide: APP_GUARD, useClass: AtGuard }, AppService, CronService],
 })
 export class AppModule {}
