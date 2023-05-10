@@ -4,7 +4,7 @@ import { LoginUserDto } from './dto';
 import { AuthService } from './auth.service';
 import { ApiResponse, Tokens } from '@Types';
 import { GetCurrentUserId, Public } from '../common/decorators';
-import { UserDataResponse } from '../types/auth/response-data.type';
+import { UserDataResponse } from '../types/auth/response.type';
 import { AtGuard, RtGuard } from '../common/guards';
 import { Cookies } from '../common/decorators/cookie.decorator';
 

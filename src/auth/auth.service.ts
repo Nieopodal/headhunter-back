@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { LoginUserDto } from './dto';
 import { AdminService } from '../admin/admin.service';
 import { StudentService } from '../student/student.service';
@@ -8,7 +8,7 @@ import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
 import { ApiResponse, Tokens } from '@Types';
 import { HrService } from '../hr/hr.service';
-import { UserDataResponse } from '../types/auth/response-data.type';
+import { UserDataResponse } from '@Types';
 
 @Injectable()
 export class AuthService {
@@ -35,10 +35,9 @@ export class AuthService {
     await user.save();
   }
 
-  async getVerificationToken(email: string): Promise<string> {
-    const { id } = await this.studentService.getStudentByEmail(email);
+  async generateVerifyToken(email: string): Promise<string> {
     const token = await this.jwtService.signAsync(
-      { id, email },
+      { email },
       {
         secret: this.configService.get('SECRET_KEY_VT'),
         expiresIn: this.configService.get('EXPIRES_IN_VT'),

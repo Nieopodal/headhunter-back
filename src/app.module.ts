@@ -26,7 +26,6 @@ import { UploadStudentDataModule } from './student/upload-student-data.module';
     forwardRef(() => AuthModule),
     forwardRef(() => MailModule),
   ],
-  controllers: [AppController],
-  providers: [{ provide: APP_GUARD, useClass: AtGuard }, AppService],
+  providers: [{ provide: APP_GUARD, useClass: AtGuard }],
 })
 export class AppModule {}

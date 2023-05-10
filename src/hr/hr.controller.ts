@@ -1,16 +1,33 @@
-import { Controller, Get, Param, Patch, UseGuards } from '@nestjs/common';
-import { GetCurrentUserId, Role } from '../common/decorators';
-import { ApiResponse, SimpleStudentData, StudentCv, StudentToInterview } from '@Types';
+import { Controller, Get, HttpCode, HttpStatus, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { GetCurrentUserId, Public, Role } from '../common/decorators';
+import { ApiResponse, ConfirmResponse, SimpleStudentData, StudentCv, StudentToInterview } from '@Types';
 import { StudentService } from '../student/student.service';
 import { StudentHrMethodsService } from '../student/student-hr-methods.service';
 import { UserRoleGuard } from '../common/guards';
+import { ConfirmHrDto } from './dto/confirm-hr.dto';
+import { HrService } from './hr.service';
+import { Hr } from './entity/hr.entity';
 
 @Controller('hr')
 export class HrController {
   constructor(
     private readonly studentHrService: StudentHrMethodsService,
     private readonly studentService: StudentService,
+    private readonly hrService: HrService,
   ) {}
+
+  @Public()
+  @Get('all')
+  getAllHr(): Promise<Hr[]> {
+    return this.hrService.get();
+  }
+
+  @Public()
+  @Post('confirm/:id/:token')
+  @HttpCode(HttpStatus.OK)
+  confirmAccount(@Param() param: ConfirmHrDto): Promise<ApiResponse<ConfirmResponse>> {
+    return this.hrService.confirmHrAccount(param);
+  }
 
   @UseGuards(UserRoleGuard)
   @Role('hr')
