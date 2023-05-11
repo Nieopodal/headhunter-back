@@ -7,7 +7,7 @@ import { AuthService } from '../auth/auth.service';
 import { UploadStudentsDto } from './dto';
 import { ApiResponse } from '@Types';
 import { MailService } from '../mail/mail.service';
-import { studentRegistrationTemplate } from '../templates/email/student-registration';
+import {studentRegistrationTemplate} from "../templates/email/student-registration";
 
 @Injectable()
 export class UploadStudentDataService {
@@ -16,6 +16,20 @@ export class UploadStudentDataService {
     private studentService: StudentService,
     private mailService: MailService,
   ) {}
+
+
+
+  async sendEmailsToStudents(mailService, students) {
+    for (const student of students) {
+      const emailTemplate = studentRegistrationTemplate(student.activationUrl);
+      try {
+        await mailService.sendMail(student.email, 'Potwierdzenie rejestracji', emailTemplate);
+        console.log(`Email sent to ${student.email}`);
+      } catch (error) {
+        console.error(`Failed to send email to ${student.email}:`, error.message);
+      }
+    }
+  }
 
   async uploadFile(file): Promise<ApiResponse<object>> {
     const records = [];
@@ -26,6 +40,7 @@ export class UploadStudentDataService {
       columns: true,
       cast: true,
     });
+
     try {
       parser.on('readable', async () => {
         let record: UploadStudentsDto;
@@ -43,9 +58,6 @@ export class UploadStudentDataService {
             data.activationUrl = await this.mailService.generateUrl(data);
             await data.save();
             records.push(data);
-
-            const emailTemplate = studentRegistrationTemplate(data.activationUrl);
-            await this.mailService.sendMail(data.email, 'Potwierdzenie rejestracji', emailTemplate);
           }
         }
       });
@@ -57,7 +69,10 @@ export class UploadStudentDataService {
         stream.on('end', resolve);
         stream.on('error', reject);
       });
-      await Promise.all(records);
+
+      this.sendEmailsToStudents(this.mailService, records).catch((error) => {
+        console.error('Failed to send emails to students:', error.message);
+      });
 
       return { isSuccess: true, payload: { numberAddedStudents: records.length } };
     } catch (e) {
