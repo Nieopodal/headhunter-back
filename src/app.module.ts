@@ -1,8 +1,6 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { DatabaseConfiguration } from './config/typeorm.config';
 import { StudentModule } from './student/student.module';
 import { AdminModule } from './admin/admin.module';
@@ -12,12 +10,17 @@ import { AtGuard } from './common/guards';
 import { APP_GUARD } from '@nestjs/core';
 import { MailModule } from './mail/mail.module';
 import { UploadStudentDataModule } from './student/upload-student-data.module';
+import {ThrottlerModule} from "@nestjs/throttler";
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRootAsync({
       useClass: DatabaseConfiguration,
+    }),
+    ThrottlerModule.forRoot({
+      ttl: 60,
+      limit: 5,
     }),
     forwardRef(() => StudentModule),
     forwardRef(() => UploadStudentDataModule),
