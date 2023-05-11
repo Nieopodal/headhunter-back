@@ -1,2 +1,2 @@
 export * from './login-user.dto';
-export * from './register-hr.dto';
+export * from './change-password.dto';

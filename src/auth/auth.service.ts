@@ -1,4 +1,4 @@
-import { ForbiddenException, forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { LoginUserDto } from './dto';
 import { AdminService } from '../admin/admin.service';
 import { StudentService } from '../student/student.service';
@@ -6,7 +6,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
 import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
-import { ApiResponse, Tokens } from '@Types';
+import { ApiResponse, ConfirmResponse, Tokens, UpdateResponse } from '@Types';
 import { HrService } from '../hr/hr.service';
 import { UserDataResponse } from '@Types';
 
@@ -27,6 +27,10 @@ export class AuthService {
     } else {
       return await this.hashData(data);
     }
+  }
+
+  async compareHashedData(plainText: string, hashedText: string): Promise<boolean> {
+    return await bcrypt.compare(plainText, hashedText);
   }
 
   async updateRtHash(id, rt: string): Promise<void> {
@@ -94,7 +98,7 @@ export class AuthService {
     const user = await this.checkUserByEmail(login.email);
     if (!user) return { isSuccess: false, error: 'Nie znaleziono użytkownika' };
     try {
-      const passwordMatches = await bcrypt.compare(login.password, user.password);
+      const passwordMatches = await this.compareHashedData(login.password, user.password);
       if (!passwordMatches) return { isSuccess: false, error: 'Niepoprawne hasło' };
       const tokens = await this.getTokens(user.id, user.email);
       await this.updateRtHash(user.id, tokens.refresh_token);
@@ -132,8 +136,33 @@ export class AuthService {
     };
   }
 
-  async getUserInfo(rt: string): Promise<ApiResponse<UserDataResponse>> {
-    const decodedJwt = await this.getDecodedToken(rt);
+  async changePassword(id, data): Promise<ApiResponse<UpdateResponse>> {
+    const user = await this.checkUserById(id);
+    if (!(await this.compareHashedData(data.password, user.password)))
+      throw new HttpException(
+        {
+          isSuccess: false,
+          error: `Podaj poprawne hasło`,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    try {
+      user.password = await this.hashData(data.newPassword);
+      await user.save();
+    } catch (e) {
+      return {
+        isSuccess: false,
+        error: 'Ups... coś poszło nie tak.',
+      };
+    }
+    return {
+      isSuccess: true,
+      payload: user.id,
+    };
+  }
+
+  async getUserInfo(token: string): Promise<ApiResponse<UserDataResponse>> {
+    const decodedJwt = await this.getDecodedToken(token);
     const user = await this.checkUserByEmail(decodedJwt['email']);
     if (!user) return { isSuccess: false, error: 'Nie znaleziono użytkownika' };
     try {
@@ -160,7 +189,7 @@ export class AuthService {
 
     if (!user || !user.refreshToken) throw new ForbiddenException('Access Denied');
 
-    const rtMatches = await bcrypt.compare(rt, user.refreshToken);
+    const rtMatches = await this.compareHashedData(rt, user.refreshToken);
     if (!rtMatches) throw new ForbiddenException('Access Denied');
 
     const tokens = await this.getTokens(user.id, user.email);
