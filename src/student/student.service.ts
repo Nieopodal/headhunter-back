@@ -158,7 +158,7 @@ export class StudentService {
     }
     return { isSuccess: false, error: 'Ups... coś poszło nie tak.' };
   }
-  async updateStudent(data): Promise<ApiResponse<UpdateResponse>> {
+  async updateStudent(id, data): Promise<ApiResponse<UpdateResponse>> {
     try {
       await Student.createQueryBuilder('student').update(Student).set(data).where('id=:id', { id }).execute();
       return {
