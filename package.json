@@ -37,6 +37,7 @@
     "cookie-parser": "^1.4.6",
     "csv-parse": "^5.3.8",
     "csv-parser": "^3.0.0",
+    "helmet": "^7.0.0",
     "mysql2": "^2.3.3",
     "nodemailer": "^6.9.1",
     "p-map": "^6.0.0",
