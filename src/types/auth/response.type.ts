@@ -9,6 +9,8 @@ export type UserDataResponse = {
   firstName?: string;
   lastName?: string;
   access_token?: string;
+  verificationToken?: string;
+  activationUrl?: string;
 };
 
 export type CreateResponse = {
@@ -21,4 +23,8 @@ export type ConfirmResponse = {
 
 export type UpdateResponse = {
   id: string;
+};
+
+export type RecoveryPasswordResponse = {
+  email: string;
 };

@@ -15,12 +15,21 @@ export class Admin extends BaseEntity {
   @Column({ length: 255 })
   password: string;
 
-  @Column({ default: UserRole.ADMIN, length: 20, enum: UserRole })
+  @Column({ type: 'enum', default: UserRole.ADMIN, enum: UserRole })
   role: UserRole;
+
+  @Column({ default: '', length: 255, nullable: true })
+  refreshToken: string;
+
+  @Column({ default: '', length: 255, nullable: true })
+  verificationToken: string;
+
+  @Column({ default: '', length: 255 })
+  activationUrl: string;
 
   @Column({ type: 'timestamp' })
   createdAt: Date;
 
-  @Column({ default: '', length: 255, nullable: true })
-  refreshToken: string;
+  @Column({ type: 'timestamp' })
+  updatedAt: Date;
 }
