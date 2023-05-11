@@ -3,7 +3,8 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
 import { StudentService } from '../student/student.service';
-import { SendMailInfo } from '@Types';
+import {SendMailInfo, UserRole} from '@Types';
+import {UserRegistrationTemplate} from "../templates/email/user-registration";
 
 @Injectable()
 export class MailService {
@@ -25,6 +26,18 @@ export class MailService {
       subject,
       html,
     });
+  }
+
+  async sendEmailsToUsers(mailService, users, role: UserRole) {
+    for (const user of users) {
+      const emailTemplate = UserRegistrationTemplate(user.activationUrl, role);
+      try {
+        await mailService.sendMail(user.email, 'Potwierdzenie rejestracji', emailTemplate);
+        console.log(`Email sent to ${user.email}`);
+      } catch (error) {
+        console.error(`Failed to send email to ${user.email}:`, error.message);
+      }
+    }
   }
 
   async testConnection(): Promise<boolean> {

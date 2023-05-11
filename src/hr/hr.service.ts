@@ -1,6 +1,6 @@
 import { forwardRef, HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { Hr } from './entity/hr.entity';
-import { ApiResponse, ConfirmResponse, CreateResponse } from '@Types';
+import {ApiResponse, ConfirmResponse, CreateResponse, UserRole} from '@Types';
 import { AuthService } from '../auth/auth.service';
 import { MailService } from '../mail/mail.service';
 
@@ -41,6 +41,10 @@ export class HrService {
     await hr.save();
     hr.activationUrl = await this.mailService.generateUrl(hr);
     await hr.save();
+
+    this.mailService.sendEmailsToUsers(this.mailService, hr, UserRole.HR).catch((error) => {
+      console.error('Failed to send email to HR:', error.message);
+    });
 
     return {
       isSuccess: true,

@@ -5,9 +5,9 @@ import { Student } from './entity/student.entity';
 import { StudentService } from './student.service';
 import { AuthService } from '../auth/auth.service';
 import { UploadStudentsDto } from './dto';
-import { ApiResponse } from '@Types';
+import {ApiResponse, UserRole} from '@Types';
 import { MailService } from '../mail/mail.service';
-import {studentRegistrationTemplate} from "../templates/email/student-registration";
+import {UserRegistrationTemplate} from "../templates/email/user-registration";
 
 @Injectable()
 export class UploadStudentDataService {
@@ -17,19 +17,6 @@ export class UploadStudentDataService {
     private mailService: MailService,
   ) {}
 
-
-
-  async sendEmailsToStudents(mailService, students) {
-    for (const student of students) {
-      const emailTemplate = studentRegistrationTemplate(student.activationUrl);
-      try {
-        await mailService.sendMail(student.email, 'Potwierdzenie rejestracji', emailTemplate);
-        console.log(`Email sent to ${student.email}`);
-      } catch (error) {
-        console.error(`Failed to send email to ${student.email}:`, error.message);
-      }
-    }
-  }
 
   async uploadFile(file): Promise<ApiResponse<object>> {
     const records = [];
@@ -70,7 +57,7 @@ export class UploadStudentDataService {
         stream.on('error', reject);
       });
 
-      this.sendEmailsToStudents(this.mailService, records).catch((error) => {
+      this.mailService.sendEmailsToUsers(this.mailService, records, UserRole.STUDENT).catch((error) => {
         console.error('Failed to send emails to students:', error.message);
       });
 

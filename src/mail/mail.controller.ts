@@ -1,8 +1,6 @@
-import { Controller, Get, Param, SetMetadata } from '@nestjs/common';
+import { Controller, Get, SetMetadata } from '@nestjs/common';
 import { MailService } from './mail.service';
-
 import { ConfigService } from '@nestjs/config';
-import { studentRegistrationTemplate } from '../templates/email/student-registration';
 
 @Controller()
 export class MailController {
