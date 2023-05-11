@@ -2,17 +2,18 @@ import { Body, Controller, Get, HttpCode, HttpStatus, Post, Res, UseGuards } fro
 import { Response } from 'express';
 import { LoginUserDto } from './dto';
 import { AuthService } from './auth.service';
-import { ApiResponse, Tokens } from '@Types';
+import {ApiResponse, Tokens, UserDataResponse} from '@Types';
 import { GetCurrentUserId, Public } from '../common/decorators';
-import { UserDataResponse } from '../types/auth/response.type';
 import { AtGuard, RtGuard } from '../common/guards';
 import { Cookies } from '../common/decorators/cookie.decorator';
+import {ThrottlerGuard} from "@nestjs/throttler";
 
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Public()
+  @UseGuards(ThrottlerGuard)
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(
