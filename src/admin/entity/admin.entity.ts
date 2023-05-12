@@ -1,4 +1,4 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {BaseEntity, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn} from 'typeorm';
 import { UserRole } from '@Types';
 
 @Entity()
@@ -27,9 +27,9 @@ export class Admin extends BaseEntity {
   @Column({ default: '', length: 255 })
   activationUrl: string;
 
-  @Column({ type: 'timestamp' })
+  @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
 
-  @Column({ type: 'timestamp' })
+  @UpdateDateColumn({ type: 'timestamp' })
   updatedAt: Date;
 }
