@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { Student } from '../student/entity/student.entity';
 import { StudentStatus } from '@Types';
@@ -7,20 +7,30 @@ import { StudentStatus } from '@Types';
 export class CronService {
 
   @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
-  async removeUnwantedStudents() {
-    console.log(new Date());
+  async removeUnwantedStudents(): Promise<void> {
 
-    const students = await Student.find({ where: { status: StudentStatus.INTERVIEW } });
+    try {
 
-    if (students.length > 0) {
-      students.map(async student => {
-        if (+student.reservationTime < +new Date()) {
-          student.status = StudentStatus.AVAILABLE;
-          student.hr = null;
-          student.reservationTime = null;
-          await student.save();
-        }
-      });
+      const students = await Student.find({ where: { status: StudentStatus.INTERVIEW } });
+
+      if (students.length > 0) {
+        students.map(async student => {
+          if (+student.reservationTime < +new Date()) {
+            student.status = StudentStatus.AVAILABLE;
+            student.hr = null;
+            student.reservationTime = null;
+            await student.save();
+          }
+        });
+      }
+    } catch {
+      throw new HttpException(
+        {
+          isSuccess: false,
+          error: `Coś poszło nie tak!`,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 }
