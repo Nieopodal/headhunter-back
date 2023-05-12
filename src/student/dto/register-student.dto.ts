@@ -20,20 +20,24 @@ export class UpdateStudentDto {
   @MaxLength(255)
   email: string;
 
+  @IsNotEmpty()
+  @IsString()
+  @MaxLength(255)
+  password: string;
+
   @IsOptional()
   @IsPhoneNumber('PL')
   contactNumber?: string | null;
 
   @IsNotEmpty()
   @IsString()
-  @MaxLength(50)
   firstName: string;
 
   @IsNotEmpty()
   @IsString()
-  @MaxLength(70)
   lastName: string;
 
+  @IsNotEmpty()
   @IsString()
   githubUsername: string;
 
