@@ -1,25 +1,20 @@
-import {Controller, Get, Param, SetMetadata} from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { MailService } from './mail.service';
-
-import { ConfigService } from '@nestjs/config';
-import {studentRegistrationTemplate} from "../templates/email/student-registration";
+import { Public } from '../common/decorators';
 
 @Controller()
 export class MailController {
-    constructor(
-        private readonly mailService: MailService,
-        private readonly configService: ConfigService,
-        ) {}
+  constructor(private readonly mailService: MailService) {}
 
-    @Get('/test-connection')
-    @SetMetadata('isPublic', true)
-    async testConnection() {
-        const isConnected = await this.mailService.testConnection();
+  @Public()
+  @Get('/test-connection')
+  async testConnection() {
+    const isConnected = await this.mailService.testConnection();
 
-        if (isConnected) {
-            return 'Połączenie z Nodemailerem powiodło się.';
-        } else {
-            return 'Nie udało się nawiązać połączenia z Nodemailerem.';
-        }
+    if (isConnected) {
+      return 'Połączenie z Nodemailerem powiodło się.';
+    } else {
+      return 'Nie udało się nawiązać połączenia z Nodemailerem.';
     }
+  }
 }

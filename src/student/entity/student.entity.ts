@@ -1,4 +1,4 @@
-import { ExpectedContractType, ExpectedTypeWork, StudentStatus } from '@Types';
+import { ExpectedContractType, ExpectedTypeWork, StudentStatus, UserRole } from '@Types';
 import {
   BaseEntity,
   Column,
@@ -20,9 +20,6 @@ export class Student extends BaseEntity {
 
   @Column({ length: 255, default: '' })
   password: string;
-
-  @Column({ length: 255, nullable: true, default: null })
-  avatar: string | null;
 
   @Column({ length: 20, nullable: true })
   contactNumber: string;
@@ -90,8 +87,8 @@ export class Student extends BaseEntity {
   @Column({ type: 'boolean', default: false })
   active: boolean;
 
-  @Column({ default: 'student', length: 20 })
-  role: string;
+  @Column({ type: 'enum', default: UserRole.STUDENT, enum: UserRole })
+  role: UserRole;
 
   @Column({
     default: null,

@@ -1,7 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Student } from './entity/student.entity';
 import { ApiResponse, StudentStatus, StudentToInterview } from '@Types';
-import { getAvatar } from '../hr/utils/get-avatar';
 import { HrService } from '../hr/hr.service';
 
 @Injectable()
@@ -93,9 +92,6 @@ export class StudentHrMethodsService {
 
     foundStudent.status = StudentStatus.INTERVIEW;
     foundStudent.hr = hr;
-    foundStudent.avatar = (await getAvatar(foundStudent.githubUsername))
-      ? 'https://www.deviantart.com/karmaanddestiny/art/Default-user-icon-4-858661084'
-      : `https://github.com/${foundStudent.githubUsername}.png`;
     foundStudent.firstName = `${foundStudent.firstName}`;
     foundStudent.lastName = `${foundStudent.lastName}`;
     foundStudent.reservationTime = new Date(+new Date().setHours(23, 59, 59, 99) + 864000000);
@@ -131,7 +127,6 @@ export class StudentHrMethodsService {
 
     foundStudent.status = StudentStatus.AVAILABLE;
     foundStudent.hr = null;
-    foundStudent.avatar = null;
     foundStudent.reservationTime = null;
     await foundStudent.save();
 
@@ -170,7 +165,6 @@ export class StudentHrMethodsService {
     foundStudent.reservationTime = null;
     foundStudent.firstName = null;
     foundStudent.lastName = null;
-    foundStudent.avatar = null;
     await foundStudent.save();
 
     return {

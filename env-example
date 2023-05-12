@@ -20,7 +20,7 @@ EXPIRES_IN_RT=7d
 EXPIRES_IN_VT=7d
 
 # Cors
-CORS_CLIENTS_URL='http://localhost:3001, http://localhost:8000'
+CORS_CLIENTS_URL='http://localhost:3001'
 
 # Email
 EMAIL_USERNAME=admin123

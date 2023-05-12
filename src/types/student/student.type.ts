@@ -30,12 +30,7 @@ export type StudentToInterview = SimpleStudentData & {
   id: string;
   firstName: string;
   lastName: string;
-  avatar: string;
   reservationTime: Date;
-};
-
-export type UpdateStudentResponse = {
-  id: string;
 };
 
 export type StudentCv = StudentPartialData & SimpleStudentData;
