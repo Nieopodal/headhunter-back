@@ -6,11 +6,12 @@ import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
 import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
-import { ApiResponse, ConfirmResponse, RecoveryPasswordResponse, Tokens, UpdateResponse } from '@Types';
+import {ApiResponse, ConfirmResponse, RecoveryPasswordResponse, Tokens, UpdateResponse, UserRole} from '@Types';
 import { HrService } from '../hr/hr.service';
 import { UserDataResponse } from '@Types';
 import { MailService } from '../mail/mail.service';
-import { studentRegistrationTemplate } from '../templates/email/student-registration';
+import {RecoveryPasswordTemplate} from "../templates/email/recovery-password";
+import {PasswordChangedTemplate} from "../templates/email/password-change";
 
 @Injectable()
 export class AuthService {
@@ -170,8 +171,13 @@ export class AuthService {
       await user.save();
       user.activationUrl = await this.mailService.generateUrl(user);
       await user.save();
-      const emailTemplate = studentRegistrationTemplate(user.activationUrl);
-      await this.mailService.sendMail(user.email, 'Potwierdzenie zmiany hasła', emailTemplate);
+
+      await this.mailService.sendEmailsToUsers(
+          this.mailService,
+          [user],
+          'Zmiana hasła',
+          (activationUrl) => RecoveryPasswordTemplate(activationUrl)
+      );
     } catch (e) {
       return {
         isSuccess: false,
@@ -198,6 +204,13 @@ export class AuthService {
     try {
       user.password = await this.hashData(data.password);
       await user.save();
+
+      await this.mailService.sendEmailsToUsers(
+          this.mailService,
+          [user],
+          'Hasło zostało zmienione',
+          () => PasswordChangedTemplate()
+      );
     } catch (e) {
       return {
         isSuccess: false,

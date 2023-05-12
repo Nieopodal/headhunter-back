@@ -3,7 +3,7 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
 import { StudentService } from '../student/student.service';
-import { SendMailInfo } from '@Types';
+import {SendMailInfo} from '@Types';
 
 @Injectable()
 export class MailService {
@@ -27,7 +27,19 @@ export class MailService {
     });
   }
 
-  async testConnection(): Promise<boolean> {
+  async sendEmailsToUsers(mailService, users, subject: string, emailTemplateFunction: (activationUrl: string) => string) {
+    for (const user of users) {
+      const emailTemplate = emailTemplateFunction(user.activationUrl);
+      try {
+        await mailService.sendMail(user.email, subject, emailTemplate);
+        console.log(`Email sent to ${user.email}`);
+      } catch (error) {
+        console.error(`Failed to send email to ${user.email}:`, error.message);
+      }
+    }
+  }
+
+    async testConnection(): Promise<boolean> {
     const transportOptions = {
       service: 'gmail',
       auth: {
