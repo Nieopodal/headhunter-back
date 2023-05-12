@@ -87,7 +87,7 @@ export class Student extends BaseEntity {
   @Column({ type: 'boolean', default: false })
   active: boolean;
 
-  @Column({ default: UserRole.STUDENT, length: 20, enum: UserRole })
+  @Column({ type: 'enum', default: UserRole.STUDENT, enum: UserRole })
   role: UserRole;
 
   @Column({

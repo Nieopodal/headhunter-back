@@ -15,7 +15,7 @@ export class Admin extends BaseEntity {
   @Column({ length: 255 })
   password: string;
 
-  @Column({ default: UserRole.ADMIN, length: 20, enum: UserRole })
+  @Column({ type: 'enum', default: UserRole.ADMIN, enum: UserRole })
   role: UserRole;
 
   @Column({ type: 'timestamp' })

@@ -27,7 +27,7 @@ export class Hr extends BaseEntity {
   @Column({ length: 255 })
   fullName: string;
 
-  @Column({ default: UserRole.HR, length: 20, enum: UserRole })
+  @Column({ type: 'enum', default: UserRole.HR, enum: UserRole })
   role: UserRole;
 
   @Column({ type: 'boolean', default: false })

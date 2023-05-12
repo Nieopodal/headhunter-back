@@ -1,14 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import {
-  ApiResponse,
-  SimpleStudentData,
-  UpdateStudentResponse,
-  StudentCv,
-  StudentStatus,
-  UpdateResponse,
-  ConfirmResponse,
-} from '@Types';
+import { ApiResponse, SimpleStudentData, UpdateStudentResponse, StudentCv, StudentStatus } from '@Types';
+import { ConfirmResponse, UpdateResponse } from 'src/types/auth/response.type';
 import { Student } from './entity/student.entity';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class StudentService {
@@ -163,10 +157,25 @@ export class StudentService {
       await Student.createQueryBuilder('student').update(Student).set(data).where('id=:id', { id }).execute();
       return {
         isSuccess: true,
-        payload: { id: data.id },
+        payload: { id },
       };
     } catch {
       return { isSuccess: false, error: 'Ups... coś poszło nie tak.' };
     }
+  }
+
+  async registerStudentData(id, registerData): Promise<ApiResponse<UpdateStudentResponse>> {
+    try {
+      await Student.createQueryBuilder('student')
+        .update(Student)
+        .set(registerData)
+        .where('student.id = :id', { id })
+        .execute();
+      await Student.update({ id }, { password: await bcrypt.hash(registerData.password, 10) });
+    } catch (e) {
+      return { isSuccess: false, error: e.message };
+    }
+
+    return { isSuccess: true, payload: id };
   }
 }

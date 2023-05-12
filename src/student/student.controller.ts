@@ -1,15 +1,15 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { Controller, Get, HttpCode, HttpStatus, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { StudentService } from './student.service';
-import { GetCurrentUserId, Public, Role } from '../common/decorators';
+import { GetCurrentUser, GetCurrentUserId, Public, Role } from '../common/decorators';
 import { UpdateStudentDto } from './dto';
 import { ApiResponse, ConfirmResponse, SimpleStudentData, StudentCv, UpdateStudentResponse, UserRole } from '@Types';
 import { ConfirmStudentDto } from './dto/confirm-student.dto';
 import { UserRoleGuard } from 'src/common/guards/user-role.guard';
+import { RegisterStudentDto } from './dto/register-student.dto';
 
 @Controller('student')
 export class StudentController {
-  constructor(private studentService: StudentService) {
-  }
+  constructor(private studentService: StudentService) {}
 
   @UseGuards(UserRoleGuard)
   @Role(UserRole.STUDENT)
@@ -31,16 +31,23 @@ export class StudentController {
   async getStudentCv(@GetCurrentUserId() id: string): Promise<ApiResponse<StudentCv>> {
     return await this.studentService.getStudentCv(id);
   }
-
+  @Public()
   @UseGuards(UserRoleGuard)
   @Role(UserRole.STUDENT)
   @Patch('update')
   @HttpCode(HttpStatus.ACCEPTED)
   updateStudent(
     @GetCurrentUserId() id: string,
-    @Body() registerData: UpdateStudentDto,
+    @GetCurrentUser() registerData: UpdateStudentDto,
   ): Promise<ApiResponse<UpdateStudentResponse>> {
     return this.studentService.updateStudent(id, registerData);
+  }
+
+  @UseGuards(UserRoleGuard)
+  @Role(UserRole.STUDENT)
+  @Patch('register')
+  registerStudent(@GetCurrentUserId() id: string, @GetCurrentUser() registerData: RegisterStudentDto) {
+    return this.studentService.registerStudentData(id, registerData);
   }
 
   @Public()
