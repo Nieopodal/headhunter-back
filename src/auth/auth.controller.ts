@@ -38,14 +38,14 @@ export class AuthController {
   }
 
   @Public()
-  @Post('password/*')
+  @Post('password/recovery')
   @HttpCode(HttpStatus.OK)
   recoveryPassword(@Body() data: RecoveryPasswordDto): Promise<ApiResponse<RecoveryPasswordResponse>> {
     return this.authService.recoveryPassword(data);
   }
 
   @Public()
-  @Patch('*/password/*')
+  @Patch('password/reset')
   @HttpCode(HttpStatus.OK)
   changePassword(@Body() data: ChangePasswordDto): Promise<ApiResponse<UpdateResponse>> {
     return this.authService.changePassword(data);

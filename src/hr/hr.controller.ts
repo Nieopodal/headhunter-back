@@ -1,10 +1,11 @@
-import { Controller, Get, HttpCode, HttpStatus, Param, Patch, UseGuards } from '@nestjs/common';
-import { GetCurrentUserId, Role } from '../common/decorators';
-import { ApiResponse, SimpleStudentData, StudentCv, StudentToInterview, UserRole } from '@Types';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Patch, UseGuards } from '@nestjs/common';
+import { GetCurrentUserId, Public, Role } from '../common/decorators';
+import { ApiResponse, SimpleStudentData, StudentCv, StudentToInterview, UpdateResponse, UserRole } from '@Types';
 import { StudentService } from '../student/student.service';
 import { StudentHrMethodsService } from '../student/student-hr-methods.service';
 import { UserRoleGuard } from '../common/guards';
 import { HrService } from './hr.service';
+import { UpdateStudentDto } from '../student/dto';
 
 @Controller('hr')
 export class HrController {
@@ -60,5 +61,12 @@ export class HrController {
   @Patch('/employed/:id')
   async setEmployed(@Param('id') id: string, @GetCurrentUserId() hrId: string): Promise<ApiResponse<null>> {
     return this.studentHrService.setEmployed(id, hrId);
+  }
+
+  @Public()
+  @HttpCode(HttpStatus.OK)
+  @Patch('update')
+  setPasswordHr(@Body() data: UpdateStudentDto): Promise<ApiResponse<UpdateResponse>> {
+    return this.hrService.setPasswordHr(data);
   }
 }

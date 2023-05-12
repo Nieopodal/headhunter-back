@@ -1,6 +1,6 @@
 import { forwardRef, HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { Hr } from './entity/hr.entity';
-import { ApiResponse, CreateResponse } from '@Types';
+import { ApiResponse, CreateResponse, UpdateResponse } from '@Types';
 import { AuthService } from '../auth/auth.service';
 import { MailService } from '../mail/mail.service';
 
@@ -46,5 +46,17 @@ export class HrService {
       isSuccess: true,
       payload: { id: hr.id },
     };
+  }
+
+  async setPasswordHr(data): Promise<ApiResponse<UpdateResponse>> {
+    try {
+      await Hr.createQueryBuilder('hr').update(Hr).set(data.password).where('id=:id', { id: data.id }).execute();
+      return {
+        isSuccess: true,
+        payload: { id: data.id },
+      };
+    } catch {
+      return { isSuccess: false, error: 'Ups... coś poszło nie tak.' };
+    }
   }
 }
