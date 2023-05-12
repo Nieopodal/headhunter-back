@@ -5,7 +5,7 @@ import { Student } from './entity/student.entity';
 import { StudentService } from './student.service';
 import { AuthService } from '../auth/auth.service';
 import { UploadStudentsDto } from './dto';
-import { ApiResponse } from '@Types';
+import { ApiResponse, UploadStudentResponse } from '@Types';
 import { MailService } from '../mail/mail.service';
 import { studentRegistrationTemplate } from '../templates/email/student-registration';
 
@@ -17,7 +17,7 @@ export class UploadStudentDataService {
     private mailService: MailService,
   ) {}
 
-  async uploadFile(file): Promise<ApiResponse<object>> {
+  async uploadFile(file): Promise<ApiResponse<UploadStudentResponse>> {
     const records = [];
     const students = await this.studentService.get();
     const parser = parse({

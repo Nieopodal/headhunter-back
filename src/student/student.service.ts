@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { ApiResponse, SimpleStudentData, StudentCv, StudentStatus, UpdateResponse, ConfirmResponse } from '@Types';
+import { ApiResponse, SimpleStudentData, StudentCv, StudentStatus, UpdateResponse } from '@Types';
 import { Student } from './entity/student.entity';
 
 @Injectable()
@@ -129,26 +129,6 @@ export class StudentService {
 
   async get(): Promise<Student[]> {
     return await Student.find();
-  }
-
-  async confirmStudentAccount(param): Promise<ApiResponse<ConfirmResponse>> {
-    const student = await this.getStudentById(param.id);
-    if (student && param.token === student.verificationToken) {
-      try {
-        await Student.createQueryBuilder('student')
-          .update(Student)
-          .set({ active: true })
-          .where('id=:id', { id: param.id })
-          .execute();
-        return {
-          isSuccess: true,
-          payload: { id: param.id },
-        };
-      } catch (e) {
-        return { isSuccess: false, error: 'Ups... coś poszło nie tak.' };
-      }
-    }
-    return { isSuccess: false, error: 'Ups... coś poszło nie tak.' };
   }
 
   async updateStudent(data, id): Promise<ApiResponse<UpdateResponse>> {

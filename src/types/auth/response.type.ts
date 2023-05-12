@@ -26,5 +26,5 @@ export type UpdateResponse = {
 };
 
 export type RecoveryPasswordResponse = {
-  email: string;
+  sentToEmail: string;
 };

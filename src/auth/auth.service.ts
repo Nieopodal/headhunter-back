@@ -6,7 +6,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
 import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
-import { ApiResponse, RecoveryPasswordResponse, Tokens, UpdateResponse } from '@Types';
+import { ApiResponse, ConfirmResponse, RecoveryPasswordResponse, Tokens, UpdateResponse } from '@Types';
 import { HrService } from '../hr/hr.service';
 import { UserDataResponse } from '@Types';
 import { MailService } from '../mail/mail.service';
@@ -139,6 +139,22 @@ export class AuthService {
     };
   }
 
+  async confirmUser(param): Promise<ApiResponse<ConfirmResponse>> {
+    const user = await this.checkUserById(param.id);
+    if (!user)
+      throw new HttpException(
+        {
+          isSuccess: false,
+          error: 'Ups... coś poszło nie tak.',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    return {
+      isSuccess: true,
+      payload: { id: user.id },
+    };
+  }
+
   async recoveryPassword(data): Promise<ApiResponse<RecoveryPasswordResponse>> {
     const user = await this.checkUserByEmail(data.email);
     if (!user)
@@ -154,7 +170,6 @@ export class AuthService {
       await user.save();
       user.activationUrl = await this.mailService.generateUrl(user);
       await user.save();
-      console.log(user);
       const emailTemplate = studentRegistrationTemplate(user.activationUrl);
       await this.mailService.sendMail(user.email, 'Potwierdzenie zmiany hasła', emailTemplate);
     } catch (e) {
@@ -165,22 +180,23 @@ export class AuthService {
     }
     return {
       isSuccess: true,
-      payload: { email: user.email },
+      payload: { sentToEmail: user.email },
     };
   }
 
-  async changePassword(id, data): Promise<ApiResponse<UpdateResponse>> {
-    const user = await this.checkUserById(id);
-    if (!(await this.compareHashedData(data.password, user.password)))
+  async changePassword(data): Promise<ApiResponse<UpdateResponse>> {
+    const user = await this.checkUserById(data.id);
+    console.log(user);
+    if (!user)
       throw new HttpException(
         {
           isSuccess: false,
-          error: `Podaj poprawne hasło`,
+          error: 'Ups... coś poszło nie tak.',
         },
         HttpStatus.BAD_REQUEST,
       );
     try {
-      user.password = await this.hashData(data.newPassword);
+      user.password = await this.hashData(data.password);
       await user.save();
     } catch (e) {
       return {
