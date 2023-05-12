@@ -7,5 +7,5 @@ export class ConfirmHrDto {
 
   @IsString()
   @IsNotEmpty()
-  verificationToken: string;
+  token: string;
 }
