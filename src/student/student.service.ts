@@ -1,13 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import {
-  ApiResponse,
-  SimpleStudentData,
-  UpdateStudentResponse,
-  StudentCv,
-  StudentStatus,
-  UpdateResponse,
-  ConfirmResponse,
-} from '@Types';
+import { ApiResponse, SimpleStudentData, StudentCv, StudentStatus, UpdateResponse } from '@Types';
 import { Student } from './entity/student.entity';
 
 @Injectable()
@@ -81,7 +73,7 @@ export class StudentService {
     return { isSuccess: true, payload: studentData };
   }
 
-  async deactivate(id: string): Promise<ApiResponse<UpdateStudentResponse>> {
+  async deactivate(id: string): Promise<ApiResponse<UpdateResponse>> {
     const student: Student = await Student.findOneBy({
       id,
       active: true,
@@ -139,26 +131,7 @@ export class StudentService {
     return await Student.find();
   }
 
-  async confirmStudentAccount(param): Promise<ApiResponse<ConfirmResponse>> {
-    const student = await this.getStudentById(param.id);
-    if (student && param.token === student.verificationToken) {
-      try {
-        await Student.createQueryBuilder('student')
-          .update(Student)
-          .set({ active: true })
-          .where('id=:id', { id: param.id })
-          .execute();
-        return {
-          isSuccess: true,
-          payload: { id: param.id },
-        };
-      } catch (e) {
-        return { isSuccess: false, error: 'Ups... coś poszło nie tak.' };
-      }
-    }
-    return { isSuccess: false, error: 'Ups... coś poszło nie tak.' };
-  }
-  async updateStudent(id, data): Promise<ApiResponse<UpdateResponse>> {
+  async updateStudent(data, id): Promise<ApiResponse<UpdateResponse>> {
     try {
       await Student.createQueryBuilder('student').update(Student).set(data).where('id=:id', { id }).execute();
       return {

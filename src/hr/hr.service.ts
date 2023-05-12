@@ -1,6 +1,6 @@
 import { forwardRef, HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { Hr } from './entity/hr.entity';
-import { ApiResponse, ConfirmResponse, CreateResponse } from '@Types';
+import { ApiResponse, CreateResponse } from '@Types';
 import { AuthService } from '../auth/auth.service';
 import { MailService } from '../mail/mail.service';
 
@@ -46,29 +46,5 @@ export class HrService {
       isSuccess: true,
       payload: { id: hr.id },
     };
-  }
-
-  async confirmHrAccount(param): Promise<ApiResponse<ConfirmResponse>> {
-    const hr = await this.getHrById(param.id);
-    if (hr.active)
-      throw new HttpException(
-        {
-          isSuccess: false,
-          error: `Konto o emailu ${hr.email} zostało już potwierdzone`,
-        },
-        HttpStatus.BAD_REQUEST,
-      );
-    if (hr && param.token === hr.verificationToken) {
-      try {
-        await Hr.createQueryBuilder('hr').update(Hr).set({ active: true }).where('id=:id', { id: param.id }).execute();
-        return {
-          isSuccess: true,
-          payload: { id: param.id },
-        };
-      } catch (e) {
-        return { isSuccess: false, error: 'Ups... coś poszło nie tak.' };
-      }
-    }
-    return { isSuccess: false, error: 'Ups... coś poszło nie tak.' };
   }
 }
