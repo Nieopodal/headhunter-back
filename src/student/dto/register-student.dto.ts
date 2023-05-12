@@ -14,7 +14,7 @@ import {
   MaxLength,
   Min,
 } from 'class-validator';
-export class UpdateStudentDto {
+export class RegisterStudentDto {
   @IsNotEmpty()
   @IsEmail()
   @MaxLength(255)
