@@ -42,7 +42,7 @@ export class HrService {
     hr.activationUrl = await this.mailService.generateUrl(hr);
     await hr.save();
 
-    this.mailService.sendEmailsToUsers(this.mailService, hr, UserRole.HR).catch((error) => {
+    this.mailService.sendEmailsToUsers(this.mailService, [hr], UserRole.HR).catch((error) => {
       console.error('Failed to send email to HR:', error.message);
     });
 
