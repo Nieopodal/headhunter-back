@@ -1,6 +1,13 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Param, Patch, UseGuards } from '@nestjs/common';
 import { GetCurrentUserId, Public, Role } from '../common/decorators';
-import { ApiResponse, SimpleStudentData, StudentCv, StudentToInterview, UpdateResponse, UserRole } from '@Types';
+import {
+  ApiResponse,
+  AvailableStudentsPaginated,
+  StudentCv,
+  StudentsToInterviewPaginated,
+  UpdateResponse,
+  UserRole,
+} from '@Types';
 import { StudentService } from '../student/student.service';
 import { StudentHrMethodsService } from '../student/student-hr-methods.service';
 import { UserRoleGuard } from '../common/guards';
@@ -13,22 +20,30 @@ export class HrController {
     private readonly studentHrService: StudentHrMethodsService,
     private readonly studentService: StudentService,
     private readonly hrService: HrService,
-  ) {}
-
-  @UseGuards(UserRoleGuard)
-  @Role(UserRole.HR)
-  @HttpCode(HttpStatus.OK)
-  @Get('/available')
-  async showAvailableStudents(): Promise<ApiResponse<SimpleStudentData[]>> {
-    return this.studentService.getFreeStudents();
+  ) {
   }
 
   @UseGuards(UserRoleGuard)
   @Role(UserRole.HR)
   @HttpCode(HttpStatus.OK)
-  @Get('/interview')
-  async showStudentsToInterview(@GetCurrentUserId() hrId: string): Promise<ApiResponse<StudentToInterview[]>> {
-    return this.studentHrService.showStudentsToInterview(hrId);
+  @Get('/available/:pageNumber?/:numberPerPage?')
+  async showAvailableStudents(
+    @Param('pageNumber') pageNumber = 1,
+    @Param('numberPerPage') numberPerPage = 10,
+  ): Promise<ApiResponse<AvailableStudentsPaginated>> {
+    return this.studentService.getFreeStudents(pageNumber, numberPerPage);
+  }
+
+  @UseGuards(UserRoleGuard)
+  @Role(UserRole.HR)
+  @HttpCode(HttpStatus.OK)
+  @Get('/interview/:pageNumber?/:numberPerPage?')
+  async showStudentsToInterview(
+    @GetCurrentUserId() hrId: string,
+    @Param('pageNumber') pageNumber = 1,
+    @Param('numberPerPage') numberPerPage = 10,
+  ): Promise<ApiResponse<StudentsToInterviewPaginated>> {
+    return this.studentHrService.showStudentsToInterview(hrId, pageNumber, numberPerPage);
   }
 
   @UseGuards(UserRoleGuard)
