@@ -102,30 +102,34 @@ export class StudentService {
   }
 
   async getFreeStudents(): Promise<ApiResponse<SimpleStudentData[]>> {
-    const studentData: SimpleStudentData[] = await Student.createQueryBuilder('student')
-      .select([
-        'student.id',
-        'student.firstName',
-        'student.lastName',
-        'student.courseCompletion',
-        'student.courseEngagement',
-        'student.projectDegree',
-        'student.teamProjectDegree',
-        'student.expectedTypeWork',
-        'student.expectedContractType',
-        'student.targetWorkCity',
-        'student.expectedSalary',
-        'student.canTakeApprenticeship',
-        'student.monthsOfCommercialExp',
-      ])
-      .where('student.hr IS NULL')
-      .andWhere('student.active = :active', { active: true })
-      .andWhere('student.status = :status', { status: StudentStatus.AVAILABLE })
-      .getRawMany();
-    if (!studentData) {
-      return { isSuccess: false, error: 'Nie znaleziono studenta' };
+    try {
+      const studentData: SimpleStudentData[] = await Student.createQueryBuilder('student')
+        .select([
+          'student.id',
+          'student.firstName',
+          'student.lastName',
+          'student.courseCompletion',
+          'student.courseEngagement',
+          'student.projectDegree',
+          'student.teamProjectDegree',
+          'student.expectedTypeWork',
+          'student.expectedContractType',
+          'student.targetWorkCity',
+          'student.expectedSalary',
+          'student.canTakeApprenticeship',
+          'student.monthsOfCommercialExp',
+        ])
+        .where('student.hr IS NULL')
+        .andWhere('student.active = :active', { active: true })
+        .andWhere('student.status = :status', { status: StudentStatus.AVAILABLE })
+        .getRawMany();
+      if (!studentData) {
+        return { isSuccess: false, error: 'Nie znaleziono studenta' };
+      }
+      return { isSuccess: true, payload: studentData };
+    } catch (e) {
+      return { isSuccess: false, error: e.message };
     }
-    return { isSuccess: true, payload: studentData };
   }
 
   async getStudentByEmail(email: string): Promise<Student> {
@@ -172,38 +176,57 @@ export class StudentService {
   }
 
   async verifyUser(id, token): Promise<ApiResponse<VerifyUserResponse>> {
-    const user = await Student.findOneBy({ id });
-    const userFilteredData = {
-      id: user.id,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-    };
+    try {
+      const user = await Student.findOneBy({ id });
+      const userFilteredData = {
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+      };
 
-    if (!user) {
-      return { isSuccess: false, error: `Nie znaleziono użytkownika o id: ${id}.` };
+      if (!user) {
+        return { isSuccess: false, error: `Nie znaleziono użytkownika o id: ${id}.` };
+      }
+
+      if (user.verificationToken !== token) {
+        return { isSuccess: false, error: `Token ${token} nie pasuje do użytkownika ${id}` };
+      }
+
+      return {
+        isSuccess: true,
+        payload: userFilteredData,
+      };
+    } catch (e) {
+      return { isSuccess: false, error: e.message };
     }
-
-    if (user.verificationToken !== token) {
-      return { isSuccess: false, error: `Token ${token} nie pasuje do użytkownika ${id}` };
-    }
-
-    return {
-      isSuccess: true,
-      payload: userFilteredData,
-    };
   }
 
-  async registerStudentData(id, registerData): Promise<ApiResponse<UpdateStudentResponse>> {
+  async registerStudentData(id, token, registerData): Promise<ApiResponse<UpdateStudentResponse>> {
     try {
+      const user = await Student.findOneBy({ id });
+      if (!user) {
+        return { isSuccess: false, error: `Nie znaleziono użytkownika o id: ${id}.` };
+      }
+
+      if (user.verificationToken !== token) {
+        return { isSuccess: false, error: `Token ${token} nie pasuje do użytkownika o id: ${id}` };
+      }
+      if (registerData.password === '' || typeof registerData.password !== 'string') {
+        return { isSuccess: false, error: 'Podane hasło jest nieprawidłowe' };
+      }
       await Student.createQueryBuilder('student')
         .update(Student)
         .set(registerData)
         .where('student.id = :id', { id })
         .execute();
-      await Student.update({ id }, { password: await bcrypt.hash(registerData.password, 10) });
+      await Student.createQueryBuilder('student')
+        .update(Student)
+        .set({ password: await bcrypt.hash(registerData.password, 10), active: true, verificationToken: null })
+        .where('student.id = :id', { id })
+        .execute();
     } catch (e) {
-      return { isSuccess: false, error: 'Ups.... coś poszło nie tak' };
+      return { isSuccess: false, error: e.message };
     }
 
     return { isSuccess: true, payload: id };

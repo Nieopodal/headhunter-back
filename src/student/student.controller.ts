@@ -57,9 +57,14 @@ export class StudentController {
     return this.studentService.verifyUser(id, token);
   }
 
-  @Patch('register')
-  registerStudent(@GetCurrentUserId() id: string, @GetCurrentUser() registerData: RegisterStudentDto) {
-    return this.studentService.registerStudentData(id, registerData);
+  @Public()
+  @Patch('register/:id/:token')
+  registerStudent(
+    @Param('id') id: string,
+    @Param('token') token: string,
+    @GetCurrentUser() registerData: RegisterStudentDto,
+  ) {
+    return this.studentService.registerStudentData(id, token, registerData);
   }
 
   @Public()
