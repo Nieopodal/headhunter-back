@@ -100,7 +100,14 @@ export class StudentService {
   }
 
   async getFreeStudents(pageNumber: number, numberPerPage: number): Promise<ApiResponse<AvailableStudentsPaginated>> {
-    const [studentData, count] = await Student.createQueryBuilder('student')
+
+    const count = await Student.createQueryBuilder('student')
+      .where('student.hr IS NULL')
+      .andWhere('student.active = :active', { active: true })
+      .andWhere('student.status = :status', { status: StudentStatus.AVAILABLE })
+      .getCount();
+
+    const studentData = await Student.createQueryBuilder('student')
       .select([
         'student.id',
         'student.firstName',
@@ -121,7 +128,7 @@ export class StudentService {
       .andWhere('student.status = :status', { status: StudentStatus.AVAILABLE })
       .skip(numberPerPage * (pageNumber - 1))
       .take(numberPerPage)
-      .getManyAndCount();
+      .getRawMany();
 
     const totalPages = Math.ceil(count / numberPerPage);
 
