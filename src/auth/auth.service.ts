@@ -6,12 +6,18 @@ import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
 import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
-import {ApiResponse, ConfirmResponse, RecoveryPasswordResponse, Tokens, UpdateResponse, UserRole} from '@Types';
+import {
+  ApiResponse,
+  ConfirmResponse,
+  RecoveryPasswordResponse,
+  Tokens,
+  UpdateResponse,
+  UserDataResponse,
+} from '@Types';
 import { HrService } from '../hr/hr.service';
-import { UserDataResponse } from '@Types';
 import { MailService } from '../mail/mail.service';
-import {RecoveryPasswordTemplate} from "../templates/email/recovery-password";
-import {PasswordChangedTemplate} from "../templates/email/password-change";
+import { RecoveryPasswordTemplate } from '../templates/email/recovery-password';
+import { PasswordChangedTemplate } from '../templates/email/password-change';
 
 @Injectable()
 export class AuthService {
@@ -192,7 +198,6 @@ export class AuthService {
 
   async changePassword(data): Promise<ApiResponse<UpdateResponse>> {
     const user = await this.checkUserById(data.id);
-    console.log(user);
     if (!user)
       throw new HttpException(
         {
