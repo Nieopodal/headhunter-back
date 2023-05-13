@@ -1,5 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { ApiResponse, SimpleStudentData, UpdateStudentResponse, StudentCv, StudentStatus } from '@Types';
+import {
+  ApiResponse,
+  SimpleStudentData,
+  UpdateStudentResponse,
+  StudentCv,
+  StudentStatus,
+  VerifyUserResponse,
+} from '@Types';
 import { ConfirmResponse, UpdateResponse } from 'src/types/auth/response.type';
 import { Student } from './entity/student.entity';
 import * as bcrypt from 'bcrypt';
@@ -159,9 +166,32 @@ export class StudentService {
         isSuccess: true,
         payload: { id },
       };
-    } catch {
-      return { isSuccess: false, error: 'Ups... coś poszło nie tak.' };
+    } catch (e) {
+      return { isSuccess: false, error: 'Ups.... coś poszło nie tak' };
     }
+  }
+
+  async verifyUser(id, token): Promise<ApiResponse<VerifyUserResponse>> {
+    const user = await Student.findOneBy({ id });
+    const userFilteredData = {
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+    };
+
+    if (!user) {
+      return { isSuccess: false, error: `Nie znaleziono użytkownika o id: ${id}.` };
+    }
+
+    if (user.verificationToken !== token) {
+      return { isSuccess: false, error: `Token ${token} nie pasuje do użytkownika ${id}` };
+    }
+
+    return {
+      isSuccess: true,
+      payload: userFilteredData,
+    };
   }
 
   async registerStudentData(id, registerData): Promise<ApiResponse<UpdateStudentResponse>> {
@@ -173,7 +203,7 @@ export class StudentService {
         .execute();
       await Student.update({ id }, { password: await bcrypt.hash(registerData.password, 10) });
     } catch (e) {
-      return { isSuccess: false, error: e.message };
+      return { isSuccess: false, error: 'Ups.... coś poszło nie tak' };
     }
 
     return { isSuccess: true, payload: id };
