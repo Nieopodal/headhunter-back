@@ -33,6 +33,16 @@ export type StudentToInterview = SimpleStudentData & {
   reservationTime: Date;
 };
 
+export type StudentsToInterviewPaginated = {
+  studentData: StudentToInterview[],
+  totalPages: number,
+}
+
+export type AvailableStudentsPaginated = {
+  studentData: SimpleStudentData[],
+  totalPages: number
+}
+
 export type StudentCv = StudentPartialData & SimpleStudentData;
 
 export enum ExpectedTypeWork {

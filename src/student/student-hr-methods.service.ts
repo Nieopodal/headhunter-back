@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Student } from './entity/student.entity';
-import { ApiResponse, StudentStatus, StudentToInterview } from '@Types';
+import { ApiResponse, StudentStatus, StudentsToInterviewPaginated, StudentToInterview } from '@Types';
 import { HrService } from '../hr/hr.service';
 
 @Injectable()
@@ -173,8 +173,8 @@ export class StudentHrMethodsService {
     };
   }
 
-  async showStudentsToInterview(id: string): Promise<ApiResponse<StudentToInterview[]>> {
-    const studentsToInterview = await Student.find({
+  async showStudentsToInterview(id: string, pageNumber: number, numberPerPage: number): Promise<ApiResponse<StudentsToInterviewPaginated>> {
+    const [studentsToInterview, count] = await Student.findAndCount({
       relations: ['hr'],
       where: {
         status: StudentStatus.INTERVIEW,
@@ -183,7 +183,11 @@ export class StudentHrMethodsService {
           id,
         },
       },
+      skip: numberPerPage * (pageNumber - 1),
+      take: numberPerPage,
     });
+
+    const totalPages = Math.ceil(count / numberPerPage);
 
     if (!studentsToInterview) {
       throw new HttpException(
@@ -197,7 +201,10 @@ export class StudentHrMethodsService {
 
     return {
       isSuccess: true,
-      payload: studentsToInterview.map((student) => this.filter(student)),
+      payload: {
+        studentData: studentsToInterview.map((student) => this.filter(student)),
+        totalPages,
+      },
     };
   }
 }

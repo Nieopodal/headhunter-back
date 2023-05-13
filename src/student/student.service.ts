@@ -1,5 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { ApiResponse, SimpleStudentData, StudentCv, StudentStatus, UpdateResponse } from '@Types';
+import {
+  ApiResponse,
+  AvailableStudentsPaginated,
+  SimpleStudentData,
+  StudentCv,
+  StudentStatus,
+  UpdateResponse,
+} from '@Types';
 import { Student } from './entity/student.entity';
 
 @Injectable()
@@ -92,8 +99,15 @@ export class StudentService {
     }
   }
 
-  async getFreeStudents(): Promise<ApiResponse<SimpleStudentData[]>> {
-    const studentData: SimpleStudentData[] = await Student.createQueryBuilder('student')
+  async getFreeStudents(pageNumber: number, numberPerPage: number): Promise<ApiResponse<AvailableStudentsPaginated>> {
+
+    const count = await Student.createQueryBuilder('student')
+      .where('student.hr IS NULL')
+      .andWhere('student.active = :active', { active: true })
+      .andWhere('student.status = :status', { status: StudentStatus.AVAILABLE })
+      .getCount();
+
+    const studentData = await Student.createQueryBuilder('student')
       .select([
         'student.id',
         'student.firstName',
@@ -112,11 +126,16 @@ export class StudentService {
       .where('student.hr IS NULL')
       .andWhere('student.active = :active', { active: true })
       .andWhere('student.status = :status', { status: StudentStatus.AVAILABLE })
+      .skip(numberPerPage * (pageNumber - 1))
+      .take(numberPerPage)
       .getRawMany();
+
+    const totalPages = Math.ceil(count / numberPerPage);
+
     if (!studentData) {
       return { isSuccess: false, error: 'Nie znaleziono studenta' };
     }
-    return { isSuccess: true, payload: studentData };
+    return { isSuccess: true, payload: { studentData, totalPages } };
   }
 
   async getStudentByEmail(email: string): Promise<Student> {
