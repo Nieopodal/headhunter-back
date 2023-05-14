@@ -1,6 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { ApiResponse, SimpleStudentData, UpdateStudentResponse, StudentCv, StudentStatus } from '@Types';
-import { ConfirmResponse, UpdateResponse } from 'src/types/auth/response.type';
+import {
+  ApiResponse,
+  SimpleStudentData,
+  UpdateStudentResponse,
+  StudentCv,
+  StudentStatus,
+  AvailableStudentsPaginated,
+} from '@Types';
+import { UpdateResponse } from 'src/types/auth/response.type';
 
 import { Student } from './entity/student.entity';
 import * as bcrypt from 'bcrypt';
@@ -95,9 +102,7 @@ export class StudentService {
     }
   }
 
-
   async getFreeStudents(pageNumber: number, numberPerPage: number): Promise<ApiResponse<AvailableStudentsPaginated>> {
-
     const count = await Student.createQueryBuilder('student')
       .where('student.hr IS NULL')
       .andWhere('student.active = :active', { active: true })

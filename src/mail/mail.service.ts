@@ -27,7 +27,12 @@ export class MailService {
     });
   }
 
-  async sendEmailsToUsers(mailService, users, subject: string, emailTemplateFunction: (activationUrl: string) => string) {
+  async sendEmailsToUsers(
+    mailService,
+    users,
+    subject: string,
+    emailTemplateFunction: (activationUrl: string) => string,
+  ) {
     for (const user of users) {
       const emailTemplate = emailTemplateFunction(user.activationUrl);
       try {
@@ -38,7 +43,7 @@ export class MailService {
     }
   }
 
-    async testConnection(): Promise<boolean> {
+  async testConnection(): Promise<boolean> {
     const transportOptions = {
       service: 'gmail',
       auth: {

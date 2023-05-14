@@ -10,7 +10,6 @@ import { Cookies } from '../common/decorators/cookie.decorator';
 import { RecoveryPasswordDto } from './dto/recovery-password.dto';
 import { ConfirmDto } from './dto/confirm.dto';
 
-
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
@@ -30,7 +29,6 @@ export class AuthController {
   logout(@GetCurrentUserId() id: string): Promise<any> {
     return this.authService.logout(id);
   }
-
 
   @Public()
   @Post('*/confirm/:id/:token')
@@ -53,6 +51,7 @@ export class AuthController {
     return this.authService.changePassword(data);
   }
 
+  @Public()
   @UseGuards(RtGuard)
   @Get('user')
   @HttpCode(HttpStatus.FOUND)

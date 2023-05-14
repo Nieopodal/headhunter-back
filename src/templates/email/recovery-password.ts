@@ -1,5 +1,4 @@
 export function RecoveryPasswordTemplate(generateUrl: string) {
-
   return `
     <h1>Zmiana hasła</h1>
     <p>Kliknij w link <a href="${generateUrl}">tutaj</a> aby zresetować hasło.</p>
@@ -8,4 +7,3 @@ export function RecoveryPasswordTemplate(generateUrl: string) {
     <p>Support MegaK</p>
   `;
 }
-

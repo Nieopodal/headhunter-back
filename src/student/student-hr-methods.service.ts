@@ -5,8 +5,7 @@ import { HrService } from '../hr/hr.service';
 
 @Injectable()
 export class StudentHrMethodsService {
-  constructor(private readonly hrService: HrService) {
-  }
+  constructor(private readonly hrService: HrService) {}
 
   filter(data: Student): StudentToInterview {
     const {
@@ -173,7 +172,11 @@ export class StudentHrMethodsService {
     };
   }
 
-  async showStudentsToInterview(id: string, pageNumber: number, numberPerPage: number): Promise<ApiResponse<StudentsToInterviewPaginated>> {
+  async showStudentsToInterview(
+    id: string,
+    pageNumber: number,
+    numberPerPage: number,
+  ): Promise<ApiResponse<StudentsToInterviewPaginated>> {
     const [studentsToInterview, count] = await Student.findAndCount({
       relations: ['hr'],
       where: {
