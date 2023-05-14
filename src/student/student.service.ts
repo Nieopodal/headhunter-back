@@ -1,13 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import {
   ApiResponse,
   AvailableStudentsPaginated,
   SimpleStudentData,
   StudentCv,
   StudentStatus,
+  StudentsToInterviewPaginated,
   UpdateResponse,
 } from '@Types';
 import { Student } from './entity/student.entity';
+import { availableFilter } from './utils/filter-methods';
 
 @Injectable()
 export class StudentService {
@@ -163,22 +165,39 @@ export class StudentService {
   }
 
   async availableStudentsSearch(name: string, pageNumber: number, numberPerPage: number): Promise<ApiResponse<AvailableStudentsPaginated>> {
-    const [studentData, count] = await Student.createQueryBuilder('student')
-      .where('student.hr IS NULL')
-      .andWhere('student.active = :active', { active: true })
-      .andWhere('student.status = :status', { status: StudentStatus.AVAILABLE })
-      .andWhere('student.firstName LIKE :name', {
-        name: `%${name}%`,
-      })
-      .orWhere('student.lastName LIKE :name', {
-        name: `%${name}%`,
-      })
-      .skip(numberPerPage * (pageNumber - 1))
-      .take(numberPerPage)
-      .getManyAndCount();
+    try {
+      const [studentData, count] = await Student.createQueryBuilder('student')
+        .where('student.hr IS NULL')
+        .andWhere('student.active = :active', { active: true })
+        .andWhere('student.status = :status', { status: StudentStatus.AVAILABLE })
+        .andWhere('student.firstName LIKE :name', {
+          name: `%${name}%`,
+        })
+        .orWhere('student.lastName LIKE :name', {
+          name: `%${name}%`,
+        })
+        .skip(numberPerPage * (pageNumber - 1))
+        .take(numberPerPage)
+        .getManyAndCount();
 
-    const totalPages = Math.ceil(count / numberPerPage);
+      const totalPages = Math.ceil(count / numberPerPage);
 
-    return { isSuccess: true, payload: { studentData, totalPages } };
+      return {
+        isSuccess: true,
+        payload: { studentData: studentData.map(student => availableFilter(student)), totalPages },
+      };
+    } catch {
+      throw new HttpException(
+        {
+          isSuccess: false,
+          error: `Coś poszło nie tak!`,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  interviewStudentsSearch(name: string, pageNumber: number, numberPerPage: number): Promise<ApiResponse<StudentsToInterviewPaginated>> {
+    return undefined;
   }
 }
