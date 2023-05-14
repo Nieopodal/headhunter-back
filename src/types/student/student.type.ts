@@ -33,9 +33,21 @@ export type StudentToInterview = SimpleStudentData & {
   reservationTime: Date;
 };
 
+
 export type UpdateStudentResponse = {
   id: string;
 };
+
+export type StudentsToInterviewPaginated = {
+  studentData: StudentToInterview[],
+  totalPages: number,
+}
+
+export type AvailableStudentsPaginated = {
+  studentData: SimpleStudentData[],
+  totalPages: number
+}
+
 
 export type StudentCv = StudentPartialData & SimpleStudentData;
 

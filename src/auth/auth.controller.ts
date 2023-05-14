@@ -1,19 +1,21 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Patch, Post, Res, UseGuards } from '@nestjs/common';
 import { Response } from 'express';
-import { LoginUserDto } from './dto';
+import { ChangePasswordDto, LoginUserDto } from './dto';
 import { AuthService } from './auth.service';
-import { ApiResponse, Tokens, UserDataResponse } from '@Types';
+import { ApiResponse, ConfirmResponse, RecoveryPasswordResponse, Tokens, UpdateResponse } from '@Types';
 import { GetCurrentUserId, Public } from '../common/decorators';
-import { AtGuard, RtGuard } from '../common/guards';
+import { UserDataResponse } from '@Types';
+import { RtGuard } from '../common/guards';
 import { Cookies } from '../common/decorators/cookie.decorator';
-import { ThrottlerGuard } from '@nestjs/throttler';
+import { RecoveryPasswordDto } from './dto/recovery-password.dto';
+import { ConfirmDto } from './dto/confirm.dto';
+
 
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Public()
-  @UseGuards(ThrottlerGuard)
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(
@@ -23,19 +25,41 @@ export class AuthController {
     return await this.authService.login(loginData, response);
   }
 
-  @UseGuards(AtGuard)
   @Post('logout')
   @HttpCode(HttpStatus.OK)
   logout(@GetCurrentUserId() id: string): Promise<any> {
     return this.authService.logout(id);
   }
 
+
+  @Public()
+  @Post('*/confirm/:id/:token')
+  @HttpCode(HttpStatus.OK)
+  confirmUser(@Param() param: ConfirmDto): Promise<ApiResponse<ConfirmResponse>> {
+    return this.authService.confirmUser(param);
+  }
+
+  @Public()
+  @Post('password/recovery')
+  @HttpCode(HttpStatus.OK)
+  recoveryPassword(@Body() data: RecoveryPasswordDto): Promise<ApiResponse<RecoveryPasswordResponse>> {
+    return this.authService.recoveryPassword(data);
+  }
+
+  @Public()
+  @Patch('password/reset')
+  @HttpCode(HttpStatus.OK)
+  changePassword(@Body() data: ChangePasswordDto): Promise<ApiResponse<UpdateResponse>> {
+    return this.authService.changePassword(data);
+  }
+
   @UseGuards(RtGuard)
   @Get('user')
   @HttpCode(HttpStatus.FOUND)
-  getUserInfo(@Cookies('jwt-refresh') rt: string): Promise<ApiResponse<UserDataResponse>> {
-    return this.authService.getUserInfo(rt);
+  getUserInfo(@Cookies() token: string): Promise<ApiResponse<UserDataResponse>> {
+    return this.authService.getUserInfo(token);
   }
+
   @Public()
   @UseGuards(RtGuard)
   @Post('refresh')

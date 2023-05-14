@@ -10,6 +10,8 @@ import { AtGuard } from './common/guards';
 import { APP_GUARD } from '@nestjs/core';
 import { MailModule } from './mail/mail.module';
 import { UploadStudentDataModule } from './student/upload-student-data.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { CronService } from './cron/cron.service';
 import {ThrottlerModule} from "@nestjs/throttler";
 
 @Module({
@@ -18,6 +20,7 @@ import {ThrottlerModule} from "@nestjs/throttler";
     TypeOrmModule.forRootAsync({
       useClass: DatabaseConfiguration,
     }),
+    ScheduleModule.forRoot(),
     ThrottlerModule.forRoot({
       ttl: 60,
       limit: 5,
@@ -29,6 +32,6 @@ import {ThrottlerModule} from "@nestjs/throttler";
     forwardRef(() => AuthModule),
     forwardRef(() => MailModule),
   ],
-  providers: [{ provide: APP_GUARD, useClass: AtGuard }],
+  providers: [{ provide: APP_GUARD, useClass: AtGuard }, CronService],
 })
 export class AppModule {}

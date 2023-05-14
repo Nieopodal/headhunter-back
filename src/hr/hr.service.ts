@@ -1,8 +1,9 @@
 import { forwardRef, HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { Hr } from './entity/hr.entity';
-import { ApiResponse, ConfirmResponse, CreateResponse } from '@Types';
+import {ApiResponse, CreateResponse, UpdateResponse, UserRole} from '@Types';
 import { AuthService } from '../auth/auth.service';
 import { MailService } from '../mail/mail.service';
+import {UserRegistrationTemplate} from "../templates/email/user-registration";
 
 @Injectable()
 export class HrService {
@@ -26,11 +27,11 @@ export class HrService {
   async createHr(formData): Promise<ApiResponse<CreateResponse>> {
     if (await this.getHrByEmail(formData.email))
       throw new HttpException(
-        {
-          isSuccess: false,
-          error: `Użytkownik o emailu ${formData.email} już istnieje`,
-        },
-        HttpStatus.BAD_REQUEST,
+          {
+            isSuccess: false,
+            error: `Użytkownik o emailu ${formData.email} już istnieje`,
+          },
+          HttpStatus.BAD_REQUEST,
       );
     const hr = new Hr();
     hr.email = formData.email;
@@ -42,33 +43,31 @@ export class HrService {
     hr.activationUrl = await this.mailService.generateUrl(hr);
     await hr.save();
 
+    this.mailService.sendEmailsToUsers(
+        this.mailService,
+        [hr],
+        'Potwierdzenie rejestracji',
+        (activationUrl) => UserRegistrationTemplate(activationUrl, UserRole.HR)
+    )
+        .catch((error) => {
+      console.error('Failed to send email to HR:', error.message);
+    });
+
     return {
       isSuccess: true,
       payload: { id: hr.id },
     };
   }
 
-  async confirmHrAccount(param): Promise<ApiResponse<ConfirmResponse>> {
-    const hr = await this.getHrById(param.id);
-    if (hr.active)
-      throw new HttpException(
-        {
-          isSuccess: false,
-          error: `Konto o emailu ${hr.email} zostało już potwierdzone`,
-        },
-        HttpStatus.BAD_REQUEST,
-      );
-    if (hr && param.token === hr.verificationToken) {
-      try {
-        await Hr.createQueryBuilder('hr').update(Hr).set({ active: true }).where('id=:id', { id: param.id }).execute();
-        return {
-          isSuccess: true,
-          payload: { id: param.id },
-        };
-      } catch (e) {
-        return { isSuccess: false, error: 'Ups... coś poszło nie tak.' };
-      }
+  async setPasswordHr(data): Promise<ApiResponse<UpdateResponse>> {
+    try {
+      await Hr.createQueryBuilder('hr').update(Hr).set(data.password).where('id=:id', { id: data.id }).execute();
+      return {
+        isSuccess: true,
+        payload: { id: data.id },
+      };
+    } catch {
+      return { isSuccess: false, error: 'Ups... coś poszło nie tak.' };
     }
-    return { isSuccess: false, error: 'Ups... coś poszło nie tak.' };
   }
 }

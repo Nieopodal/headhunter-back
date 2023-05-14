@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ApiResponse, SimpleStudentData, UpdateStudentResponse, StudentCv, StudentStatus } from '@Types';
 import { ConfirmResponse, UpdateResponse } from 'src/types/auth/response.type';
+
 import { Student } from './entity/student.entity';
 import * as bcrypt from 'bcrypt';
 
@@ -75,7 +76,7 @@ export class StudentService {
     return { isSuccess: true, payload: studentData };
   }
 
-  async deactivate(id: string): Promise<ApiResponse<UpdateStudentResponse>> {
+  async deactivate(id: string): Promise<ApiResponse<UpdateResponse>> {
     const student: Student = await Student.findOneBy({
       id,
       active: true,
@@ -94,35 +95,44 @@ export class StudentService {
     }
   }
 
-  async getFreeStudents(): Promise<ApiResponse<SimpleStudentData[]>> {
-    try {
-      const studentData: SimpleStudentData[] = await Student.createQueryBuilder('student')
-        .select([
-          'student.id',
-          'student.firstName',
-          'student.lastName',
-          'student.courseCompletion',
-          'student.courseEngagement',
-          'student.projectDegree',
-          'student.teamProjectDegree',
-          'student.expectedTypeWork',
-          'student.expectedContractType',
-          'student.targetWorkCity',
-          'student.expectedSalary',
-          'student.canTakeApprenticeship',
-          'student.monthsOfCommercialExp',
-        ])
-        .where('student.hr IS NULL')
-        .andWhere('student.active = :active', { active: true })
-        .andWhere('student.status = :status', { status: StudentStatus.AVAILABLE })
-        .getRawMany();
-      if (!studentData) {
-        return { isSuccess: false, error: 'Nie znaleziono studenta' };
-      }
-      return { isSuccess: true, payload: studentData };
-    } catch (e) {
-      return { isSuccess: false, error: e.message };
+
+  async getFreeStudents(pageNumber: number, numberPerPage: number): Promise<ApiResponse<AvailableStudentsPaginated>> {
+
+    const count = await Student.createQueryBuilder('student')
+      .where('student.hr IS NULL')
+      .andWhere('student.active = :active', { active: true })
+      .andWhere('student.status = :status', { status: StudentStatus.AVAILABLE })
+      .getCount();
+
+    const studentData = await Student.createQueryBuilder('student')
+      .select([
+        'student.id',
+        'student.firstName',
+        'student.lastName',
+        'student.courseCompletion',
+        'student.courseEngagement',
+        'student.projectDegree',
+        'student.teamProjectDegree',
+        'student.expectedTypeWork',
+        'student.expectedContractType',
+        'student.targetWorkCity',
+        'student.expectedSalary',
+        'student.canTakeApprenticeship',
+        'student.monthsOfCommercialExp',
+      ])
+      .where('student.hr IS NULL')
+      .andWhere('student.active = :active', { active: true })
+      .andWhere('student.status = :status', { status: StudentStatus.AVAILABLE })
+      .skip(numberPerPage * (pageNumber - 1))
+      .take(numberPerPage)
+      .getRawMany();
+
+    const totalPages = Math.ceil(count / numberPerPage);
+
+    if (!studentData) {
+      return { isSuccess: false, error: 'Nie znaleziono studenta' };
     }
+    return { isSuccess: true, payload: { studentData, totalPages } };
   }
 
   async getStudentByEmail(email: string): Promise<Student> {
@@ -137,26 +147,7 @@ export class StudentService {
     return await Student.find();
   }
 
-  async confirmStudentAccount(param): Promise<ApiResponse<ConfirmResponse>> {
-    const student = await this.getStudentById(param.id);
-    if (student && param.token === student.verificationToken) {
-      try {
-        await Student.createQueryBuilder('student')
-          .update(Student)
-          .set({ active: true })
-          .where('id=:id', { id: param.id })
-          .execute();
-        return {
-          isSuccess: true,
-          payload: { id: param.id },
-        };
-      } catch (e) {
-        return { isSuccess: false, error: 'Ups... coś poszło nie tak.' };
-      }
-    }
-    return { isSuccess: false, error: 'Ups... coś poszło nie tak.' };
-  }
-  async updateStudent(id, data): Promise<ApiResponse<UpdateResponse>> {
+  async updateStudent(data, id): Promise<ApiResponse<UpdateResponse>> {
     try {
       await Student.createQueryBuilder('student').update(Student).set(data).where('id=:id', { id }).execute();
       return {

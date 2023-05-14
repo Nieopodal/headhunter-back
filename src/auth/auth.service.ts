@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { LoginUserDto } from './dto';
 import { AdminService } from '../admin/admin.service';
 import { StudentService } from '../student/student.service';
@@ -6,9 +6,13 @@ import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
 import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
-import { ApiResponse, Tokens } from '@Types';
+import {ApiResponse, ConfirmResponse, RecoveryPasswordResponse, Tokens, UpdateResponse, UserRole} from '@Types';
 import { HrService } from '../hr/hr.service';
-import { UserDataResponse } from 'src/types/auth/response.type';
+import { UserDataResponse } from '@Types';
+import { MailService } from '../mail/mail.service';
+import {RecoveryPasswordTemplate} from "../templates/email/recovery-password";
+import {PasswordChangedTemplate} from "../templates/email/password-change";
+
 
 @Injectable()
 export class AuthService {
@@ -16,6 +20,7 @@ export class AuthService {
     private adminService: AdminService,
     private studentService: StudentService,
     private hrService: HrService,
+    private mailService: MailService,
     private jwtService: JwtService,
     private configService: ConfigService,
   ) {}
@@ -27,6 +32,10 @@ export class AuthService {
     } else {
       return await this.hashData(data);
     }
+  }
+
+  async compareHashedData(plainText: string, hashedText: string): Promise<boolean> {
+    return await bcrypt.compare(plainText, hashedText);
   }
 
   async updateRtHash(id, rt: string): Promise<void> {
@@ -70,7 +79,7 @@ export class AuthService {
     return this.jwtService.decode(rt);
   }
 
-  async checkUserByEmail(email: string): Promise<UserDataResponse> {
+  async checkUserByEmail(email: string): Promise<any> {
     const admin = await this.adminService.getAdminByEmail(email);
 
     const hr = await this.hrService.getHrByEmail(email);
@@ -94,7 +103,7 @@ export class AuthService {
     const user = await this.checkUserByEmail(login.email);
     if (!user) return { isSuccess: false, error: 'Nie znaleziono użytkownika' };
     try {
-      const passwordMatches = await bcrypt.compare(login.password, user.password);
+      const passwordMatches = await this.compareHashedData(login.password, user.password);
       if (!passwordMatches) return { isSuccess: false, error: 'Niepoprawne hasło' };
       const tokens = await this.getTokens(user.id, user.email);
       await this.updateRtHash(user.id, tokens.refresh_token);
@@ -132,8 +141,91 @@ export class AuthService {
     };
   }
 
-  async getUserInfo(rt: string): Promise<ApiResponse<UserDataResponse>> {
-    const decodedJwt = await this.getDecodedToken(rt);
+  async confirmUser(param): Promise<ApiResponse<ConfirmResponse>> {
+    const user = await this.checkUserById(param.id);
+    if (!user)
+      throw new HttpException(
+        {
+          isSuccess: false,
+          error: 'Ups... coś poszło nie tak.',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    return {
+      isSuccess: true,
+      payload: { id: user.id },
+    };
+  }
+
+  async recoveryPassword(data): Promise<ApiResponse<RecoveryPasswordResponse>> {
+    const user = await this.checkUserByEmail(data.email);
+    if (!user)
+      throw new HttpException(
+        {
+          isSuccess: false,
+          error: `Nie ma takiego adresu email w systemie`,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    try {
+      user.verificationToken = await this.generateVerifyToken(data.email);
+      await user.save();
+      user.activationUrl = await this.mailService.generateUrl(user);
+      await user.save();
+
+      await this.mailService.sendEmailsToUsers(
+          this.mailService,
+          [user],
+          'Zmiana hasła',
+          (activationUrl) => RecoveryPasswordTemplate(activationUrl)
+      );
+    } catch (e) {
+      return {
+        isSuccess: false,
+        error: 'Ups... coś poszło nie tak.',
+      };
+    }
+    return {
+      isSuccess: true,
+      payload: { sentToEmail: user.email },
+    };
+  }
+
+  async changePassword(data): Promise<ApiResponse<UpdateResponse>> {
+    const user = await this.checkUserById(data.id);
+    console.log(user);
+    if (!user)
+      throw new HttpException(
+        {
+          isSuccess: false,
+          error: 'Ups... coś poszło nie tak.',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    try {
+      user.password = await this.hashData(data.password);
+      await user.save();
+
+      await this.mailService.sendEmailsToUsers(
+          this.mailService,
+          [user],
+          'Hasło zostało zmienione',
+          () => PasswordChangedTemplate()
+      );
+    } catch (e) {
+      return {
+        isSuccess: false,
+        error: 'Ups... coś poszło nie tak.',
+      };
+    }
+    return {
+      isSuccess: true,
+      payload: user.id,
+    };
+  }
+
+  async getUserInfo(token: string): Promise<ApiResponse<UserDataResponse>> {
+    const decodedJwt = await this.getDecodedToken(token);
     const user = await this.checkUserByEmail(decodedJwt['email']);
     if (!user) return { isSuccess: false, error: 'Nie znaleziono użytkownika' };
     try {
@@ -160,7 +252,7 @@ export class AuthService {
 
     if (!user || !user.refreshToken) throw new ForbiddenException('Access Denied');
 
-    const rtMatches = await bcrypt.compare(rt, user.refreshToken);
+    const rtMatches = await this.compareHashedData(rt, user.refreshToken);
     if (!rtMatches) throw new ForbiddenException('Access Denied');
 
     const tokens = await this.getTokens(user.id, user.email);
