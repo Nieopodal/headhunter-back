@@ -14,11 +14,16 @@ import {
   MaxLength,
   Min,
 } from 'class-validator';
-export class UpdateStudentDto {
+export class RegisterStudentDto {
   @IsNotEmpty()
   @IsEmail()
   @MaxLength(255)
   email: string;
+
+  @IsNotEmpty()
+  @IsString()
+  @MaxLength(255)
+  password: string;
 
   @IsOptional()
   @IsPhoneNumber('PL')
@@ -26,14 +31,13 @@ export class UpdateStudentDto {
 
   @IsNotEmpty()
   @IsString()
-  @MaxLength(50)
   firstName: string;
 
   @IsNotEmpty()
   @IsString()
-  @MaxLength(70)
   lastName: string;
 
+  @IsNotEmpty()
   @IsString()
   githubUsername: string;
 

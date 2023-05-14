@@ -3,7 +3,7 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
 import { StudentService } from '../student/student.service';
-import {SendMailInfo} from '@Types';
+import { SendMailInfo } from '@Types';
 
 @Injectable()
 export class MailService {
@@ -32,7 +32,6 @@ export class MailService {
       const emailTemplate = emailTemplateFunction(user.activationUrl);
       try {
         await mailService.sendMail(user.email, subject, emailTemplate);
-        console.log(`Email sent to ${user.email}`);
       } catch (error) {
         console.error(`Failed to send email to ${user.email}:`, error.message);
       }
