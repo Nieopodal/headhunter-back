@@ -2,11 +2,11 @@ import { Body, Controller, Get, HttpCode, HttpStatus, Post, Res, UseGuards } fro
 import { Response } from 'express';
 import { LoginUserDto } from './dto';
 import { AuthService } from './auth.service';
-import {ApiResponse, Tokens, UserDataResponse} from '@Types';
+import { ApiResponse, Tokens, UserDataResponse } from '@Types';
 import { GetCurrentUserId, Public } from '../common/decorators';
 import { AtGuard, RtGuard } from '../common/guards';
 import { Cookies } from '../common/decorators/cookie.decorator';
-import {ThrottlerGuard} from "@nestjs/throttler";
+import { ThrottlerGuard } from '@nestjs/throttler';
 
 @Controller('auth')
 export class AuthController {
@@ -30,7 +30,6 @@ export class AuthController {
     return this.authService.logout(id);
   }
 
-  @Public()
   @UseGuards(RtGuard)
   @Get('user')
   @HttpCode(HttpStatus.FOUND)

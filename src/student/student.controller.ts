@@ -2,15 +2,7 @@ import { Controller, Get, HttpCode, HttpStatus, Param, Patch, Post, UseGuards } 
 import { StudentService } from './student.service';
 import { GetCurrentUser, GetCurrentUserId, Public, Role } from '../common/decorators';
 import { UpdateStudentDto } from './dto';
-import {
-  ApiResponse,
-  ConfirmResponse,
-  SimpleStudentData,
-  StudentCv,
-  UpdateStudentResponse,
-  UserRole,
-  VerifyUserResponse,
-} from '@Types';
+import { ApiResponse, ConfirmResponse, SimpleStudentData, StudentCv, UpdateStudentResponse, UserRole } from '@Types';
 import { ConfirmStudentDto } from './dto/confirm-student.dto';
 import { UserRoleGuard } from 'src/common/guards/user-role.guard';
 import { RegisterStudentDto } from './dto/register-student.dto';
@@ -49,12 +41,6 @@ export class StudentController {
     @GetCurrentUser() updateData: UpdateStudentDto,
   ): Promise<ApiResponse<UpdateStudentResponse>> {
     return this.studentService.updateStudent(id, updateData);
-  }
-
-  @Public()
-  @Get('verify/:id/:token')
-  verifyUser(@Param('id') id: string, @Param('token') token: string): Promise<ApiResponse<VerifyUserResponse>> {
-    return this.studentService.verifyUser(id, token);
   }
 
   @Public()

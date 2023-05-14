@@ -33,13 +33,6 @@ export type StudentToInterview = SimpleStudentData & {
   reservationTime: Date;
 };
 
-export type VerifyUserResponse = {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-};
-
 export type UpdateStudentResponse = {
   id: string;
 };
