@@ -170,22 +170,26 @@ export class StudentService {
 
   async registerStudentData(id, token, registerData): Promise<ApiResponse<UpdateStudentResponse>> {
     const user = await Student.findOneBy({ id });
-    if (user && token === user.verificationToken) {
-      try {
-        await Student.createQueryBuilder('student')
-          .update(Student)
-          .set(registerData)
-          .where('student.id = :id', { id })
-          .execute();
-        await Student.createQueryBuilder('student')
-          .update(Student)
-          .set({ password: await bcrypt.hash(registerData.password, 10), active: true, verificationToken: null })
-          .where('student.id = :id', { id })
-          .execute();
-        return { isSuccess: true, payload: id };
-      } catch (e) {
-        return { isSuccess: false, error: e.message };
-      }
+    if (!user) {
+      return { isSuccess: false, error: 'Blędne dane' };
+    }
+    if (token !== user.verificationToken) {
+      return { isSuccess: false, error: 'Błędne dane' };
+    }
+    try {
+      await Student.createQueryBuilder('student')
+        .update(Student)
+        .set(registerData)
+        .where('student.id = :id', { id })
+        .execute();
+      await Student.createQueryBuilder('student')
+        .update(Student)
+        .set({ password: await bcrypt.hash(registerData.password, 10), active: true, verificationToken: null })
+        .where('student.id = :id', { id })
+        .execute();
+      return { isSuccess: true, payload: id };
+    } catch (e) {
+      return { isSuccess: false, error: e.message };
     }
   }
 }

@@ -1,4 +1,4 @@
-import { Controller, Get, HttpCode, HttpStatus, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { StudentService } from './student.service';
 import { GetCurrentUser, GetCurrentUserId, Public, Role } from '../common/decorators';
 import { UpdateStudentDto } from './dto';
@@ -45,11 +45,7 @@ export class StudentController {
 
   @Public()
   @Patch('register/:id/:token')
-  registerStudent(
-    @Param('id') id: string,
-    @Param('token') token: string,
-    @GetCurrentUser() registerData: RegisterStudentDto,
-  ) {
+  registerStudent(@Param('id') id: string, @Param('token') token: string, @Body() registerData: RegisterStudentDto) {
     return this.studentService.registerStudentData(id, token, registerData);
   }
 
