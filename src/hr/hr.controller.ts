@@ -26,6 +26,18 @@ export class HrController {
   @UseGuards(UserRoleGuard)
   @Role(UserRole.HR)
   @HttpCode(HttpStatus.OK)
+  @Get('/search-available/:name?/:pageNumber?/:numberPerPage?')
+  async availableStudentsSearch(
+    @Param('name') name: string = '',
+    @Param('pageNumber') pageNumber = 1,
+    @Param('numberPerPage') numberPerPage = 10,
+  ): Promise<ApiResponse<AvailableStudentsPaginated>> {
+    return this.studentService.availableStudentsSearch(name, pageNumber, numberPerPage);
+  }
+
+  @UseGuards(UserRoleGuard)
+  @Role(UserRole.HR)
+  @HttpCode(HttpStatus.OK)
   @Get('/available/:pageNumber?/:numberPerPage?')
   async showAvailableStudents(
     @Param('pageNumber') pageNumber = 1,

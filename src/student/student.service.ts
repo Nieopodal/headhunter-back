@@ -161,4 +161,24 @@ export class StudentService {
       return { isSuccess: false, error: 'Ups... coś poszło nie tak.' };
     }
   }
+
+  async availableStudentsSearch(name: string, pageNumber: number, numberPerPage: number): Promise<ApiResponse<AvailableStudentsPaginated>> {
+    const [studentData, count] = await Student.createQueryBuilder('student')
+      .where('student.hr IS NULL')
+      .andWhere('student.active = :active', { active: true })
+      .andWhere('student.status = :status', { status: StudentStatus.AVAILABLE })
+      .andWhere('student.firstName LIKE :name', {
+        name: `%${name}%`,
+      })
+      .orWhere('student.lastName LIKE :name', {
+        name: `%${name}%`,
+      })
+      .skip(numberPerPage * (pageNumber - 1))
+      .take(numberPerPage)
+      .getManyAndCount();
+
+    const totalPages = Math.ceil(count / numberPerPage);
+
+    return { isSuccess: true, payload: { studentData, totalPages } };
+  }
 }

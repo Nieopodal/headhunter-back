@@ -26,10 +26,13 @@ export type SimpleStudentData = {
   monthsOfCommercialExp: number;
 };
 
-export type StudentToInterview = SimpleStudentData & {
+export type AvailableStudent = SimpleStudentData & {
   id: string;
   firstName: string;
   lastName: string;
+};
+
+export type StudentToInterview = AvailableStudent & {
   reservationTime: Date;
 };
 
@@ -39,7 +42,7 @@ export type StudentsToInterviewPaginated = {
 }
 
 export type AvailableStudentsPaginated = {
-  studentData: SimpleStudentData[],
+  studentData: AvailableStudent[],
   totalPages: number
 }
 
