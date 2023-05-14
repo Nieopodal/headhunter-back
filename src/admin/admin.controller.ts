@@ -5,11 +5,12 @@ import { UploadStudentDataService } from '../student/upload-student-data.service
 import { ApiResponse, CreateResponse } from '@Types';
 import { HrDto } from '../hr/dto';
 import { HrService } from '../hr/hr.service';
-import {Public} from "../common/decorators";
+import { Public } from '../common/decorators';
 
 @Controller('admin')
 export class AdminController {
   constructor(private uploadStudentDataService: UploadStudentDataService, private hrService: HrService) {}
+
   @Public()
   @Post('upload/file')
   @HttpCode(HttpStatus.OK)
@@ -17,6 +18,7 @@ export class AdminController {
   async uploadFile(@UploadedFile() file: Express.Multer.File): Promise<ApiResponse<object>> {
     return this.uploadStudentDataService.uploadFile(file);
   }
+
   @Public()
   @Post('hr/create')
   @HttpCode(HttpStatus.OK)

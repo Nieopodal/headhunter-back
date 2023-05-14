@@ -100,7 +100,6 @@ export class StudentService {
   }
 
   async getFreeStudents(pageNumber: number, numberPerPage: number): Promise<ApiResponse<AvailableStudentsPaginated>> {
-
     const count = await Student.createQueryBuilder('student')
       .where('student.hr IS NULL')
       .andWhere('student.active = :active', { active: true })

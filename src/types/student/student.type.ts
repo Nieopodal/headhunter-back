@@ -1,3 +1,32 @@
+export type Student = {
+  id: string;
+  email: string;
+  password: string;
+  contactNumber: string;
+  firstName: string;
+  lastName: string;
+  githubUsername: string;
+  portfolioUrls: string[];
+  courseCompletion: number;
+  courseEngagement: number;
+  projectDegree: number;
+  teamProjectDegree: number;
+  scrumProjectUrls: string[];
+  bio: string;
+  expectedTypeWork: string;
+  targetWorkCity: string;
+  expectedContractType: string;
+  expectedSalary: string;
+  canTakeApprenticeship: boolean;
+  monthsOfCommercialExp: number;
+  education: string;
+  workExperience: string;
+  courses: string;
+  active: boolean;
+  role: string;
+  refreshToken: string;
+};
+
 export type StudentPartialData = {
   id: string;
   email: string;
@@ -34,14 +63,14 @@ export type StudentToInterview = SimpleStudentData & {
 };
 
 export type StudentsToInterviewPaginated = {
-  studentData: StudentToInterview[],
-  totalPages: number,
-}
+  studentData: StudentToInterview[];
+  totalPages: number;
+};
 
 export type AvailableStudentsPaginated = {
-  studentData: SimpleStudentData[],
-  totalPages: number
-}
+  studentData: SimpleStudentData[];
+  totalPages: number;
+};
 
 export type StudentCv = StudentPartialData & SimpleStudentData;
 
