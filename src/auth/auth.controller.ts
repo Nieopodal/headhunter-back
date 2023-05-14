@@ -4,7 +4,7 @@ import { ChangePasswordDto, LoginUserDto } from './dto';
 import { AuthService } from './auth.service';
 import { ApiResponse, ConfirmResponse, RecoveryPasswordResponse, Tokens, UpdateResponse } from '@Types';
 import { GetCurrentUserId, Public } from '../common/decorators';
-import { BasicDataResponse } from '@Types';
+import { UserDataResponse } from '@Types';
 import { RtGuard } from '../common/guards';
 import { Cookies } from '../common/decorators/cookie.decorator';
 import { RecoveryPasswordDto } from './dto/recovery-password.dto';
@@ -20,7 +20,7 @@ export class AuthController {
   async login(
     @Body() loginData: LoginUserDto,
     @Res({ passthrough: true }) response: Response,
-  ): Promise<ApiResponse<BasicDataResponse>> {
+  ): Promise<ApiResponse<UserDataResponse>> {
     return await this.authService.login(loginData, response);
   }
 
@@ -50,11 +50,12 @@ export class AuthController {
   changePassword(@Body() data: ChangePasswordDto): Promise<ApiResponse<UpdateResponse>> {
     return this.authService.changePassword(data);
   }
+
   @Public()
   @UseGuards(RtGuard)
   @Get('user')
   @HttpCode(HttpStatus.FOUND)
-  getUserInfo(@Cookies() token: string): Promise<ApiResponse<BasicDataResponse>> {
+  getUserInfo(@Cookies() token: string): Promise<ApiResponse<UserDataResponse>> {
     return this.authService.getUserInfo(token);
   }
 

@@ -146,10 +146,14 @@ export class AuthService {
     const tokens = await this.getTokens(user.id, user.email);
     await this.updateRtHash(user.id, tokens.refresh_token);
     response.cookie('jwt-refresh', tokens.refresh_token, { httpOnly: true });
-    return {
-      isSuccess: true,
-      payload: await this.getUserData(user, tokens),
-    };
+    try {
+      return {
+        isSuccess: true,
+        payload: await this.getUserData(user, tokens),
+      };
+    } catch (e) {
+      return { isSuccess: false, error: 'Ups... coś poszło nie tak.' };
+    }
   }
 
   async logout(id: string): Promise<ApiResponse<any>> {
