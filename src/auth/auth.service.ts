@@ -13,6 +13,7 @@ import { MailService } from '../mail/mail.service';
 import {RecoveryPasswordTemplate} from "../templates/email/recovery-password";
 import {PasswordChangedTemplate} from "../templates/email/password-change";
 
+
 @Injectable()
 export class AuthService {
   constructor(

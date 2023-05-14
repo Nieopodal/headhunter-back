@@ -1,13 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import {
-  ApiResponse,
-  AvailableStudentsPaginated,
-  SimpleStudentData,
-  StudentCv,
-  StudentStatus,
-  UpdateResponse,
-} from '@Types';
+import { ApiResponse, SimpleStudentData, UpdateStudentResponse, StudentCv, StudentStatus } from '@Types';
+import { ConfirmResponse, UpdateResponse } from 'src/types/auth/response.type';
+
 import { Student } from './entity/student.entity';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class StudentService {
@@ -99,6 +95,7 @@ export class StudentService {
     }
   }
 
+
   async getFreeStudents(pageNumber: number, numberPerPage: number): Promise<ApiResponse<AvailableStudentsPaginated>> {
 
     const count = await Student.createQueryBuilder('student')
@@ -155,10 +152,35 @@ export class StudentService {
       await Student.createQueryBuilder('student').update(Student).set(data).where('id=:id', { id }).execute();
       return {
         isSuccess: true,
-        payload: { id: data.id },
+        payload: { id },
       };
-    } catch {
-      return { isSuccess: false, error: 'Ups... coś poszło nie tak.' };
+    } catch (e) {
+      return { isSuccess: false, error: 'Ups.... coś poszło nie tak' };
+    }
+  }
+
+  async registerStudentData(id, token, registerData): Promise<ApiResponse<UpdateStudentResponse>> {
+    const user = await Student.findOneBy({ id });
+    if (!user) {
+      return { isSuccess: false, error: 'Blędne dane' };
+    }
+    if (token !== user.verificationToken) {
+      return { isSuccess: false, error: 'Błędne dane' };
+    }
+    try {
+      await Student.createQueryBuilder('student')
+        .update(Student)
+        .set(registerData)
+        .where('student.id = :id', { id })
+        .execute();
+      await Student.createQueryBuilder('student')
+        .update(Student)
+        .set({ password: await bcrypt.hash(registerData.password, 10), active: true, verificationToken: null })
+        .where('student.id = :id', { id })
+        .execute();
+      return { isSuccess: true, payload: id };
+    } catch (e) {
+      return { isSuccess: false, error: e.message };
     }
   }
 }
