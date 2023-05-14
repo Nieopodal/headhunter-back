@@ -40,18 +40,14 @@ export class StudentController {
   @HttpCode(HttpStatus.ACCEPTED)
   updateStudent(
     @GetCurrentUserId() id: string,
-
-    @GetCurrentUser() updateData: UpdateStudentDto,
+    @Body() updateData: UpdateStudentDto,
   ): Promise<ApiResponse<UpdateStudentResponse>> {
     return this.studentService.updateStudent(id, updateData);
   }
 
   @Public()
   @Patch('register/:id/:token')
-  registerStudent(@Param('id') id: string, @Param('token') token: string, @Body() registerData: RegisterStudentDto) {
-    return this.studentService.registerStudentData(id, token, registerData);
-    @Body() registerData: UpdateStudentDto,
-  ): Promise<ApiResponse<UpdateResponse>> {
+  registerStudent(@Param('id') id: string, @Param('token') token: string, @Body() registerData: RegisterStudentDto): Promise<ApiResponse<UpdateResponse>> {
     return this.studentService.updateStudent(id, registerData);
   }
 
