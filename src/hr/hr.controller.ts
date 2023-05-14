@@ -38,6 +38,19 @@ export class HrController {
   @UseGuards(UserRoleGuard)
   @Role(UserRole.HR)
   @HttpCode(HttpStatus.OK)
+  @Get('/search-interview/:name?/:pageNumber?/:numberPerPage?')
+  async interviewStudentsSearch(
+    @GetCurrentUserId() hrId: string,
+    @Param('name') name: string = '',
+    @Param('pageNumber') pageNumber = 1,
+    @Param('numberPerPage') numberPerPage = 10,
+  ): Promise<ApiResponse<StudentsToInterviewPaginated>> {
+    return this.studentService.interviewStudentsSearch(name, pageNumber, numberPerPage, hrId);
+  }
+
+  @UseGuards(UserRoleGuard)
+  @Role(UserRole.HR)
+  @HttpCode(HttpStatus.OK)
   @Get('/available/:pageNumber?/:numberPerPage?')
   async showAvailableStudents(
     @Param('pageNumber') pageNumber = 1,
