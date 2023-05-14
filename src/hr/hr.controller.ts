@@ -20,8 +20,7 @@ export class HrController {
     private readonly studentHrService: StudentHrMethodsService,
     private readonly studentService: StudentService,
     private readonly hrService: HrService,
-  ) {
-  }
+  ) {}
 
   @UseGuards(UserRoleGuard)
   @Role(UserRole.HR)

@@ -5,9 +5,9 @@ import { Student } from './entity/student.entity';
 import { StudentService } from './student.service';
 import { AuthService } from '../auth/auth.service';
 import { UploadStudentsDto } from './dto';
-import {ApiResponse, UploadStudentResponse, UserRole} from '@Types';
+import { ApiResponse, UploadStudentResponse, UserRole } from '@Types';
 import { MailService } from '../mail/mail.service';
-import {UserRegistrationTemplate} from "../templates/email/user-registration";
+import { UserRegistrationTemplate } from '../templates/email/user-registration';
 
 @Injectable()
 export class UploadStudentDataService {
@@ -56,13 +56,13 @@ export class UploadStudentDataService {
         stream.on('error', reject);
       });
 
-      this.mailService.sendEmailsToUsers(
-          this.mailService,
-          records,
-          'Potwierdzenie rejestracji',
-          (activationUrl) => UserRegistrationTemplate(activationUrl, UserRole.STUDENT)).catch((error) => {
-        console.error('Failed to send emails to students:', error.message);
-      });
+      this.mailService
+        .sendEmailsToUsers(this.mailService, records, 'Potwierdzenie rejestracji', (activationUrl) =>
+          UserRegistrationTemplate(activationUrl, UserRole.STUDENT),
+        )
+        .catch((error) => {
+          console.error('Failed to send emails to students:', error.message);
+        });
 
       return { isSuccess: true, payload: { numberAddedStudents: records.length } };
     } catch (e) {

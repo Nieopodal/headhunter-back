@@ -1,4 +1,4 @@
-import {UserRole} from "@Types";
+import { UserRole } from '@Types';
 
 export function UserRegistrationTemplate(generateUrl: string, role: UserRole) {
   const greeting = role === UserRole.STUDENT ? 'Witaj, Kursancie!' : 'Witaj, Rekruterze!';

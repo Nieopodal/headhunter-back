@@ -12,7 +12,7 @@ import { MailModule } from './mail/mail.module';
 import { UploadStudentDataModule } from './student/upload-student-data.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { CronService } from './cron/cron.service';
-import {ThrottlerModule} from "@nestjs/throttler";
+import { ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [
