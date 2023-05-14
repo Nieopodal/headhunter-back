@@ -37,6 +37,14 @@ export class HrController {
   @UseGuards(UserRoleGuard)
   @Role(UserRole.HR)
   @HttpCode(HttpStatus.OK)
+  @Get('/interview/cv/:id')
+  async showStudentCv(@Param('id') id: string): Promise<ApiResponse<StudentCv>> {
+    return this.studentService.getStudentCv(id);
+  }
+
+  @UseGuards(UserRoleGuard)
+  @Role(UserRole.HR)
+  @HttpCode(HttpStatus.OK)
   @Get('/interview/:pageNumber?/:numberPerPage?')
   async showStudentsToInterview(
     @GetCurrentUserId() hrId: string,
@@ -44,14 +52,6 @@ export class HrController {
     @Param('numberPerPage') numberPerPage = 10,
   ): Promise<ApiResponse<StudentsToInterviewPaginated>> {
     return this.studentHrService.showStudentsToInterview(hrId, pageNumber, numberPerPage);
-  }
-
-  @UseGuards(UserRoleGuard)
-  @Role(UserRole.HR)
-  @HttpCode(HttpStatus.OK)
-  @Get('/interview/cv/:id')
-  async showStudentCv(@Param('id') id: string): Promise<ApiResponse<StudentCv>> {
-    return this.studentService.getStudentCv(id);
   }
 
   @UseGuards(UserRoleGuard)
