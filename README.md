@@ -96,6 +96,8 @@ This version of MegaK HeadHunter app was made by participants of the group #2 fr
 * Irek [https://github.com/IrePro78](https://github.com/IrePro78)
 * Wojtek [https://github.com/RavenPl](https://github.com/RavenPl)
 * Paweł [https://github.com/Now1k](https://github.com/Now1k)
+* Radek [https://github.com/RadekK1996](https://github.com/RadekK1996)
+* Arek [https://github.com/bubelarek](https://github.com/bubelarek)
 
 
 It was a great co-working experience 🤝
