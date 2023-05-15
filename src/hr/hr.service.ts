@@ -38,7 +38,8 @@ export class HrService {
     hr.fullName = formData.fullName;
     hr.company = formData.company;
     hr.maxReservedStudents = formData.maxReservedStudents;
-    hr.verificationToken = await this.authService.generateVerifyToken(formData.email);
+    await hr.save();
+    hr.verificationToken = await this.authService.hashData(await this.authService.generateEmailToken(hr.id, hr.email));
     await hr.save();
     hr.activationUrl = await this.mailService.generateUrl(hr);
     await hr.save();
@@ -57,15 +58,21 @@ export class HrService {
     };
   }
 
-  async setPasswordHr(data): Promise<ApiResponse<UpdateResponse>> {
-    try {
-      await Hr.createQueryBuilder('hr').update(Hr).set(data.password).where('id=:id', { id: data.id }).execute();
-      return {
-        isSuccess: true,
-        payload: { id: data.id },
-      };
-    } catch {
-      return { isSuccess: false, error: 'Ups... coś poszło nie tak.' };
-    }
+  async setPasswordHr(id, data): Promise<ApiResponse<UpdateResponse>> {
+    const user = await this.getHrById(id);
+    if (!user || !data.password)
+      throw new HttpException(
+        {
+          isSuccess: false,
+          error: 'Ups... coś poszło nie tak.',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    user.password = await this.authService.hashData(data.password);
+    await user.save();
+    return {
+      isSuccess: true,
+      payload: { id: user.id },
+    };
   }
 }

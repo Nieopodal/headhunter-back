@@ -53,15 +53,14 @@ export class AuthService {
     await user.save();
   }
 
-  async generateVerifyToken(email: string): Promise<string> {
-    const token = await this.jwtService.signAsync(
-      { email },
+  async generateEmailToken(id, email): Promise<string> {
+    return await this.jwtService.signAsync(
+      { id, email },
       {
-        secret: this.configService.get('SECRET_KEY_VT'),
-        expiresIn: this.configService.get('EXPIRES_IN_VT'),
+        secret: this.configService.get('SECRET_KEY_MT'),
+        expiresIn: this.configService.get('EXPIRES_IN_MT'),
       },
     );
-    return await this.hashData(token);
   }
 
   async getTokens(id: string, email: string): Promise<Tokens> {
@@ -170,9 +169,9 @@ export class AuthService {
     };
   }
 
-  async confirmUser(param): Promise<ApiResponse<ConfirmResponse>> {
+  async confirmFromEmail(param): Promise<ApiResponse<ConfirmResponse>> {
     const user = await this.checkUserById(param.id);
-    if (!user)
+    if (!user || param.token !== user.verificationToken)
       throw new HttpException(
         {
           isSuccess: false,
@@ -182,7 +181,7 @@ export class AuthService {
       );
     return {
       isSuccess: true,
-      payload: { id: user.id },
+      payload: { email: user.email, emailToken: await this.generateEmailToken(user.id, user.email) },
     };
   }
 
@@ -197,7 +196,7 @@ export class AuthService {
         HttpStatus.BAD_REQUEST,
       );
     try {
-      user.verificationToken = await this.generateVerifyToken(data.email);
+      user.verificationToken = await this.hashData(await this.generateEmailToken(user.id, user.email));
       await user.save();
       user.activationUrl = await this.mailService.generateUrl(user);
       await user.save();
@@ -217,8 +216,8 @@ export class AuthService {
     };
   }
 
-  async changePassword(data): Promise<ApiResponse<UpdateResponse>> {
-    const user = await this.checkUserById(data.id);
+  async changePassword(data, id): Promise<ApiResponse<UpdateResponse>> {
+    const user = await this.checkUserById(id);
     if (!user)
       throw new HttpException(
         {

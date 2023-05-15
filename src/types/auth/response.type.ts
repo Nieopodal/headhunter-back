@@ -32,7 +32,8 @@ export type CreateResponse = {
 };
 
 export type ConfirmResponse = {
-  id: string;
+  email: string;
+  emailToken: string;
 };
 
 export type UpdateResponse = {
