@@ -14,7 +14,6 @@ async function bootstrap() {
   app.use(cookieParser());
   app.enableCors({
     origin: configService.get('CORS_CLIENTS_URL'),
-
     credentials: true,
   });
   await app.listen(configService.get('PORT') ? parseInt(configService.get('PORT')) : 3000); // [BE] port: 3000

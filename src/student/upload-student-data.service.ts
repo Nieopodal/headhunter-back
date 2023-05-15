@@ -5,7 +5,7 @@ import { Student } from './entity/student.entity';
 import { StudentService } from './student.service';
 import { AuthService } from '../auth/auth.service';
 import { UploadStudentsDto } from './dto';
-import { ApiResponse, UploadStudentResponse, UserRole } from '@Types';
+import { ApiResponse, UserRole } from '@Types';
 import { MailService } from '../mail/mail.service';
 import { UserRegistrationTemplate } from '../templates/email/user-registration';
 
@@ -39,7 +39,10 @@ export class UploadStudentDataService {
           data.teamProjectDegree = Number(record.teamProjectDegree);
           data.scrumProjectUrls = record.scrumProjectUrls;
           if (!students.some((std) => std.email == record.email)) {
-            data.verificationToken = await this.authService.generateVerifyToken(record.email);
+            await data.save();
+            data.verificationToken = await this.authService.hashData(
+              await this.authService.generateEmailToken(data.id, data.email),
+            );
             await data.save();
             data.activationUrl = await this.mailService.generateUrl(data);
             await data.save();

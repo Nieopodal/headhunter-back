@@ -14,10 +14,10 @@ TYPEORM_ENTITIES=dist/**/*.entity.js
 # Token
 SECRET_KEY_AT='at-secret'
 SECRET_KEY_RT='rt-secret'
-SECRET_KEY_VT='vt-secret'
+SECRET_KEY_MT='mt-secret'
 EXPIRES_IN_AT=15m
 EXPIRES_IN_RT=7d
-EXPIRES_IN_VT=7d
+EXPIRES_IN_MT=15m
 
 # Cors
 CORS_CLIENTS_URL='http://localhost:3001'
