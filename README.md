@@ -6,7 +6,7 @@
 
 # About The Project
 
-![screenshot of the app](https://i.ibb.co/qMW6hLp/browser-mockup.png)
+![screenshot of the app](https://i.ibb.co/smrmmbr/browser-mockup.png)
 
 MegaK HeadHunter is a project made by participants of a Polish webdev course called [MegaKurs](https://megak.pl). It was a team-based (agile/scrum) effort, that was assigned as a final project.
 
