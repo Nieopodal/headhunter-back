@@ -8,7 +8,7 @@
 
 ![screenshot of the app](https://i.ibb.co/qMW6hLp/browser-mockup.png)
 
-MegaK HeadHunter is a project made by participants of a Polish webdev course called [MegaKurs](https://megak.pl). It was a team-based (agile/scrum) effort, that was assigned as a final project to complete the course.
+MegaK HeadHunter is a project made by participants of a Polish webdev course called [MegaKurs](https://megak.pl). It was a team-based (agile/scrum) effort, that was assigned as a final project.
 
 MegaK HeadHunter is an IT employment-focused platform, which allows the students, who have completed the abovementioned course, to apply for their first jobs. It allows head hunters from various companies to browse each sudent's CV's and appoint interviews.
 
