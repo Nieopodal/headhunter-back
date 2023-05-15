@@ -78,6 +78,7 @@ After that, it is advised to turn this setting off.
 <span style="color:#e02735">You *will* need the MegaK HeadHunter frontend app for this to make sense</span>.
 
 Check it out at [https://github.com/Nieopodal/headhunter-front](https://github.com/Nieopodal/headhunter-front)
+
 ⚠️ Make sure the file structure of both apps is this *(and mind the folder names)*:
 
 ```
