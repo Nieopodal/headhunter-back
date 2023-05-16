@@ -22,6 +22,8 @@ import { PasswordChangedTemplate } from '../templates/email/password-change';
 import { Admin } from '../admin/entity/admin.entity';
 import { Student } from '../student/entity/student.entity';
 import { Hr } from '../hr/entity/hr.entity';
+import { InvalidCredentialsException } from '../common/exceptions/invalid-credentials.exception';
+import { InvalidTokenException } from '../common/exceptions/invalid-token.exception';
 
 @Injectable()
 export class AuthService {
@@ -139,46 +141,38 @@ export class AuthService {
 
   async login(login: LoginUserDto, response: Response): Promise<ApiResponse<UserDataResponse>> {
     const user = await this.checkUserByEmail(login.email);
-    if (!user) return { isSuccess: false, error: 'Nie znaleziono użytkownika' };
+    if (!user) throw new InvalidCredentialsException();
+
     const passwordMatches = await this.compareHashedData(login.password, user.password);
-    if (!passwordMatches) return { isSuccess: false, error: 'Niepoprawne hasło' };
+    if (!passwordMatches) throw new InvalidCredentialsException();
+
     const tokens = await this.getTokens(user.id, user.email);
     await this.updateRtHash(user.id, tokens.refresh_token);
     response.cookie('jwt-refresh', tokens.refresh_token, { httpOnly: true });
-    try {
-      return {
-        isSuccess: true,
-        payload: await this.getUserData(user, tokens),
-      };
-    } catch (e) {
-      return { isSuccess: false, error: 'Ups... coś poszło nie tak.' };
-    }
+    return {
+      isSuccess: true,
+      payload: await this.getUserData(user, tokens),
+    };
   }
 
   async logout(id: string): Promise<ApiResponse<any>> {
     const user = await this.checkUserById(id);
-    if (!user) {
-      throw new NotFoundException('User not found');
-    } else if (user.refreshToken !== null) {
+    if (!user) throw new HttpException('Użytkownik nie znaleziony', HttpStatus.NOT_FOUND);
+    if (user.refreshToken !== null) {
       user.refreshToken = null;
       await user.save();
+      return {
+        isSuccess: true,
+        payload: null,
+      };
     }
-    return {
-      isSuccess: true,
-      payload: null,
-    };
+    throw new HttpException('Użytkownik nie znaleziony', HttpStatus.BAD_REQUEST);
   }
 
   async confirmFromEmail(param): Promise<ApiResponse<ConfirmResponse>> {
     const user = await this.checkUserById(param.id);
-    if (!user || param.token !== user.verificationToken)
-      throw new HttpException(
-        {
-          isSuccess: false,
-          error: 'Ups... coś poszło nie tak.',
-        },
-        HttpStatus.BAD_REQUEST,
-      );
+    if (!user || param.token !== user.verificationToken) throw new InvalidTokenException();
+
     return {
       isSuccess: true,
       payload: { email: user.email, emailToken: await this.generateEmailToken(user.id, user.email) },
@@ -187,14 +181,7 @@ export class AuthService {
 
   async recoveryPassword(data): Promise<ApiResponse<RecoveryPasswordResponse>> {
     const user = await this.checkUserByEmail(data.email);
-    if (!user)
-      throw new HttpException(
-        {
-          isSuccess: false,
-          error: `Nie ma takiego adresu email w systemie`,
-        },
-        HttpStatus.BAD_REQUEST,
-      );
+    if (!user.email) throw new HttpException(`Nie ma takiego adresu email w systemie`, HttpStatus.NOT_FOUND);
     try {
       user.verificationToken = await this.hashData(await this.generateEmailToken(user.id, user.email));
       await user.save();
@@ -204,28 +191,18 @@ export class AuthService {
       await this.mailService.sendEmailsToUsers(this.mailService, [user], 'Zmiana hasła', (activationUrl) =>
         RecoveryPasswordTemplate(activationUrl),
       );
-    } catch (e) {
       return {
-        isSuccess: false,
-        error: 'Ups... coś poszło nie tak.',
+        isSuccess: true,
+        payload: { sentToEmail: user.email },
       };
+    } catch (e) {
+      throw new HttpException('Ups... coś poszło nie tak.', HttpStatus.BAD_REQUEST);
     }
-    return {
-      isSuccess: true,
-      payload: { sentToEmail: user.email },
-    };
   }
 
   async changePassword(data, id): Promise<ApiResponse<UpdateResponse>> {
     const user = await this.checkUserById(id);
-    if (!user)
-      throw new HttpException(
-        {
-          isSuccess: false,
-          error: 'Ups... coś poszło nie tak.',
-        },
-        HttpStatus.BAD_REQUEST,
-      );
+    if (!data.password) new HttpException('Nie prawidłowe hasło', HttpStatus.BAD_REQUEST);
     try {
       user.password = await this.hashData(data.password);
       await user.save();

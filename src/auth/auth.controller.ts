@@ -53,7 +53,6 @@ export class AuthController {
     @GetUserId() id: string,
     @GetUserData() data: ChangePasswordDto,
   ): Promise<ApiResponse<UpdateResponse>> {
-    console.log(id, data);
     return this.authService.changePassword(data, id);
   }
 
