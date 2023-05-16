@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Patch, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { GetCurrentUserId, Public, Role } from '../common/decorators';
 import {
   ApiResponse,
@@ -13,6 +13,7 @@ import { StudentHrMethodsService } from '../student/student-hr-methods.service';
 import { UserRoleGuard } from '../common/guards';
 import { HrService } from './hr.service';
 import { UpdateStudentDto } from '../student/dto';
+import { StudentFilterDto } from '../student/dto/student-filter.dto';
 
 @Controller('hr')
 export class HrController {
@@ -62,6 +63,14 @@ export class HrController {
   @UseGuards(UserRoleGuard)
   @Role(UserRole.HR)
   @HttpCode(HttpStatus.OK)
+  @Get('/interview/cv/:id')
+  async showStudentCv(@Param('id') id: string): Promise<ApiResponse<StudentCv>> {
+    return this.studentService.getStudentCv(id);
+  }
+
+  @UseGuards(UserRoleGuard)
+  @Role(UserRole.HR)
+  @HttpCode(HttpStatus.OK)
   @Get('/interview/:pageNumber?/:numberPerPage?')
   async showStudentsToInterview(
     @GetCurrentUserId() hrId: string,
@@ -73,10 +82,13 @@ export class HrController {
 
   @UseGuards(UserRoleGuard)
   @Role(UserRole.HR)
-  @HttpCode(HttpStatus.OK)
-  @Get('/interview/cv/:id')
-  async showStudentCv(@Param('id') id: string): Promise<ApiResponse<StudentCv>> {
-    return this.studentService.getStudentCv(id);
+  @Post('/set-filter/:pageNumber?/:numberPerPage?')
+  async setFilter(
+    @Body() data: StudentFilterDto,
+    @Param('pageNumber') pageNumber = 1,
+    @Param('numberPerPage') numberPerPage = 10,
+  ): Promise<ApiResponse<AvailableStudentsPaginated>> {
+    return this.studentService.setFilter(data, pageNumber, numberPerPage);
   }
 
   @UseGuards(UserRoleGuard)
