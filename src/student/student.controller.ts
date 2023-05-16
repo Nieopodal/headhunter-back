@@ -50,9 +50,8 @@ export class StudentController {
   @UseGuards(MtGuard)
   @Patch('register')
   registerStudent(
-    @Param('id') id: string,
-    @Param('token') token: string,
-    @Body() registerData: RegisterStudentDto,
+    @GetUserId() id: string,
+    @GetUserData() registerData: RegisterStudentDto,
   ): Promise<ApiResponse<UpdateResponse>> {
     return this.studentService.updateStudent(id, registerData);
   }
