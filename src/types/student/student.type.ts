@@ -49,18 +49,18 @@ export type AvailableStudentsPaginated = {
 export type StudentCv = StudentPartialData & SimpleStudentData;
 
 export enum ExpectedTypeWork {
-  office = 'Na miejscu',
-  move = 'Przeprowadzka',
-  remote = 'Praca zdalna',
-  hybrid = 'Praca hybrydowa',
+  OFFICE = 'Na miejscu',
+  MOVE = 'Przeprowadzka',
+  REMOTE = 'Praca zdalna',
+  HYBRID = 'Praca hybrydowa',
   DM = 'Nie ma znaczenia',
 }
 
 export enum ExpectedContractType {
   B2B = 'Możliwe B2B',
-  employ = 'Tylko umowa o pracę',
-  contract = 'Umowa zlecenie / dzieło',
-  none = 'Brak preferencji',
+  EMPLOY = 'Tylko umowa o pracę',
+  CONTRACT = 'Umowa zlecenie / dzieło',
+  NONE = 'Brak preferencji',
 }
 
 export enum StudentStatus {
