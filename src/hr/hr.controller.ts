@@ -22,7 +22,16 @@ export class HrController {
     private readonly studentHrService: StudentHrMethodsService,
     private readonly studentService: StudentService,
     private readonly hrService: HrService,
-  ) {}
+  ) {
+  }
+
+  @UseGuards(UserRoleGuard)
+  @Role(UserRole.HR)
+  @HttpCode(HttpStatus.OK)
+  @Get('/remove-filter')
+  async removeFilter(): Promise<void> {
+    return this.studentService.removeFilter();
+  }
 
   @UseGuards(UserRoleGuard)
   @Role(UserRole.HR)

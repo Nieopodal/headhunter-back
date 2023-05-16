@@ -307,4 +307,8 @@ export class StudentService {
       );
     }
   }
+
+  async removeFilter(): Promise<void> {
+    await this.cacheManager.del('filter');
+  }
 }
