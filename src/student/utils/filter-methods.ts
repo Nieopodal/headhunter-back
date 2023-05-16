@@ -38,7 +38,6 @@ export const interviewFilter = (data: Student): StudentToInterview => {
     updatedAt,
     refreshToken,
     active,
-    githubUsername,
     status,
     hr,
     bio,

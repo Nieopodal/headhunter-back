@@ -63,6 +63,7 @@ export type AvailableStudent = SimpleStudentData & {
 
 export type StudentToInterview = AvailableStudent & {
   reservationTime: Date;
+  githubUsername: string;
 };
 
 export type UpdateStudentResponse = {
