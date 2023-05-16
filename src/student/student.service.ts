@@ -207,16 +207,16 @@ export class StudentService {
         .andWhere('student.active = :active', { active: true })
         .andWhere('student.status = :status', { status: StudentStatus.AVAILABLE })
         .andWhere('(student.firstName LIKE :name OR student.lastName LIKE :name)', { name: `%${name}%` })
-        .andWhere('(:check IS NULL OR student.monthsOfCommercialExp = :monthsOfCommercialExp)', { monthsOfCommercialExp: filterSchema ? filterSchema.monthsOfCommercialExp : false })
+        .andWhere('(:check IS NULL OR student.monthsOfCommercialExp >= :monthsOfCommercialExp)', { monthsOfCommercialExp: filterSchema ? filterSchema.monthsOfCommercialExp : false })
         .andWhere('(:check IS NULL OR student.canTakeApprenticeship = :canTakeApprenticeship)', { canTakeApprenticeship: filterSchema ? filterSchema.canTakeApprenticeship : false })
         .andWhere('(:check IS NULL OR student.expectedSalary BETWEEN :minSalary AND :maxSalary)', {
           minSalary: filterSchema ? filterSchema.minSalary : false,
           maxSalary: filterSchema ? filterSchema.maxSalary : false,
         })
-        .andWhere('(:check IS NULL OR student.teamProjectDegree = :teamProjectDegree)', { teamProjectDegree: filterSchema ? filterSchema.teamProjectDegree : false })
-        .andWhere('(:check IS NULL OR student.projectDegree = :projectDegree)', { projectDegree: filterSchema ? filterSchema.projectDegree : null })
-        .andWhere('(:check IS NULL OR student.courseEngagement = :courseEngagement)', { courseEngagement: filterSchema ? filterSchema.courseEngagement : null })
-        .andWhere('(:check IS NULL OR student.courseCompletion = :courseCompletion)', { courseCompletion: filterSchema ? filterSchema.courseCompletion : null })
+        .andWhere('(:check IS NULL OR student.teamProjectDegree >= :teamProjectDegree)', { teamProjectDegree: filterSchema ? filterSchema.teamProjectDegree : false })
+        .andWhere('(:check IS NULL OR student.projectDegree >= :projectDegree)', { projectDegree: filterSchema ? filterSchema.projectDegree : null })
+        .andWhere('(:check IS NULL OR student.courseEngagement >= :courseEngagement)', { courseEngagement: filterSchema ? filterSchema.courseEngagement : null })
+        .andWhere('(:check IS NULL OR student.courseCompletion >= :courseCompletion)', { courseCompletion: filterSchema ? filterSchema.courseCompletion : null })
         .andWhere('(:check IS NULL OR student.expectedContractType IN (:expectedContractType))', { expectedContractType: filterSchema ? filterSchema.expectedContractType : false })
         .andWhere('(:check IS NULL OR student.expectedTypeWork IN (:expectedTypeWork))', { expectedTypeWork: filterSchema ? filterSchema.expectedTypeWork : false })
         .skip(numberPerPage * (pageNumber - 1))
@@ -274,16 +274,16 @@ export class StudentService {
         .where('student.hr IS NULL')
         .andWhere('student.active = :active', { active: true })
         .andWhere('student.status = :status', { status: StudentStatus.AVAILABLE })
-        .andWhere('student.monthsOfCommercialExp = :monthsOfCommercialExp', { monthsOfCommercialExp: data.monthsOfCommercialExp })
+        .andWhere('student.monthsOfCommercialExp >= :monthsOfCommercialExp', { monthsOfCommercialExp: data.monthsOfCommercialExp })
         .andWhere('student.canTakeApprenticeship = :canTakeApprenticeship', { canTakeApprenticeship: data.canTakeApprenticeship })
         .andWhere('student.expectedSalary BETWEEN :minSalary AND :maxSalary', {
           minSalary: data.minSalary,
           maxSalary: data.maxSalary,
         })
-        .andWhere('student.teamProjectDegree = :teamProjectDegree', { teamProjectDegree: data.teamProjectDegree })
-        .andWhere('student.projectDegree = :projectDegree', { projectDegree: data.projectDegree })
-        .andWhere('student.courseEngagement = :courseEngagement', { courseEngagement: data.courseEngagement })
-        .andWhere('student.courseCompletion = :courseCompletion', { courseCompletion: data.courseCompletion })
+        .andWhere('student.teamProjectDegree >= :teamProjectDegree', { teamProjectDegree: data.teamProjectDegree })
+        .andWhere('student.projectDegree >= :projectDegree', { projectDegree: data.projectDegree })
+        .andWhere('student.courseEngagement >= :courseEngagement', { courseEngagement: data.courseEngagement })
+        .andWhere('student.courseCompletion >= :courseCompletion', { courseCompletion: data.courseCompletion })
         .andWhere('student.expectedContractType IN (:expectedContractType)', { expectedContractType: data.expectedContractType })
         .andWhere('student.expectedTypeWork IN (:expectedTypeWork)', { expectedTypeWork: data.expectedTypeWork })
         .skip(numberPerPage * (pageNumber - 1))
