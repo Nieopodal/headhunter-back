@@ -17,11 +17,11 @@ Check out the live demo at [tutaj link](https://mwyso.usermd.net link)
 Test student account credentials:
 
 login: student@hh.com
-password: Testowy123!@#
+password: Test123!@#
 Test headhunter account credentials:
 
 login: hr@hh.com
-password: Testowy123!@#
+password: Test123!@#
 
 # Features 🔧
 
