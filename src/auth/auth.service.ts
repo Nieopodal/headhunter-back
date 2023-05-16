@@ -1,4 +1,6 @@
-import { ForbiddenException, HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, HttpException, HttpStatus, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 import { LoginUserDto } from './dto';
 import { AdminService } from '../admin/admin.service';
 import { StudentService } from '../student/student.service';
@@ -26,6 +28,7 @@ import { Hr } from '../hr/entity/hr.entity';
 @Injectable()
 export class AuthService {
   constructor(
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private adminService: AdminService,
     private studentService: StudentService,
     private hrService: HrService,
@@ -160,6 +163,7 @@ export class AuthService {
     if (!user) {
       throw new NotFoundException('User not found');
     } else if (user.refreshToken !== null) {
+      await this.cacheManager.del('filter');
       user.refreshToken = null;
       await user.save();
     }
