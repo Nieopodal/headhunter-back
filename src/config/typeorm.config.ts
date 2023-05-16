@@ -1,7 +1,12 @@
 import { ConfigService } from '@nestjs/config';
+import {configDb} from "./config";
 import { TypeOrmModuleOptions, TypeOrmOptionsFactory } from '@nestjs/typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { Injectable } from '@nestjs/common';
+import {Admin} from "../admin/entity/admin.entity";
+import {Hr} from "../hr/entity/hr.entity";
+import {Student} from "../student/entity/student.entity";
+
 
 @Injectable()
 export class DatabaseConfiguration implements TypeOrmOptionsFactory {
@@ -10,12 +15,11 @@ export class DatabaseConfiguration implements TypeOrmOptionsFactory {
   createTypeOrmOptions(): TypeOrmModuleOptions | Promise<TypeOrmModuleOptions> {
     return {
       type: 'mysql',
-      host: this.configService.get('DB_HOST'),
-      port: parseInt(this.configService.get('DB_PORT')),
-      username: this.configService.get('DB_USERNAME'),
-      password: this.configService.get('DB_PASSWORD'),
-      database: this.configService.get('DB_NAME'),
-      entities: [this.configService.get('TYPEORM_ENTITIES')],
+      host: configDb.dbHost,
+      username: configDb.dbUser,
+      password: configDb.dbPassword,
+      database: configDb.dbDatabase,
+      entities: [Admin, Hr, Student],
       autoLoadEntities: true,
       bigNumberStrings: false,
       logging: true,

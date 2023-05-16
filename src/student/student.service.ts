@@ -10,7 +10,7 @@ import {
 import { UpdateResponse } from 'src/types/auth/response.type';
 
 import { Student } from './entity/student.entity';
-import * as bcrypt from 'bcrypt';
+import * as bcryptjs from 'bcryptjs'
 
 @Injectable()
 export class StudentService {
@@ -180,7 +180,7 @@ export class StudentService {
         .execute();
       await Student.createQueryBuilder('student')
         .update(Student)
-        .set({ password: await bcrypt.hash(registerData.password, 10), active: true, verificationToken: null })
+        .set({ password: await bcryptjs.hash(registerData.password, 10), active: true, verificationToken: null })
         .where('student.id = :id', { id })
         .execute();
       return { isSuccess: true, payload: id };
