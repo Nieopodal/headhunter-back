@@ -12,7 +12,8 @@ import { MailModule } from './mail/mail.module';
 import { UploadStudentDataModule } from './student/upload-student-data.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { CronService } from './cron/cron.service';
-import {ThrottlerModule} from "@nestjs/throttler";
+import { ThrottlerModule } from '@nestjs/throttler';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import {ThrottlerModule} from "@nestjs/throttler";
     TypeOrmModule.forRootAsync({
       useClass: DatabaseConfiguration,
     }),
+    CacheModule.register({ isGlobal: true }),
     ScheduleModule.forRoot(),
     ThrottlerModule.forRoot({
       ttl: 60,
