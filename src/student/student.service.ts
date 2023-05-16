@@ -3,15 +3,14 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import {
   ApiResponse,
+  AvailableStudentsPaginated,
   SimpleStudentData,
-  UpdateStudentResponse,
   StudentCv,
   StudentStatus,
   StudentsToInterviewPaginated,
   UpdateResponse,
-  AvailableStudentsPaginated,
+  UpdateStudentResponse,
 } from '@Types';
-import { UpdateResponse } from 'src/types/auth/response.type';
 import { Student } from './entity/student.entity';
 import { availableFilter, interviewFilter } from './utils/filter-methods';
 import { FilterStudentDto } from './dto/filter-student.dto';
@@ -197,7 +196,7 @@ export class StudentService {
       return { isSuccess: false, error: e.message };
     }
   }
-}
+
 
   async availableStudentsSearch(name: string, pageNumber: number, numberPerPage: number): Promise<ApiResponse<AvailableStudentsPaginated>> {
     try {

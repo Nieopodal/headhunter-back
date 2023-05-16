@@ -1,5 +1,5 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Param, Patch, Post, UseGuards } from '@nestjs/common';
-import { GetCurrentUserId, GetUserData, GetUserId, Public, Role } from '../common/decorators';
+import { GetUserData, GetUserId, Public, Role } from '../common/decorators';
 
 import {
   ApiResponse,
@@ -11,9 +11,8 @@ import {
 } from '@Types';
 import { StudentService } from '../student/student.service';
 import { StudentHrMethodsService } from '../student/student-hr-methods.service';
-import { UserRoleGuard, MtGuard } from '../common/guards';
+import { MtGuard, UserRoleGuard } from '../common/guards';
 import { HrService } from './hr.service';
-import { UpdateStudentDto } from '../student/dto';
 import { FilterStudentDto } from '../student/dto/filter-student.dto';
 import { UpdateHrDto } from './dto/update-hr.dto';
 
@@ -42,7 +41,7 @@ export class HrController {
   @HttpCode(HttpStatus.OK)
   @Get('/search-interview/:name?/:pageNumber?/:numberPerPage?')
   async interviewStudentsSearch(
-    @GetCurrentUserId() hrId: string,
+    @GetUserId() hrId: string,
     @Param('name') name: string = '',
     @Param('pageNumber') pageNumber = 1,
     @Param('numberPerPage') numberPerPage = 10,
