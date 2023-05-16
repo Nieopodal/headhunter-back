@@ -164,14 +164,7 @@ export class StudentService {
     }
   }
 
-  async registerStudentData(id, token, registerData): Promise<ApiResponse<UpdateStudentResponse>> {
-    const user = await Student.findOneBy({ id });
-    if (!user) {
-      return { isSuccess: false, error: 'Blędne dane' };
-    }
-    if (token !== user.verificationToken) {
-      return { isSuccess: false, error: 'Błędne dane' };
-    }
+  async registerStudentData(id, registerData): Promise<ApiResponse<UpdateResponse>> {
     try {
       await Student.createQueryBuilder('student')
         .update(Student)

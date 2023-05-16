@@ -53,7 +53,7 @@ export class StudentController {
     @GetUserId() id: string,
     @GetUserData() registerData: RegisterStudentDto,
   ): Promise<ApiResponse<UpdateResponse>> {
-    return this.studentService.updateStudent(id, registerData);
+    return this.studentService.registerStudentData(id, registerData);
   }
 
   @UseGuards(UserRoleGuard)
