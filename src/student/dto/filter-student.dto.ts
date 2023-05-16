@@ -1,7 +1,7 @@
 import { ArrayMinSize, IsArray, IsBoolean, IsEnum, IsNotEmpty, IsNumber, Max, Min } from 'class-validator';
 import { ExpectedContractType, ExpectedTypeWork } from '@Types';
 
-export class StudentFilterDto {
+export class FilterStudentDto {
 
   @IsNotEmpty()
   @IsNumber()

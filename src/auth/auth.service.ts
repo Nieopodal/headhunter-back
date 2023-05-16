@@ -1,4 +1,6 @@
-import { ForbiddenException, HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, HttpException, HttpStatus, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 import { LoginUserDto } from './dto';
 import { AdminService } from '../admin/admin.service';
 import { StudentService } from '../student/student.service';
@@ -6,16 +8,23 @@ import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
 import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
-import {ApiResponse, ConfirmResponse, RecoveryPasswordResponse, Tokens, UpdateResponse, UserRole} from '@Types';
+import {
+  ApiResponse,
+  ConfirmResponse,
+  RecoveryPasswordResponse,
+  Tokens,
+  UpdateResponse,
+  UserDataResponse,
+} from '@Types';
 import { HrService } from '../hr/hr.service';
-import { UserDataResponse } from '@Types';
 import { MailService } from '../mail/mail.service';
-import {RecoveryPasswordTemplate} from "../templates/email/recovery-password";
-import {PasswordChangedTemplate} from "../templates/email/password-change";
+import { RecoveryPasswordTemplate } from '../templates/email/recovery-password';
+import { PasswordChangedTemplate } from '../templates/email/password-change';
 
 @Injectable()
 export class AuthService {
   constructor(
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private adminService: AdminService,
     private studentService: StudentService,
     private hrService: HrService,
@@ -131,6 +140,7 @@ export class AuthService {
     if (!user) {
       throw new NotFoundException('User not found');
     } else if (user.refreshToken !== null) {
+      await this.cacheManager.del('filter');
       user.refreshToken = null;
       await user.save();
     }

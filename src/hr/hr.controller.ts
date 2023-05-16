@@ -13,7 +13,7 @@ import { StudentHrMethodsService } from '../student/student-hr-methods.service';
 import { UserRoleGuard } from '../common/guards';
 import { HrService } from './hr.service';
 import { UpdateStudentDto } from '../student/dto';
-import { StudentFilterDto } from '../student/dto/student-filter.dto';
+import { FilterStudentDto } from '../student/dto/filter-student.dto';
 
 @Controller('hr')
 export class HrController {
@@ -84,7 +84,7 @@ export class HrController {
   @Role(UserRole.HR)
   @Post('/set-filter/:pageNumber?/:numberPerPage?')
   async setFilter(
-    @Body() data: StudentFilterDto,
+    @Body() data: FilterStudentDto,
     @Param('pageNumber') pageNumber = 1,
     @Param('numberPerPage') numberPerPage = 10,
   ): Promise<ApiResponse<AvailableStudentsPaginated>> {

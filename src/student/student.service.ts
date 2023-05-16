@@ -1,4 +1,6 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 import {
   ApiResponse,
   AvailableStudentsPaginated,
@@ -10,9 +12,7 @@ import {
 } from '@Types';
 import { Student } from './entity/student.entity';
 import { availableFilter, interviewFilter } from './utils/filter-methods';
-import { StudentFilterDto } from './dto/student-filter.dto';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Cache } from 'cache-manager';
+import { FilterStudentDto } from './dto/filter-student.dto';
 
 @Injectable()
 export class StudentService {
@@ -173,7 +173,7 @@ export class StudentService {
 
   async availableStudentsSearch(name: string, pageNumber: number, numberPerPage: number): Promise<ApiResponse<AvailableStudentsPaginated>> {
     try {
-      const filterSchema: StudentFilterDto = await this.cacheManager.get('filter');
+      const filterSchema: FilterStudentDto = await this.cacheManager.get('filter');
       const [studentData, count] = await Student.createQueryBuilder('student')
         .setParameter('check', filterSchema ? true : null)
         .where('student.hr IS NULL')
@@ -241,7 +241,7 @@ export class StudentService {
     }
   }
 
-  async setFilter(data: StudentFilterDto, pageNumber: number, numberPerPage: number): Promise<ApiResponse<AvailableStudentsPaginated>> {
+  async setFilter(data: FilterStudentDto, pageNumber: number, numberPerPage: number): Promise<ApiResponse<AvailableStudentsPaginated>> {
     try {
       const [studentData, count] = await Student.createQueryBuilder('student')
         .where('student.hr IS NULL')
