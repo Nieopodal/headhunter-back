@@ -5,16 +5,13 @@ import { StudentStatus } from '@Types';
 
 @Injectable()
 export class CronService {
-
   @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
   async removeUnwantedStudents(): Promise<void> {
-
     try {
-
       const students = await Student.find({ where: { status: StudentStatus.INTERVIEW } });
 
       if (students.length > 0) {
-        students.map(async student => {
+        students.map(async (student) => {
           if (+student.reservationTime < +new Date()) {
             student.status = StudentStatus.AVAILABLE;
             student.hr = null;

@@ -10,6 +10,7 @@ import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
 import {
   ApiResponse,
+  CheckUserResponse,
   ConfirmResponse,
   RecoveryPasswordResponse,
   Tokens,
@@ -20,6 +21,9 @@ import { HrService } from '../hr/hr.service';
 import { MailService } from '../mail/mail.service';
 import { RecoveryPasswordTemplate } from '../templates/email/recovery-password';
 import { PasswordChangedTemplate } from '../templates/email/password-change';
+import { Admin } from '../admin/entity/admin.entity';
+import { Student } from '../student/entity/student.entity';
+import { Hr } from '../hr/entity/hr.entity';
 
 @Injectable()
 export class AuthService {
@@ -52,15 +56,14 @@ export class AuthService {
     await user.save();
   }
 
-  async generateVerifyToken(email: string): Promise<string> {
-    const token = await this.jwtService.signAsync(
-      { email },
+  async generateEmailToken(id, email): Promise<string> {
+    return await this.jwtService.signAsync(
+      { id, email },
       {
-        secret: this.configService.get('SECRET_KEY_VT'),
-        expiresIn: this.configService.get('EXPIRES_IN_VT'),
+        secret: this.configService.get('SECRET_KEY_MT'),
+        expiresIn: this.configService.get('EXPIRES_IN_MT'),
       },
     );
-    return await this.hashData(token);
   }
 
   async getTokens(id: string, email: string): Promise<Tokens> {
@@ -87,7 +90,7 @@ export class AuthService {
     return this.jwtService.decode(rt);
   }
 
-  async checkUserByEmail(email: string): Promise<any> {
+  async checkUserByEmail(email: string): Promise<CheckUserResponse> {
     const admin = await this.adminService.getAdminByEmail(email);
 
     const hr = await this.hrService.getHrByEmail(email);
@@ -97,7 +100,7 @@ export class AuthService {
     return hr ? hr : student ? student : admin ? admin : null;
   }
 
-  async checkUserById(id: string): Promise<any> {
+  async checkUserById(id: string): Promise<CheckUserResponse> {
     const admin = await this.adminService.getUserById(id);
 
     const hr = await this.hrService.getHrById(id);
@@ -107,28 +110,48 @@ export class AuthService {
     return admin ? admin : student ? student : hr ? hr : null;
   }
 
+  async getUserData(user, tokens?): Promise<UserDataResponse> {
+    const obj = {
+      id: user.id,
+      email: user.email,
+      role: user.role,
+      access_token: tokens.access_token,
+    };
+
+    if (user instanceof Admin) {
+      return {
+        ...obj,
+        name: user.name,
+      };
+    }
+    if (user instanceof Hr) {
+      return {
+        ...obj,
+        fullName: user.fullName,
+      };
+    }
+    if (user instanceof Student) {
+      return {
+        ...obj,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        githubUsername: user.githubUsername,
+      };
+    }
+  }
+
   async login(login: LoginUserDto, response: Response): Promise<ApiResponse<UserDataResponse>> {
     const user = await this.checkUserByEmail(login.email);
     if (!user) return { isSuccess: false, error: 'Nie znaleziono użytkownika' };
+    const passwordMatches = await this.compareHashedData(login.password, user.password);
+    if (!passwordMatches) return { isSuccess: false, error: 'Niepoprawne hasło' };
+    const tokens = await this.getTokens(user.id, user.email);
+    await this.updateRtHash(user.id, tokens.refresh_token);
+    response.cookie('jwt-refresh', tokens.refresh_token, { httpOnly: true });
     try {
-      const passwordMatches = await this.compareHashedData(login.password, user.password);
-      if (!passwordMatches) return { isSuccess: false, error: 'Niepoprawne hasło' };
-      const tokens = await this.getTokens(user.id, user.email);
-      await this.updateRtHash(user.id, tokens.refresh_token);
-      response.cookie('jwt-refresh', tokens.refresh_token, { httpOnly: true });
       return {
         isSuccess: true,
-        payload: {
-          id: user.id,
-          email: user.email,
-          role: user.role,
-          githubUsername: user.githubUsername,
-          name: user.name,
-          fullName: user.fullName,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          access_token: tokens.access_token,
-        },
+        payload: await this.getUserData(user, tokens),
       };
     } catch (e) {
       return { isSuccess: false, error: 'Ups... coś poszło nie tak.' };
@@ -150,9 +173,9 @@ export class AuthService {
     };
   }
 
-  async confirmUser(param): Promise<ApiResponse<ConfirmResponse>> {
+  async confirmFromEmail(param): Promise<ApiResponse<ConfirmResponse>> {
     const user = await this.checkUserById(param.id);
-    if (!user)
+    if (!user || param.token !== user.verificationToken)
       throw new HttpException(
         {
           isSuccess: false,
@@ -162,7 +185,7 @@ export class AuthService {
       );
     return {
       isSuccess: true,
-      payload: { id: user.id },
+      payload: { email: user.email, emailToken: await this.generateEmailToken(user.id, user.email) },
     };
   }
 
@@ -177,16 +200,13 @@ export class AuthService {
         HttpStatus.BAD_REQUEST,
       );
     try {
-      user.verificationToken = await this.generateVerifyToken(data.email);
+      user.verificationToken = await this.hashData(await this.generateEmailToken(user.id, user.email));
       await user.save();
       user.activationUrl = await this.mailService.generateUrl(user);
       await user.save();
 
-      await this.mailService.sendEmailsToUsers(
-          this.mailService,
-          [user],
-          'Zmiana hasła',
-          (activationUrl) => RecoveryPasswordTemplate(activationUrl)
+      await this.mailService.sendEmailsToUsers(this.mailService, [user], 'Zmiana hasła', (activationUrl) =>
+        RecoveryPasswordTemplate(activationUrl),
       );
     } catch (e) {
       return {
@@ -200,9 +220,8 @@ export class AuthService {
     };
   }
 
-  async changePassword(data): Promise<ApiResponse<UpdateResponse>> {
-    const user = await this.checkUserById(data.id);
-    console.log(user);
+  async changePassword(data, id): Promise<ApiResponse<UpdateResponse>> {
+    const user = await this.checkUserById(id);
     if (!user)
       throw new HttpException(
         {
@@ -215,40 +234,29 @@ export class AuthService {
       user.password = await this.hashData(data.password);
       await user.save();
 
-      await this.mailService.sendEmailsToUsers(
-          this.mailService,
-          [user],
-          'Hasło zostało zmienione',
-          () => PasswordChangedTemplate()
+      await this.mailService.sendEmailsToUsers(this.mailService, [user], 'Hasło zostało zmienione', () =>
+        PasswordChangedTemplate(),
       );
+      return {
+        isSuccess: true,
+        payload: { id: user.id },
+      };
     } catch (e) {
       return {
         isSuccess: false,
         error: 'Ups... coś poszło nie tak.',
       };
     }
-    return {
-      isSuccess: true,
-      payload: user.id,
-    };
   }
 
   async getUserInfo(token: string): Promise<ApiResponse<UserDataResponse>> {
     const decodedJwt = await this.getDecodedToken(token);
     const user = await this.checkUserByEmail(decodedJwt['email']);
-    if (!user) return { isSuccess: false, error: 'Nie znaleziono użytkownika' };
+
     try {
       return {
         isSuccess: true,
-        payload: {
-          id: user.id,
-          email: user.email,
-          role: user.role,
-          name: user.name,
-          fullName: user.fullName,
-          firstName: user.firstName,
-          lastName: user.lastName,
-        },
+        payload: await this.getUserData(user),
       };
     } catch (e) {
       return { isSuccess: false, error: 'Ups... coś poszło nie tak.' };

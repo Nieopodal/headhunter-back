@@ -3,12 +3,13 @@ import { Response } from 'express';
 import { ChangePasswordDto, LoginUserDto } from './dto';
 import { AuthService } from './auth.service';
 import { ApiResponse, ConfirmResponse, RecoveryPasswordResponse, Tokens, UpdateResponse } from '@Types';
-import { GetCurrentUserId, Public } from '../common/decorators';
+import { GetUserData, GetUserId, Public } from '../common/decorators';
 import { UserDataResponse } from '@Types';
 import { RtGuard } from '../common/guards';
 import { Cookies } from '../common/decorators/cookie.decorator';
 import { RecoveryPasswordDto } from './dto/recovery-password.dto';
 import { ConfirmDto } from './dto/confirm.dto';
+import { MtGuard } from '../common/guards';
 
 @Controller('auth')
 export class AuthController {
@@ -26,15 +27,15 @@ export class AuthController {
 
   @Post('logout')
   @HttpCode(HttpStatus.OK)
-  logout(@GetCurrentUserId() id: string): Promise<any> {
+  logout(@GetUserId() id: string): Promise<any> {
     return this.authService.logout(id);
   }
 
   @Public()
   @Post('*/confirm/:id/:token')
   @HttpCode(HttpStatus.OK)
-  confirmUser(@Param() param: ConfirmDto): Promise<ApiResponse<ConfirmResponse>> {
-    return this.authService.confirmUser(param);
+  confirmFromEmail(@Param() param: ConfirmDto): Promise<ApiResponse<ConfirmResponse>> {
+    return this.authService.confirmFromEmail(param);
   }
 
   @Public()
@@ -45,11 +46,17 @@ export class AuthController {
   }
 
   @Public()
+  @UseGuards(MtGuard)
   @Patch('password/reset')
   @HttpCode(HttpStatus.OK)
-  changePassword(@Body() data: ChangePasswordDto): Promise<ApiResponse<UpdateResponse>> {
-    return this.authService.changePassword(data);
+  changePassword(
+    @GetUserId() id: string,
+    @GetUserData() data: ChangePasswordDto,
+  ): Promise<ApiResponse<UpdateResponse>> {
+    console.log(id, data);
+    return this.authService.changePassword(data, id);
   }
+
   @Public()
   @UseGuards(RtGuard)
   @Get('user')

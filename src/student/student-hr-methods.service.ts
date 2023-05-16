@@ -6,8 +6,7 @@ import { interviewFilter } from './utils/filter-methods';
 
 @Injectable()
 export class StudentHrMethodsService {
-  constructor(private readonly hrService: HrService) {
-  }
+  constructor(private readonly hrService: HrService) {}
 
   async setToInterview(id: string, hrId: string): Promise<ApiResponse<null>> {
     const hr = await this.hrService.getHrById(hrId);
@@ -148,7 +147,11 @@ export class StudentHrMethodsService {
     };
   }
 
-  async showStudentsToInterview(id: string, pageNumber: number, numberPerPage: number): Promise<ApiResponse<StudentsToInterviewPaginated>> {
+  async showStudentsToInterview(
+    id: string,
+    pageNumber: number,
+    numberPerPage: number,
+  ): Promise<ApiResponse<StudentsToInterviewPaginated>> {
     const [studentsToInterview, count] = await Student.findAndCount({
       relations: ['hr'],
       where: {

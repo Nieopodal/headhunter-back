@@ -1,9 +1,11 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Patch, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Patch, UseGuards } from '@nestjs/common';
 import { StudentService } from './student.service';
-import { GetCurrentUserId, Role } from '../common/decorators';
+import { GetUserData, GetUserId, Public, Role } from '../common/decorators';
 import { UpdateStudentDto } from './dto';
-import { ApiResponse, SimpleStudentData, StudentCv, UpdateResponse, UserRole } from '@Types';
+import { ApiResponse, SimpleStudentData, StudentCv, UpdateResponse, UpdateStudentResponse, UserRole } from '@Types';
 import { UserRoleGuard } from 'src/common/guards/user-role.guard';
+import { RegisterStudentDto } from './dto/register-student.dto';
+import { MtGuard } from '../common/guards';
 
 @Controller('student')
 export class StudentController {
@@ -13,7 +15,7 @@ export class StudentController {
   @Role(UserRole.STUDENT)
   @HttpCode(HttpStatus.OK)
   @Get('/avatar')
-  async getAvatar(@GetCurrentUserId() id: string): Promise<ApiResponse<string>> {
+  async getAvatar(@GetUserId() id: string): Promise<ApiResponse<string>> {
     return await this.studentService.getAvatar(id);
   }
 
@@ -21,7 +23,7 @@ export class StudentController {
   @Role(UserRole.STUDENT)
   @HttpCode(HttpStatus.OK)
   @Get('/simple/')
-  async getSimpleStudentData(@GetCurrentUserId() id: string): Promise<ApiResponse<SimpleStudentData>> {
+  async getSimpleStudentData(@GetUserId() id: string): Promise<ApiResponse<SimpleStudentData>> {
     return await this.studentService.simpleStudentData(id);
   }
 
@@ -29,7 +31,7 @@ export class StudentController {
   @Role(UserRole.STUDENT)
   @HttpCode(HttpStatus.OK)
   @Get('/cv')
-  async getStudentCv(@GetCurrentUserId() id: string): Promise<ApiResponse<StudentCv>> {
+  async getStudentCv(@GetUserId() id: string): Promise<ApiResponse<StudentCv>> {
     return await this.studentService.getStudentCv(id);
   }
 
@@ -38,8 +40,19 @@ export class StudentController {
   @Patch('update')
   @HttpCode(HttpStatus.ACCEPTED)
   updateStudent(
-    @GetCurrentUserId() id: string,
-    @Body() registerData: UpdateStudentDto,
+    @GetUserId() id: string,
+    @GetUserData() updateData: UpdateStudentDto,
+  ): Promise<ApiResponse<UpdateStudentResponse>> {
+    return this.studentService.updateStudent(id, updateData);
+  }
+
+  @Public()
+  @UseGuards(MtGuard)
+  @Patch('register')
+  registerStudent(
+    @Param('id') id: string,
+    @Param('token') token: string,
+    @Body() registerData: RegisterStudentDto,
   ): Promise<ApiResponse<UpdateResponse>> {
     return this.studentService.updateStudent(id, registerData);
   }
@@ -48,7 +61,7 @@ export class StudentController {
   @Role(UserRole.STUDENT)
   @HttpCode(HttpStatus.OK)
   @Patch('/employed')
-  deactivate(@GetCurrentUserId() id: string): Promise<ApiResponse<any>> {
+  deactivate(@GetUserId() id: string): Promise<ApiResponse<any>> {
     return this.studentService.deactivate(id);
   }
 }
