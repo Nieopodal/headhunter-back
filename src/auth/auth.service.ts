@@ -1,4 +1,6 @@
-import { ForbiddenException, HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, HttpException, HttpStatus, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 import { LoginUserDto } from './dto';
 import { AdminService } from '../admin/admin.service';
 import { StudentService } from '../student/student.service';
@@ -26,6 +28,7 @@ import { Hr } from '../hr/entity/hr.entity';
 @Injectable()
 export class AuthService {
   constructor(
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private adminService: AdminService,
     private studentService: StudentService,
     private hrService: HrService,
@@ -107,12 +110,11 @@ export class AuthService {
     return admin ? admin : student ? student : hr ? hr : null;
   }
 
-  async getUserData(user, tokens?): Promise<UserDataResponse> {
+  async getUserData(user): Promise<UserDataResponse> {
     const obj = {
       id: user.id,
       email: user.email,
       role: user.role,
-      access_token: tokens.access_token,
     };
 
     if (user instanceof Admin) {
@@ -148,7 +150,7 @@ export class AuthService {
     try {
       return {
         isSuccess: true,
-        payload: await this.getUserData(user, tokens),
+        payload: { ...(await this.getUserData(user)), access_token: tokens.access_token },
       };
     } catch (e) {
       return { isSuccess: false, error: 'Ups... coś poszło nie tak.' };
@@ -160,6 +162,7 @@ export class AuthService {
     if (!user) {
       throw new NotFoundException('User not found');
     } else if (user.refreshToken !== null) {
+      await this.cacheManager.del('filter');
       user.refreshToken = null;
       await user.save();
     }

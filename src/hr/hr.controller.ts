@@ -1,5 +1,6 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Patch, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { GetUserData, GetUserId, Public, Role } from '../common/decorators';
+
 import {
   ApiResponse,
   AvailableStudentsPaginated,
@@ -10,8 +11,9 @@ import {
 } from '@Types';
 import { StudentService } from '../student/student.service';
 import { StudentHrMethodsService } from '../student/student-hr-methods.service';
-import { UserRoleGuard, MtGuard } from '../common/guards';
+import { MtGuard, UserRoleGuard } from '../common/guards';
 import { HrService } from './hr.service';
+import { FilterStudentDto } from '../student/dto/filter-student.dto';
 import { UpdateHrDto } from './dto/update-hr.dto';
 
 @Controller('hr')
@@ -21,6 +23,31 @@ export class HrController {
     private readonly studentService: StudentService,
     private readonly hrService: HrService,
   ) {}
+
+  @UseGuards(UserRoleGuard)
+  @Role(UserRole.HR)
+  @HttpCode(HttpStatus.OK)
+  @Get('/search-available/:name?/:pageNumber?/:numberPerPage?')
+  async availableStudentsSearch(
+    @Param('name') name: string = '',
+    @Param('pageNumber') pageNumber = 1,
+    @Param('numberPerPage') numberPerPage = 10,
+  ): Promise<ApiResponse<AvailableStudentsPaginated>> {
+    return this.studentService.availableStudentsSearch(name, pageNumber, numberPerPage);
+  }
+
+  @UseGuards(UserRoleGuard)
+  @Role(UserRole.HR)
+  @HttpCode(HttpStatus.OK)
+  @Get('/search-interview/:name?/:pageNumber?/:numberPerPage?')
+  async interviewStudentsSearch(
+    @GetUserId() hrId: string,
+    @Param('name') name: string = '',
+    @Param('pageNumber') pageNumber = 1,
+    @Param('numberPerPage') numberPerPage = 10,
+  ): Promise<ApiResponse<StudentsToInterviewPaginated>> {
+    return this.studentService.interviewStudentsSearch(name, pageNumber, numberPerPage, hrId);
+  }
 
   @UseGuards(UserRoleGuard)
   @Role(UserRole.HR)
@@ -51,6 +78,17 @@ export class HrController {
     @Param('numberPerPage') numberPerPage = 10,
   ): Promise<ApiResponse<StudentsToInterviewPaginated>> {
     return this.studentHrService.showStudentsToInterview(hrId, pageNumber, numberPerPage);
+  }
+
+  @UseGuards(UserRoleGuard)
+  @Role(UserRole.HR)
+  @Post('/set-filter/:pageNumber?/:numberPerPage?')
+  async setFilter(
+    @Body() data: FilterStudentDto,
+    @Param('pageNumber') pageNumber = 1,
+    @Param('numberPerPage') numberPerPage = 10,
+  ): Promise<ApiResponse<AvailableStudentsPaginated>> {
+    return this.studentService.setFilter(data, pageNumber, numberPerPage);
   }
 
   @UseGuards(UserRoleGuard)
