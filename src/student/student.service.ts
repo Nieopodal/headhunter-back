@@ -1,9 +1,6 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Cache } from 'cache-manager';
+import { Injectable } from '@nestjs/common';
 import {
   ApiResponse,
-  AvailableStudentsPaginated,
   SimpleStudentData,
   StudentCv,
   StudentStatus,
@@ -11,15 +8,10 @@ import {
   UpdateStudentResponse,
 } from '@Types';
 import { Student } from './entity/student.entity';
-import { availableFilter } from './utils/filter-methods';
-import { FilterStudentDto } from './dto/filter-student.dto';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class StudentService {
-
-  constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {
-  }
 
   async getAvatar(id: string): Promise<ApiResponse<string>> {
     const studentAvatar = await Student.findOneBy({ id });
@@ -156,53 +148,5 @@ export class StudentService {
     } catch (e) {
       return { isSuccess: false, error: e.message };
     }
-  }
-
-  async setFilter(data: FilterStudentDto, pageNumber: number, numberPerPage: number): Promise<ApiResponse<AvailableStudentsPaginated>> {
-    try {
-      const [studentData, count] = await Student.createQueryBuilder('student')
-        .where('student.hr IS NULL')
-        .andWhere('student.active = :active', { active: true })
-        .andWhere('student.status = :status', { status: StudentStatus.AVAILABLE })
-        .andWhere('student.monthsOfCommercialExp >= :monthsOfCommercialExp', { monthsOfCommercialExp: data.monthsOfCommercialExp })
-        .andWhere('student.canTakeApprenticeship = :canTakeApprenticeship', { canTakeApprenticeship: data.canTakeApprenticeship })
-        .andWhere('student.expectedSalary BETWEEN :minSalary AND :maxSalary', {
-          minSalary: data.minSalary,
-          maxSalary: data.maxSalary,
-        })
-        .andWhere('student.teamProjectDegree >= :teamProjectDegree', { teamProjectDegree: data.teamProjectDegree })
-        .andWhere('student.projectDegree >= :projectDegree', { projectDegree: data.projectDegree })
-        .andWhere('student.courseEngagement >= :courseEngagement', { courseEngagement: data.courseEngagement })
-        .andWhere('student.courseCompletion >= :courseCompletion', { courseCompletion: data.courseCompletion })
-        .andWhere('student.expectedContractType IN (:expectedContractType)', { expectedContractType: data.expectedContractType })
-        .andWhere('student.expectedTypeWork IN (:expectedTypeWork)', { expectedTypeWork: data.expectedTypeWork })
-        .skip(numberPerPage * (pageNumber - 1))
-        .take(numberPerPage)
-        .getManyAndCount();
-
-      const totalPages = Math.ceil(count / numberPerPage);
-
-      await this.cacheManager.set('filter', data, 0);
-      return {
-        isSuccess: true,
-        payload: { studentData: studentData.map(student => availableFilter(student)), totalPages },
-      };
-    } catch {
-      throw new HttpException(
-        {
-          isSuccess: false,
-          error: `Coś poszło nie tak!`,
-        },
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
-  }
-
-  async removeFilter(): Promise<ApiResponse<null>> {
-    await this.cacheManager.del('filter');
-    return {
-      isSuccess: true,
-      payload: null,
-    };
   }
 }

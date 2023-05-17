@@ -4,6 +4,7 @@ import {
   ApiResponse,
   AvailableStudentsPaginated,
   StudentCv,
+  StudentFilter,
   StudentsToInterviewPaginated,
   UpdateResponse,
   UserRole,
@@ -29,7 +30,7 @@ export class HrController {
   @HttpCode(HttpStatus.OK)
   @Get('/remove-filter')
   async removeFilter(): Promise<ApiResponse<null>> {
-    return this.studentService.removeFilter();
+    return this.studentHrService.removeFilter();
   }
 
   @UseGuards(UserRoleGuard)
@@ -67,13 +68,11 @@ export class HrController {
 
   @UseGuards(UserRoleGuard)
   @Role(UserRole.HR)
-  @Post('/set-filter/:pageNumber?/:numberPerPage?')
+  @Post('/set-filter')
   async setFilter(
     @Body() data: FilterStudentDto,
-    @Param('pageNumber') pageNumber = 1,
-    @Param('numberPerPage') numberPerPage = 10,
-  ): Promise<ApiResponse<AvailableStudentsPaginated>> {
-    return this.studentService.setFilter(data, pageNumber, numberPerPage);
+  ): Promise<ApiResponse<StudentFilter>> {
+    return this.studentHrService.setFilter(data);
   }
 
   @UseGuards(UserRoleGuard)

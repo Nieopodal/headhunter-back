@@ -5,7 +5,13 @@ import { Student } from './entity/student.entity';
 import { HrService } from '../hr/hr.service';
 import { FilterStudentDto } from './dto/filter-student.dto';
 import { availableFilter, interviewFilter } from './utils/filter-methods';
-import { ApiResponse, AvailableStudentsPaginated, StudentStatus, StudentsToInterviewPaginated } from '@Types';
+import {
+  ApiResponse,
+  AvailableStudentsPaginated,
+  StudentFilter,
+  StudentStatus,
+  StudentsToInterviewPaginated,
+} from '@Types';
 
 @Injectable()
 export class StudentHrMethodsService {
@@ -225,6 +231,44 @@ export class StudentHrMethodsService {
       return {
         isSuccess: true,
         payload: { studentData: studentData.map(student => availableFilter(student)), totalPages },
+      };
+    } catch {
+      throw new HttpException(
+        {
+          isSuccess: false,
+          error: `Coś poszło nie tak!`,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async setFilter(data: FilterStudentDto): Promise<ApiResponse<StudentFilter>> {
+    try {
+      await this.cacheManager.set('filter', data, 0);
+      return {
+        isSuccess: true,
+        payload: {
+          usedFilter: data,
+        },
+      };
+    } catch {
+      throw new HttpException(
+        {
+          isSuccess: false,
+          error: `Coś poszło nie tak!`,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async removeFilter(): Promise<ApiResponse<null>> {
+    try {
+      await this.cacheManager.del('filter');
+      return {
+        isSuccess: true,
+        payload: null,
       };
     } catch {
       throw new HttpException(
