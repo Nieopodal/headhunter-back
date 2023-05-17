@@ -1,4 +1,4 @@
-import { ForbiddenException, HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { LoginUserDto } from './dto';
 import { AdminService } from '../admin/admin.service';
 import { StudentService } from '../student/student.service';
@@ -85,10 +85,6 @@ export class AuthService {
     return { access_token: at, refresh_token: rt };
   }
 
-  async getDecodedToken(rt: string) {
-    return this.jwtService.decode(rt);
-  }
-
   async checkUserByEmail(email: string): Promise<CheckUserResponse> {
     const admin = await this.adminService.getAdminByEmail(email);
 
@@ -109,14 +105,12 @@ export class AuthService {
     return admin ? admin : student ? student : hr ? hr : null;
   }
 
-  async getUserData(user, tokens?): Promise<UserDataResponse> {
+  async getUserData(user): Promise<UserDataResponse> {
     const obj = {
       id: user.id,
       email: user.email,
       role: user.role,
-      access_token: tokens.access_token,
     };
-
     if (user instanceof Admin) {
       return {
         ...obj,
@@ -151,28 +145,28 @@ export class AuthService {
     response.cookie('jwt-refresh', tokens.refresh_token, { httpOnly: true });
     return {
       isSuccess: true,
-      payload: await this.getUserData(user, tokens),
+      payload: { ...(await this.getUserData(user)), access_token: tokens.access_token },
     };
   }
 
-  async logout(id: string): Promise<ApiResponse<any>> {
+  async logout(id: string, res: Response): Promise<ApiResponse<any>> {
     const user = await this.checkUserById(id);
-    if (!user) throw new HttpException('Użytkownik nie znaleziony', HttpStatus.NOT_FOUND);
+    if (!user) throw new HttpException('Nie ma takiego użytkownika w systemie', HttpStatus.NOT_FOUND);
     if (user.refreshToken !== null) {
       user.refreshToken = null;
       await user.save();
+      res.clearCookie('jwt-refresh');
       return {
         isSuccess: true,
         payload: null,
       };
     }
-    throw new HttpException('Użytkownik nie znaleziony', HttpStatus.BAD_REQUEST);
   }
 
   async confirmFromEmail(param): Promise<ApiResponse<ConfirmResponse>> {
     const user = await this.checkUserById(param.id);
     if (!user || param.token !== user.verificationToken) throw new InvalidTokenException();
-
+    console.log(user);
     return {
       isSuccess: true,
       payload: { email: user.email, emailToken: await this.generateEmailToken(user.id, user.email) },
@@ -187,7 +181,6 @@ export class AuthService {
       await user.save();
       user.activationUrl = await this.mailService.generateUrl(user);
       await user.save();
-
       await this.mailService.sendEmailsToUsers(this.mailService, [user], 'Zmiana hasła', (activationUrl) =>
         RecoveryPasswordTemplate(activationUrl),
       );
@@ -196,7 +189,7 @@ export class AuthService {
         payload: { sentToEmail: user.email },
       };
     } catch (e) {
-      throw new HttpException('Ups... coś poszło nie tak.', HttpStatus.BAD_REQUEST);
+      throw new HttpException('Odzyskanie hasła nie powiodło się. Spróbuj ponownie później', HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -206,7 +199,6 @@ export class AuthService {
     try {
       user.password = await this.hashData(data.password);
       await user.save();
-
       await this.mailService.sendEmailsToUsers(this.mailService, [user], 'Hasło zostało zmienione', () =>
         PasswordChangedTemplate(),
       );
@@ -215,39 +207,33 @@ export class AuthService {
         payload: { id: user.id },
       };
     } catch (e) {
-      return {
-        isSuccess: false,
-        error: 'Ups... coś poszło nie tak.',
-      };
+      throw new HttpException('Zmiana hasła nie powiodła się. Spróbuj ponownie później', HttpStatus.BAD_REQUEST);
     }
   }
 
-  async getUserInfo(token: string): Promise<ApiResponse<UserDataResponse>> {
-    const decodedJwt = await this.getDecodedToken(token);
-    const user = await this.checkUserByEmail(decodedJwt['email']);
-
-    try {
-      return {
-        isSuccess: true,
-        payload: await this.getUserData(user),
-      };
-    } catch (e) {
-      return { isSuccess: false, error: 'Ups... coś poszło nie tak.' };
-    }
+  async getUserInfo(id: string): Promise<ApiResponse<UserDataResponse>> {
+    const user = await this.checkUserById(id);
+    if (!user) throw new HttpException('Nie ma takiego użytkownika w systemie', HttpStatus.NOT_FOUND);
+    return {
+      isSuccess: true,
+      payload: await this.getUserData(user),
+    };
   }
 
-  async refreshTokens(rt: string, response: Response): Promise<Tokens> {
-    const decodedJwt = await this.getDecodedToken(rt);
-    const user = await this.checkUserById(decodedJwt['id']);
+  async refreshTokens(id: string, rt: string, res: Response): Promise<Tokens> {
+    const user = await this.checkUserById(id);
 
-    if (!user || !user.refreshToken) throw new ForbiddenException('Access Denied');
+    if (!user || !user.refreshToken) throw new Error();
 
     const rtMatches = await this.compareHashedData(rt, user.refreshToken);
-    if (!rtMatches) throw new ForbiddenException('Access Denied');
-
-    const tokens = await this.getTokens(user.id, user.email);
-    await this.updateRtHash(user.id, tokens.refresh_token);
-    response.cookie('jwt-refresh', tokens.refresh_token, { httpOnly: true });
-    return { access_token: tokens.access_token };
+    if (!rtMatches) throw new InvalidCredentialsException();
+    try {
+      const tokens = await this.getTokens(user.id, user.email);
+      await this.updateRtHash(user.id, tokens.refresh_token);
+      res.cookie('jwt-refresh', tokens.refresh_token, { httpOnly: true });
+      return { access_token: tokens.access_token };
+    } catch (e) {
+      throw new InvalidCredentialsException();
+    }
   }
 }
