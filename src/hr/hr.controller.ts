@@ -36,13 +36,13 @@ export class HrController {
   @UseGuards(UserRoleGuard)
   @Role(UserRole.HR)
   @HttpCode(HttpStatus.OK)
-  @Get('/search-available/:pageNumber?/:numberPerPage?/:name?')
-  async availableStudentsSearch(
+  @Get('/show-available/:pageNumber?/:numberPerPage?/:name?')
+  async showAvailableStudents(
     @Param('name') name: string = '',
     @Param('pageNumber') pageNumber = 1,
     @Param('numberPerPage') numberPerPage = 10,
   ): Promise<ApiResponse<AvailableStudentsPaginated>> {
-    return this.studentService.availableStudentsSearch(name, pageNumber, numberPerPage);
+    return this.studentHrService.showAvailableStudents(name, pageNumber, numberPerPage);
   }
 
   @UseGuards(UserRoleGuard)
@@ -58,17 +58,17 @@ export class HrController {
     return this.studentHrService.showInterviewStudents(name, pageNumber, numberPerPage, hrId);
   }
 
-  @UseGuards(UserRoleGuard)
-  @Role(UserRole.HR)
-  @HttpCode(HttpStatus.OK)
-  @Get('/available/:pageNumber?/:numberPerPage?/:name?')
-  async showAvailableStudents(
-    @Param('name') name: string = '',
-    @Param('pageNumber') pageNumber = 1,
-    @Param('numberPerPage') numberPerPage = 10,
-  ): Promise<ApiResponse<AvailableStudentsPaginated>> {
-    return this.studentService.getFreeStudents(pageNumber, numberPerPage, name);
-  }
+  // @UseGuards(UserRoleGuard)
+  // @Role(UserRole.HR)
+  // @HttpCode(HttpStatus.OK)
+  // @Get('/available/:pageNumber?/:numberPerPage?/:name?')
+  // async showAvailableStudents(
+  //   @Param('name') name: string = '',
+  //   @Param('pageNumber') pageNumber = 1,
+  //   @Param('numberPerPage') numberPerPage = 10,
+  // ): Promise<ApiResponse<AvailableStudentsPaginated>> {
+  //   return this.studentService.getFreeStudents(pageNumber, numberPerPage, name);
+  // }
 
   @UseGuards(UserRoleGuard)
   @Role(UserRole.HR)

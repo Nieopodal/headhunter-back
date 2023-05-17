@@ -199,48 +199,6 @@ export class StudentService {
   }
 
 
-  async availableStudentsSearch(name: string, pageNumber: number, numberPerPage: number): Promise<ApiResponse<AvailableStudentsPaginated>> {
-    try {
-      const filterSchema: FilterStudentDto = await this.cacheManager.get('filter');
-      const [studentData, count] = await Student.createQueryBuilder('student')
-        .setParameter('check', filterSchema ? true : null)
-        .where('student.hr IS NULL')
-        .andWhere('student.active = :active', { active: true })
-        .andWhere('student.status = :status', { status: StudentStatus.AVAILABLE })
-        .andWhere('(student.firstName LIKE :name OR student.lastName LIKE :name)', { name: `%${name}%` })
-        .andWhere('(:check IS NULL OR student.monthsOfCommercialExp >= :monthsOfCommercialExp)', { monthsOfCommercialExp: filterSchema ? filterSchema.monthsOfCommercialExp : false })
-        .andWhere('(:check IS NULL OR student.canTakeApprenticeship = :canTakeApprenticeship)', { canTakeApprenticeship: filterSchema ? filterSchema.canTakeApprenticeship : false })
-        .andWhere('(:check IS NULL OR student.expectedSalary BETWEEN :minSalary AND :maxSalary)', {
-          minSalary: filterSchema ? filterSchema.minSalary : false,
-          maxSalary: filterSchema ? filterSchema.maxSalary : false,
-        })
-        .andWhere('(:check IS NULL OR student.teamProjectDegree >= :teamProjectDegree)', { teamProjectDegree: filterSchema ? filterSchema.teamProjectDegree : false })
-        .andWhere('(:check IS NULL OR student.projectDegree >= :projectDegree)', { projectDegree: filterSchema ? filterSchema.projectDegree : null })
-        .andWhere('(:check IS NULL OR student.courseEngagement >= :courseEngagement)', { courseEngagement: filterSchema ? filterSchema.courseEngagement : null })
-        .andWhere('(:check IS NULL OR student.courseCompletion >= :courseCompletion)', { courseCompletion: filterSchema ? filterSchema.courseCompletion : null })
-        .andWhere('(:check IS NULL OR student.expectedContractType IN (:expectedContractType))', { expectedContractType: filterSchema ? filterSchema.expectedContractType : false })
-        .andWhere('(:check IS NULL OR student.expectedTypeWork IN (:expectedTypeWork))', { expectedTypeWork: filterSchema ? filterSchema.expectedTypeWork : false })
-        .skip(numberPerPage * (pageNumber - 1))
-        .take(numberPerPage)
-        .getManyAndCount();
-
-      const totalPages = Math.ceil(count / numberPerPage);
-
-      return {
-        isSuccess: true,
-        payload: { studentData: studentData.map(student => availableFilter(student)), totalPages },
-      };
-    } catch {
-      throw new HttpException(
-        {
-          isSuccess: false,
-          error: `Coś poszło nie tak!`,
-        },
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
-  }
-
 
 
   async setFilter(data: FilterStudentDto, pageNumber: number, numberPerPage: number): Promise<ApiResponse<AvailableStudentsPaginated>> {
