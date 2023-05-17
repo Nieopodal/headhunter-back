@@ -14,6 +14,9 @@ import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class StudentService {
+  constructor (
+    private authService: AuthService
+  ) {}
   async getAvatar(id: string): Promise<ApiResponse<string>> {
     const studentAvatar = await Student.findOneBy({ id });
     if (!studentAvatar) {
@@ -173,7 +176,7 @@ export class StudentService {
         .execute();
       await Student.createQueryBuilder('student')
         .update(Student)
-        .set({ password: await bcrypt.hash(registerData.password, 10), active: true, verificationToken: null })
+        .set({ password: this.authService.hashData(registerData.password), active: true, verificationToken: null, activationUrl: null })
         .where('student.id = :id', { id })
         .execute();
       return { isSuccess: true, payload: id };
