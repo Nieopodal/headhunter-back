@@ -110,12 +110,11 @@ export class AuthService {
     return admin ? admin : student ? student : hr ? hr : null;
   }
 
-  async getUserData(user, tokens?): Promise<UserDataResponse> {
+  async getUserData(user): Promise<UserDataResponse> {
     const obj = {
       id: user.id,
       email: user.email,
       role: user.role,
-      access_token: tokens.access_token,
     };
 
     if (user instanceof Admin) {
@@ -151,7 +150,7 @@ export class AuthService {
     try {
       return {
         isSuccess: true,
-        payload: await this.getUserData(user, tokens),
+        payload: { ...(await this.getUserData(user)), access_token: tokens.access_token },
       };
     } catch (e) {
       return { isSuccess: false, error: 'Ups... coś poszło nie tak.' };
