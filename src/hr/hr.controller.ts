@@ -1,6 +1,5 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { GetUserData, GetUserId, Public, Role } from '../common/decorators';
-
 import {
   ApiResponse,
   AvailableStudentsPaginated,
@@ -29,7 +28,7 @@ export class HrController {
   @Role(UserRole.HR)
   @HttpCode(HttpStatus.OK)
   @Get('/remove-filter')
-  async removeFilter(): Promise<void> {
+  async removeFilter(): Promise<ApiResponse<null>> {
     return this.studentService.removeFilter();
   }
 
@@ -57,18 +56,6 @@ export class HrController {
   ): Promise<ApiResponse<StudentsToInterviewPaginated>> {
     return this.studentHrService.showInterviewStudents(name, pageNumber, numberPerPage, hrId);
   }
-
-  // @UseGuards(UserRoleGuard)
-  // @Role(UserRole.HR)
-  // @HttpCode(HttpStatus.OK)
-  // @Get('/available/:pageNumber?/:numberPerPage?/:name?')
-  // async showAvailableStudents(
-  //   @Param('name') name: string = '',
-  //   @Param('pageNumber') pageNumber = 1,
-  //   @Param('numberPerPage') numberPerPage = 10,
-  // ): Promise<ApiResponse<AvailableStudentsPaginated>> {
-  //   return this.studentService.getFreeStudents(pageNumber, numberPerPage, name);
-  // }
 
   @UseGuards(UserRoleGuard)
   @Role(UserRole.HR)
@@ -116,7 +103,7 @@ export class HrController {
   @Public()
   @UseGuards(MtGuard)
   @HttpCode(HttpStatus.OK)
-  @Patch('update')
+  @Patch('/update')
   setPasswordHr(@GetUserId() id: string, @GetUserData() data: UpdateHrDto): Promise<ApiResponse<UpdateResponse>> {
     return this.hrService.setPasswordHr(id, data);
   }

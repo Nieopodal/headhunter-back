@@ -109,46 +109,6 @@ export class StudentService {
     }
   }
 
-  async getFreeStudents(pageNumber: number, numberPerPage: number, name: string): Promise<ApiResponse<AvailableStudentsPaginated>> {
-    const count = await Student.createQueryBuilder('student')
-      .where('student.hr IS NULL')
-      .andWhere('student.active = :active', { active: true })
-      .andWhere('student.status = :status', { status: StudentStatus.AVAILABLE })
-      .andWhere('(student.firstName LIKE :name OR student.lastName LIKE :name)', { name: `%${name}%` })
-      .getCount();
-
-    const studentData = await Student.createQueryBuilder('student')
-      .select([
-        'student.id',
-        'student.firstName',
-        'student.lastName',
-        'student.courseCompletion',
-        'student.courseEngagement',
-        'student.projectDegree',
-        'student.teamProjectDegree',
-        'student.expectedTypeWork',
-        'student.expectedContractType',
-        'student.targetWorkCity',
-        'student.expectedSalary',
-        'student.canTakeApprenticeship',
-        'student.monthsOfCommercialExp',
-      ])
-      .where('student.hr IS NULL')
-      .andWhere('student.active = :active', { active: true })
-      .andWhere('student.status = :status', { status: StudentStatus.AVAILABLE })
-      .andWhere('(student.firstName LIKE :name OR student.lastName LIKE :name)', { name: `%${name}%` })
-      .skip(numberPerPage * (pageNumber - 1))
-      .take(numberPerPage)
-      .getRawMany();
-
-    const totalPages = Math.ceil(count / numberPerPage);
-
-    if (!studentData) {
-      return { isSuccess: false, error: 'Nie znaleziono studenta' };
-    }
-    return { isSuccess: true, payload: { studentData, totalPages } };
-  }
-
   async getStudentByEmail(email: string): Promise<Student> {
     return await Student.findOneBy({ email });
   }
@@ -198,9 +158,6 @@ export class StudentService {
     }
   }
 
-
-
-
   async setFilter(data: FilterStudentDto, pageNumber: number, numberPerPage: number): Promise<ApiResponse<AvailableStudentsPaginated>> {
     try {
       const [studentData, count] = await Student.createQueryBuilder('student')
@@ -241,7 +198,11 @@ export class StudentService {
     }
   }
 
-  async removeFilter(): Promise<void> {
+  async removeFilter(): Promise<ApiResponse<null>> {
     await this.cacheManager.del('filter');
+    return {
+      isSuccess: true,
+      payload: null,
+    };
   }
 }
