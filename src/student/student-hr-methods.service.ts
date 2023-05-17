@@ -147,27 +147,21 @@ export class StudentHrMethodsService {
     };
   }
 
-  async showStudentsToInterview(
-    id: string,
-    pageNumber: number,
-    numberPerPage: number,
+  async showStudentsToInterview(hrId: string, pageNumber: number, numberPerPage: number, name: string,
   ): Promise<ApiResponse<StudentsToInterviewPaginated>> {
-    const [studentsToInterview, count] = await Student.findAndCount({
-      relations: ['hr'],
-      where: {
-        status: StudentStatus.INTERVIEW,
-        active: true,
-        hr: {
-          id,
-        },
-      },
-      skip: numberPerPage * (pageNumber - 1),
-      take: numberPerPage,
-    });
+
+    const [studentData, count] = await Student.createQueryBuilder('student')
+      .where('student.hr = :hrId', { hrId: hrId })
+      .andWhere('student.active = :active', { active: true })
+      .andWhere('student.status = :status', { status: StudentStatus.INTERVIEW })
+      .andWhere('(student.firstName LIKE :name OR student.lastName LIKE :name)', { name: `%${name}%` })
+      .skip(numberPerPage * (pageNumber - 1))
+      .take(numberPerPage)
+      .getManyAndCount();
 
     const totalPages = Math.ceil(count / numberPerPage);
 
-    if (!studentsToInterview) {
+    if (!studentData) {
       throw new HttpException(
         {
           isSuccess: false,
@@ -180,7 +174,7 @@ export class StudentHrMethodsService {
     return {
       isSuccess: true,
       payload: {
-        studentData: studentsToInterview.map((student) => interviewFilter(student)),
+        studentData: studentData.map((student) => interviewFilter(student)),
         totalPages,
       },
     };

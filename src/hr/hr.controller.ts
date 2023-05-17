@@ -61,12 +61,13 @@ export class HrController {
   @UseGuards(UserRoleGuard)
   @Role(UserRole.HR)
   @HttpCode(HttpStatus.OK)
-  @Get('/available/:pageNumber?/:numberPerPage?')
+  @Get('/available/:pageNumber?/:numberPerPage?/:name?')
   async showAvailableStudents(
+    @Param('name') name: string = '',
     @Param('pageNumber') pageNumber = 1,
     @Param('numberPerPage') numberPerPage = 10,
   ): Promise<ApiResponse<AvailableStudentsPaginated>> {
-    return this.studentService.getFreeStudents(pageNumber, numberPerPage);
+    return this.studentService.getFreeStudents(pageNumber, numberPerPage, name);
   }
 
   @UseGuards(UserRoleGuard)
@@ -80,13 +81,14 @@ export class HrController {
   @UseGuards(UserRoleGuard)
   @Role(UserRole.HR)
   @HttpCode(HttpStatus.OK)
-  @Get('/interview/:pageNumber?/:numberPerPage?')
+  @Get('/interview/:pageNumber?/:numberPerPage?/:name?')
   async showStudentsToInterview(
     @GetUserId() hrId: string,
+    @Param('name') name: string = '',
     @Param('pageNumber') pageNumber = 1,
     @Param('numberPerPage') numberPerPage = 10,
   ): Promise<ApiResponse<StudentsToInterviewPaginated>> {
-    return this.studentHrService.showStudentsToInterview(hrId, pageNumber, numberPerPage);
+    return this.studentHrService.showStudentsToInterview(hrId, pageNumber, numberPerPage, name);
   }
 
   @UseGuards(UserRoleGuard)
