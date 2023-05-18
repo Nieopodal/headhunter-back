@@ -1,5 +1,5 @@
 import { BaseEntity, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
-import { UserRole } from '@Types';
+import { UserRole } from '../../types';
 
 @Entity()
 export class Admin extends BaseEntity {

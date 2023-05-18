@@ -1,4 +1,4 @@
-import { ExpectedContractType, ExpectedTypeWork, StudentStatus, UserRole } from '@Types';
+import { ExpectedContractType, ExpectedTypeWork, StudentStatus, UserRole } from '../../types';
 import {
   BaseEntity,
   Column,

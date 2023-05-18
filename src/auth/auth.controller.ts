@@ -6,7 +6,7 @@ import { ApiResponse, ConfirmResponse, RecoveryPasswordResponse, Tokens, UpdateR
 import { GetUserData, GetUserId, Public } from '../common/decorators';
 import { UserDataResponse } from '@Types';
 import { RtGuard } from '../common/guards';
-import { Cookies } from '../common/decorators/cookie.decorator';
+import { GetToken } from '../common/decorators';
 import { RecoveryPasswordDto } from './dto/recovery-password.dto';
 import { ConfirmDto } from './dto/confirm.dto';
 import { MtGuard } from '../common/guards';
@@ -27,8 +27,8 @@ export class AuthController {
 
   @Post('logout')
   @HttpCode(HttpStatus.OK)
-  logout(@GetUserId() id: string): Promise<any> {
-    return this.authService.logout(id);
+  logout(@GetUserId() id: string, @Res({ passthrough: true }) res: Response): Promise<any> {
+    return this.authService.logout(id, res);
   }
 
   @Public()
@@ -53,7 +53,6 @@ export class AuthController {
     @GetUserId() id: string,
     @GetUserData() data: ChangePasswordDto,
   ): Promise<ApiResponse<UpdateResponse>> {
-    console.log(id, data);
     return this.authService.changePassword(data, id);
   }
 
@@ -61,15 +60,19 @@ export class AuthController {
   @UseGuards(RtGuard)
   @Get('user')
   @HttpCode(HttpStatus.FOUND)
-  getUserInfo(@Cookies() token: string): Promise<ApiResponse<UserDataResponse>> {
-    return this.authService.getUserInfo(token);
+  getUserInfo(@GetUserId() id: string): Promise<ApiResponse<UserDataResponse>> {
+    return this.authService.getUserInfo(id);
   }
 
   @Public()
   @UseGuards(RtGuard)
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
-  refreshTokens(@Cookies('jwt-refresh') rt: string, @Res({ passthrough: true }) response: Response): Promise<Tokens> {
-    return this.authService.refreshTokens(rt, response);
+  refreshTokens(
+    @GetToken() rt: string,
+    @GetUserId() id: string,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<Tokens> {
+    return this.authService.refreshTokens(id, rt, res);
   }
 }
