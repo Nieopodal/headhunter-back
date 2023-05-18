@@ -119,8 +119,6 @@ export class StudentHrMethodsService {
     foundStudent.active = false;
     foundStudent.hr = null;
     foundStudent.reservationTime = null;
-    foundStudent.firstName = null;
-    foundStudent.lastName = null;
     await foundStudent.save();
 
     return {
