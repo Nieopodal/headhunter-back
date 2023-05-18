@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
 
-export class InvalidTokenException extends HttpException {
+export class MyUnauthorizedException extends HttpException {
   constructor() {
-    super('Token jest nieprawidłowy', HttpStatus.UNAUTHORIZED);
+    super('Token jest nieprawidłowy lub wygasł', HttpStatus.UNAUTHORIZED);
   }
 }

@@ -21,7 +21,7 @@ export class CronService {
         });
       }
     } catch {
-      throw new HttpException('"Wystąpił nieznany błąd"', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException('Wystąpił nieznany błąd', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 }

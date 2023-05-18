@@ -23,7 +23,7 @@ import { Admin } from '../admin/entity/admin.entity';
 import { Student } from '../student/entity/student.entity';
 import { Hr } from '../hr/entity/hr.entity';
 import { InvalidCredentialsException } from '../common/exceptions/invalid-credentials.exception';
-import { InvalidTokenException } from '../common/exceptions/invalid-token.exception';
+import { MyUnauthorizedException } from '../common/exceptions/invalid-token.exception';
 
 @Injectable()
 export class AuthService {
@@ -165,8 +165,7 @@ export class AuthService {
 
   async confirmFromEmail(param): Promise<ApiResponse<ConfirmResponse>> {
     const user = await this.checkUserById(param.id);
-    if (!user || param.token !== user.verificationToken) throw new InvalidTokenException();
-    console.log(user);
+    if (!user || param.token !== user.verificationToken) throw new MyUnauthorizedException();
     return {
       isSuccess: true,
       payload: { email: user.email, emailToken: await this.generateEmailToken(user.id, user.email) },
