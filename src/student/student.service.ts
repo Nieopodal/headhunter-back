@@ -18,10 +18,8 @@ import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class StudentService {
-
-  constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {
+  constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache, private authService: AuthService) {
   }
-
   async getAvatar(id: string): Promise<ApiResponse<string>> {
     const studentAvatar = await Student.findOneBy({ id });
     if (!studentAvatar) {
@@ -172,14 +170,7 @@ export class StudentService {
     }
   }
 
-  async registerStudentData(id, token, registerData): Promise<ApiResponse<UpdateStudentResponse>> {
-    const user = await Student.findOneBy({ id });
-    if (!user) {
-      return { isSuccess: false, error: 'Blędne dane' };
-    }
-    if (token !== user.verificationToken) {
-      return { isSuccess: false, error: 'Błędne dane' };
-    }
+  async registerStudentData(id, registerData): Promise<ApiResponse<UpdateResponse>> {
     try {
       await Student.createQueryBuilder('student')
         .update(Student)
@@ -188,7 +179,7 @@ export class StudentService {
         .execute();
       await Student.createQueryBuilder('student')
         .update(Student)
-        .set({ password: await bcrypt.hash(registerData.password, 10), active: true, verificationToken: null })
+        .set({ password: this.authService.hashData(registerData.password), active: true, verificationToken: null, activationUrl: null })
         .where('student.id = :id', { id })
         .execute();
       return { isSuccess: true, payload: id };
