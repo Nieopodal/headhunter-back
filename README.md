@@ -1,73 +1,119 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://i.ibb.co/CMYzDvn/logo-white.png">
+  <source media="(prefers-color-scheme: light)" srcset="https://i.ibb.co/pR1by1g/logo-black.png">
+  <img alt="MegaK HeadHunter logo" src="https://i.ibb.co/pR1by1g/logo-black.png">
+</picture>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+# About The Project
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+![screenshot of the app](https://i.ibb.co/mSzmTB6/browser-mockup.png)
 
-## Description
+MegaK HeadHunter is a project made by participants of a Polish webdev course called [MegaKurs](https://megak.pl). It was a team-based (agile/scrum) effort, that was assigned as a final project.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+MegaK HeadHunter is an IT employment-focused platform, which allows the students, who have completed the abovementioned course, to apply for their first jobs. It allows head hunters from various companies to browse each sudent's CV's and appoint interviews.
 
-## Installation
+# Check out the live demo
 
-```bash
-$ npm install
+**https://mwyso.usermd.net**
+
+Test student account credentials:
+
+**login**: student@hh.com
+**password**: Test123!@#
+
+Test headhunter account credentials:
+
+**login**: hr@hh.com
+**password**: Test123!@#
+
+# Features 🔧
+
+* Three types of accounts: administrator, headhunter and student
+* Authorization and authentication (JWT/bearer)
+* All accounts are created by administrator either by CSV file upload or a special form
+* Account activation or password-reset links sent through e-mail
+* Responsive for mobile
+
+# About this repo🔍
+This is a backend client for the MegaK HeadHunter app. It was made using:
+* NodeJs [![nodejs][nodejs]][nodejs-url]
+* NestJS [![NestJS][NestJS]][NestJs-url]
+* Typescript [![typescript][typescript]][typescript-url]
+* mySQL [![mySQL][mySQL]][mySQL-url]
+
+* packages like [Nodemailer](https://nodemailer.com/about/), [Passport](https://www.passportjs.org/),
+[TypeORM](https://typeorm.io/),
+[Helmet](https://helmetjs.github.io/), and others
+
+
+### Install locally
+To install HeadHunter app locally:
+
+1. Clone the repo
+   ```sh
+   git clone https://github.com/Nieopodal/headhunter-back.git
+   ```
+2. Install NPM packages
+   ```sh
+   npm install
+   ```
+3. run npm start
+   ```sh
+   npm run start:dev
+   or
+   nest start --watch
+   ```
+
+### Set up your env file
+To configure this backend server correctly, edit the appropriate fields of the .env file, such as the app running port, your mailer config, SQL database connection details, or CORS settings for the frontend client. The template for this file is in the code (`env-example`)
+
+Also, take a look a the TypeORM config file
+(`src/config/typeorm.config.ts`) and make sure you have synchronization turned on, so that TypeORM can populate your database with the right tables. 
+
+```
+{...
+synchronize: true,
+...}
 ```
 
-## Running the app
+After that, it is advised to turn this setting off. 
 
-```bash
-# development
-$ npm run start
+### Frontend app
+<span style="color:#e02735">You *will* need the MegaK HeadHunter frontend app for this to make sense</span>.
 
-# watch mode
-$ npm run start:dev
+Check it out at [https://github.com/Nieopodal/headhunter-front](https://github.com/Nieopodal/headhunter-front)
 
-# production mode
-$ npm run start:prod
+⚠️ Make sure the file structure of both apps is this *(and mind the folder names)*:
+
+```
+├─ //your folder
+│   ├── headhunter-back
+│   ├── headhunter-front
 ```
 
-## Test
+# About the authors
+This version of MegaK HeadHunter app was made by participants of the group #2 from the 2nd edition of [MegaKurs](https://megak.pl) webdev course:
 
-```bash
-# unit tests
-$ npm run test
+* Maciej [https://github.com/Nieopodal/](https://github.com/Nieopodal)
+* Marcin [https://github.com/mp-martin/](https://github.com/mp-martin/)
+* Mateusz [https://github.com/MWyso](https://github.com/MWyso)
+* Irek [https://github.com/IrePro78](https://github.com/IrePro78)
+* Wojtek [https://github.com/RavenPl](https://github.com/RavenPl)
+* Paweł [https://github.com/Now1k](https://github.com/Now1k)
+* Radek [https://github.com/RadekK1996](https://github.com/RadekK1996)
+* Arek [https://github.com/bubelarek](https://github.com/bubelarek)
 
-# e2e tests
-$ npm run test:e2e
 
-# test coverage
-$ npm run test:cov
-```
+It was a great co-working experience 🤝
 
-## Support
+<!-- MARKDOWN LINKS & IMAGES -->
+[nodejs]: https://img.shields.io/badge/node.js-6DA55F?style=for-the-badge&logo=node.js&logoColor=white
+[nodejs-url]: https://nodejs.org/
+[typescript]: https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white
+[typescript-url]: https://www.typescriptlang.org/
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+[NestJS]: https://img.shields.io/badge/nestjs-%23E0234E.svg?style=for-the-badge&logo=nestjs&logoColor=white
+[NestJS-url]: https://https://nestjs.com/
 
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
+[mySQL]: https://img.shields.io/badge/mysql-%2300f.svg?style=for-the-badge&logo=mysql&logoColor=white
+[mySQL-url]: https://https://nestjs.com/

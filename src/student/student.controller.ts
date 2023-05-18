@@ -1,29 +1,66 @@
-import { Controller, Get, Patch } from '@nestjs/common';
-import { Student } from './entity/student.entity';
-
-// import { StudentService } from './student.service';
+import { Controller, Get, HttpCode, HttpStatus, Patch, UseGuards } from '@nestjs/common';
+import { GetUserData, GetUserId, Public, Role } from '../common/decorators';
+import { StudentService } from './student.service';
+import { RegisterStudentDto, UpdateStudentDto } from './dto';
+import { UserRoleGuard } from 'src/common/guards/user-role.guard';
+import { MtGuard } from '../common/guards';
+import { ApiResponse, SimpleStudentData, StudentCv, UpdateResponse, UpdateStudentResponse, UserRole } from '@Types';
 
 @Controller('student')
 export class StudentController {
-  // constructor(private readonly studentService: StudentService) {}
-
-  @Get('/all')
-  getAllStudents(): Student[] {
-    return null; //this.studentService.get()
+  constructor(private studentService: StudentService) {
   }
 
-  @Get('/one')
-  getOneStudent(): Student {
-    return null; //this.studentService.getOne()
+  @UseGuards(UserRoleGuard)
+  @Role(UserRole.STUDENT)
+  @HttpCode(HttpStatus.OK)
+  @Get('/avatar')
+  async getAvatar(@GetUserId() id: string): Promise<ApiResponse<string>> {
+    return await this.studentService.getAvatar(id);
   }
 
+  @UseGuards(UserRoleGuard)
+  @Role(UserRole.STUDENT)
+  @HttpCode(HttpStatus.OK)
+  @Get('/simple')
+  async getSimpleStudentData(@GetUserId() id: string): Promise<ApiResponse<SimpleStudentData>> {
+    return await this.studentService.simpleStudentData(id);
+  }
+
+  @UseGuards(UserRoleGuard)
+  @Role(UserRole.STUDENT)
+  @HttpCode(HttpStatus.OK)
+  @Get('/cv')
+  async getStudentCv(@GetUserId() id: string): Promise<ApiResponse<StudentCv>> {
+    return await this.studentService.getStudentCv(id);
+  }
+
+  @UseGuards(UserRoleGuard)
+  @Role(UserRole.STUDENT)
   @Patch('/update')
-  updateUserData(): Student {
-    return null; //this.studentService.update()
+  @HttpCode(HttpStatus.ACCEPTED)
+  updateStudent(
+    @GetUserId() id: string,
+    @GetUserData() updateData: UpdateStudentDto,
+  ): Promise<ApiResponse<UpdateStudentResponse>> {
+    return this.studentService.updateStudent(id, updateData);
   }
 
-  @Get('/deactivate')
-  deactivate(): void {
-    return null; //this.studentService.deactivate()
+  @Public()
+  @UseGuards(MtGuard)
+  @Patch('/register')
+  registerStudent(
+    @GetUserId() id: string,
+    @GetUserData() registerData: RegisterStudentDto,
+  ): Promise<ApiResponse<UpdateResponse>> {
+    return this.studentService.registerStudentData(id, registerData);
+  }
+
+  @UseGuards(UserRoleGuard)
+  @Role(UserRole.STUDENT)
+  @HttpCode(HttpStatus.OK)
+  @Patch('/employed')
+  deactivate(@GetUserId() id: string): Promise<ApiResponse<any>> {
+    return this.studentService.deactivate(id);
   }
 }

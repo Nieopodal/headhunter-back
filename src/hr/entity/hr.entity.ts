@@ -1,4 +1,14 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  BaseEntity,
+  Column,
+  CreateDateColumn,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { Student } from '../../student/entity/student.entity';
+import { UserRole } from '@Types';
 
 @Entity()
 export class Hr extends BaseEntity {
@@ -11,14 +21,17 @@ export class Hr extends BaseEntity {
   })
   email: string;
 
-  @Column({ length: 255 })
+  @Column({ length: 255, default: '' })
   password: string;
 
   @Column({ length: 255 })
   fullName: string;
 
-  @Column({ default: 'hr', length: 20 })
-  role: string;
+  @Column({ type: 'enum', default: UserRole.HR, enum: UserRole })
+  role: UserRole;
+
+  @Column({ type: 'boolean', default: false })
+  active: boolean;
 
   @Column({
     length: 150,
@@ -28,6 +41,21 @@ export class Hr extends BaseEntity {
   @Column({ default: 0 })
   maxReservedStudents: number;
 
-  @Column({ default: '', length: 255, nullable: true })
+  @Column({ length: 255, nullable: true, default: '' })
   refreshToken: string;
+
+  @Column({ length: 255, nullable: true, default: null })
+  verificationToken: string;
+
+  @Column({ default: '', length: 255 })
+  activationUrl: string;
+
+  @CreateDateColumn({ type: 'timestamp' })
+  createdAt: Date;
+
+  @UpdateDateColumn({ type: 'timestamp' })
+  updatedAt: Date;
+
+  @OneToMany(() => Student, (student) => student.hr)
+  students: Student[];
 }

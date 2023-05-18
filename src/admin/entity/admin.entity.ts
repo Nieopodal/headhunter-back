@@ -1,4 +1,5 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { BaseEntity, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { UserRole } from '../../types';
 
 @Entity()
 export class Admin extends BaseEntity {
@@ -14,12 +15,21 @@ export class Admin extends BaseEntity {
   @Column({ length: 255 })
   password: string;
 
-  @Column({ default: 'admin', length: 20 })
-  role: string;
-
-  @Column({ default: () => 'CURRENT_TIMESTAMP' })
-  createdAt: Date;
+  @Column({ type: 'enum', default: UserRole.ADMIN, enum: UserRole })
+  role: UserRole;
 
   @Column({ default: '', length: 255, nullable: true })
   refreshToken: string;
+
+  @Column({ default: '', length: 255, nullable: true })
+  verificationToken: string;
+
+  @Column({ default: '', length: 255 })
+  activationUrl: string;
+
+  @CreateDateColumn({ type: 'timestamp' })
+  createdAt: Date;
+
+  @UpdateDateColumn({ type: 'timestamp' })
+  updatedAt: Date;
 }
