@@ -84,12 +84,10 @@ export class StudentService {
       active: true,
     });
     try {
-      student.active = true;
+      student.active = false;
       student.status = StudentStatus.EMPLOYED;
       student.hr = null;
       student.reservationTime = null;
-      student.firstName = null;
-      student.lastName = null;
       await Student.save(student);
       return { isSuccess: true, payload: { id } };
     } catch {
@@ -109,7 +107,7 @@ export class StudentService {
     return await Student.find();
   }
 
-  async updateStudent(data, id): Promise<ApiResponse<UpdateResponse>> {
+  async updateStudent(id, data): Promise<ApiResponse<UpdateResponse>> {
     try {
       await Student.update({ id }, data);
       return {
