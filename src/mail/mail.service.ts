@@ -1,15 +1,16 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
 import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
 import { StudentService } from '../student/student.service';
 import { SendMailInfo } from '@Types';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable()
 export class MailService {
   constructor(
     private mailerService: MailerService,
-    private studentService: StudentService,
+    @Inject(forwardRef(() => StudentService)) private studentService: StudentService,
     private configService: ConfigService,
   ) {}
 

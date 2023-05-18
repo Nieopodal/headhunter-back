@@ -1,14 +1,17 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { ApiResponse, SimpleStudentData, StudentCv, StudentStatus, AvailableStudentsPaginated } from '@Types';
 import { UpdateResponse } from 'src/types/auth/response.type';
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 import { Student } from './entity/student.entity';
 import { AuthService } from 'src/auth/auth.service';
 
 @Injectable()
 export class StudentService {
-  constructor(@Inject(forwardRef(() => AuthService)) private authService: AuthService) {
-  }
+  constructor(
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    @Inject(forwardRef(() => AuthService)) private authService: AuthService,
+  ) {}
 
   async getAvatar(id: string): Promise<ApiResponse<string>> {
     const studentAvatar = await Student.findOneBy({ id });
@@ -96,6 +99,44 @@ export class StudentService {
     } catch {
       return { isSuccess: false, error: 'Nie znaleziono studenta' };
     }
+  }
+
+  async getFreeStudents(pageNumber: number, numberPerPage: number): Promise<ApiResponse<AvailableStudentsPaginated>> {
+    const count = await Student.createQueryBuilder('student')
+      .where('student.hr IS NULL')
+      .andWhere('student.active = :active', { active: true })
+      .andWhere('student.status = :status', { status: StudentStatus.AVAILABLE })
+      .getCount();
+
+    const studentData = await Student.createQueryBuilder('student')
+      .select([
+        'student.id',
+        'student.firstName',
+        'student.lastName',
+        'student.courseCompletion',
+        'student.courseEngagement',
+        'student.projectDegree',
+        'student.teamProjectDegree',
+        'student.expectedTypeWork',
+        'student.expectedContractType',
+        'student.targetWorkCity',
+        'student.expectedSalary',
+        'student.canTakeApprenticeship',
+        'student.monthsOfCommercialExp',
+      ])
+      .where('student.hr IS NULL')
+      .andWhere('student.active = :active', { active: true })
+      .andWhere('student.status = :status', { status: StudentStatus.AVAILABLE })
+      .skip(numberPerPage * (pageNumber - 1))
+      .take(numberPerPage)
+      .getRawMany();
+
+    const totalPages = Math.ceil(count / numberPerPage);
+
+    if (!studentData) {
+      return { isSuccess: false, error: 'Nie znaleziono studenta' };
+    }
+    return { isSuccess: true, payload: { studentData, totalPages } };
   }
 
   async getStudentByEmail(email: string): Promise<Student> {

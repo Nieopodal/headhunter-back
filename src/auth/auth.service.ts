@@ -1,5 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { ForbiddenException, HttpException, HttpStatus, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { forwardRef, HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { LoginUserDto } from './dto';
@@ -32,8 +31,8 @@ import { MyUnauthorizedException } from '../common/exceptions/invalid-token.exce
 export class AuthService {
   constructor(
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    @Inject(forwardRef(() => StudentService)) private studentService: StudentService,
     private adminService: AdminService,
-    private studentService: StudentService,
     private hrService: HrService,
     private mailService: MailService,
     private jwtService: JwtService,

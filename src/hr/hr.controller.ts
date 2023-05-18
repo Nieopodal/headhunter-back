@@ -1,4 +1,4 @@
-import { Controller, Get, HttpCode, HttpStatus, Param, Patch, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { GetUserData, GetUserId, Public, Role } from '../common/decorators';
 import {
   ApiResponse,
@@ -22,8 +22,7 @@ export class HrController {
     private readonly studentHrService: StudentHrMethodsService,
     private readonly studentService: StudentService,
     private readonly hrService: HrService,
-  ) {
-  }
+  ) {}
 
   @UseGuards(UserRoleGuard)
   @Role(UserRole.HR)
@@ -51,7 +50,7 @@ export class HrController {
   @Get('/show-interview/:pageNumber?/:numberPerPage?/:name?')
   async showInterviewStudents(
     @GetUserId() hrId: string,
-    @Param('name') name: string = '',
+    @Param('name') name = '',
     @Param('pageNumber') pageNumber = 1,
     @Param('numberPerPage') numberPerPage = 10,
   ): Promise<ApiResponse<StudentsToInterviewPaginated>> {
@@ -69,9 +68,7 @@ export class HrController {
   @UseGuards(UserRoleGuard)
   @Role(UserRole.HR)
   @Post('/set-filter')
-  async setFilter(
-    @Body() data: FilterStudentDto,
-  ): Promise<ApiResponse<StudentFilter>> {
+  async setFilter(@Body() data: FilterStudentDto): Promise<ApiResponse<StudentFilter>> {
     return this.studentHrService.setFilter(data);
   }
 

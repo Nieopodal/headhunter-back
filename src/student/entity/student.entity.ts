@@ -107,7 +107,7 @@ export class Student extends BaseEntity {
   @Column({ nullable: true, default: null, length: 255 })
   verificationToken: string;
 
-  @Column({ default: '', length: 255 })
+  @Column({ nullable: true, default: null, length: 255 })
   activationUrl: string;
 
   @CreateDateColumn({ type: 'timestamp' })
