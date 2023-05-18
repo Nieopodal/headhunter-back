@@ -44,7 +44,7 @@ export class UploadStudentDataService {
               await this.authService.generateEmailToken(data.id, data.email),
             );
             await data.save();
-            data.activationUrl = await this.mailService.generateUrl(data);
+            data.activationUrl = await this.mailService.generateUrl(data, 'new-user');
             await data.save();
             records.push(data);
           }

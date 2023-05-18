@@ -38,7 +38,7 @@ export class HrService {
         await this.authService.generateEmailToken(hr.id, hr.email),
       );
       await hr.save();
-      hr.activationUrl = await this.mailService.generateUrl(hr);
+      hr.activationUrl = await this.mailService.generateUrl(hr, 'new-user');
       await hr.save();
       this.mailService
         .sendEmailsToUsers(this.mailService, [hr], 'Potwierdzenie rejestracji', (activationUrl) =>

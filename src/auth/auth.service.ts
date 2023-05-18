@@ -178,11 +178,11 @@ export class AuthService {
 
   async recoveryPassword(data): Promise<ApiResponse<RecoveryPasswordResponse>> {
     const user = await this.checkUserByEmail(data.email);
-    if (!user.email) throw new HttpException(`Nie ma takiego adresu email w systemie`, HttpStatus.NOT_FOUND);
+    if (!user) throw new HttpException(`Nie ma takiego adresu email w systemie`, HttpStatus.NOT_FOUND);
     try {
       user.verificationToken = await this.hashData(await this.generateEmailToken(user.id, user.email));
       await user.save();
-      user.activationUrl = await this.mailService.generateUrl(user);
+      user.activationUrl = await this.mailService.generateUrl(user, 'reset-password');
       await user.save();
       await this.mailService.sendEmailsToUsers(this.mailService, [user], 'Zmiana hasła', (activationUrl) =>
         RecoveryPasswordTemplate(activationUrl),
@@ -192,6 +192,7 @@ export class AuthService {
         payload: { sentToEmail: user.email },
       };
     } catch (e) {
+      console.log(e);
       throw new HttpException('Odzyskanie hasła nie powiodło się. Spróbuj ponownie później', HttpStatus.BAD_REQUEST);
     }
   }

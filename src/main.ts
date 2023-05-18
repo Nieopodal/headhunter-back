@@ -19,8 +19,8 @@ async function bootstrap() {
     credentials: true,
   });
 
-  app.useGlobalFilters(new GlobalExceptionFilter(configService));
   app.useGlobalFilters(new UnauthorizedExceptionFilter());
+  app.useGlobalFilters(new GlobalExceptionFilter(configService));
   await app.listen(configService.get('PORT') ? parseInt(configService.get('PORT')) : 3000);
 }
 

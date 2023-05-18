@@ -14,10 +14,10 @@ export class MailService {
     private configService: ConfigService,
   ) {}
 
-  async generateUrl(data): Promise<string> {
+  async generateUrl(data, actionType): Promise<string> {
     const { id, role, verificationToken } = data;
     const appUrl = this.configService.get('APP_URL');
-    return `${appUrl}/auth/${role}/confirm/${id}/${verificationToken}`;
+    return `${appUrl}auth/${actionType}/${role}/confirm/${id}/${verificationToken}`;
   }
 
   async sendMail(to: string, subject: string, html: string): Promise<SendMailInfo> {
