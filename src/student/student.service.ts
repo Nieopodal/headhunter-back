@@ -1,22 +1,19 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Cache } from 'cache-manager';
+import { forwardRef, HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { UpdateResponse } from 'src/types/auth/response.type';
 import { Student } from './entity/student.entity';
 import { AuthService } from 'src/auth/auth.service';
-import { ApiResponse, AvailableStudentsPaginated, SimpleStudentData, StudentCv, StudentStatus } from '@Types';
+import { ApiResponse, SimpleStudentData, StudentCv, StudentStatus } from '@Types';
 
 @Injectable()
 export class StudentService {
   constructor(
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
     @Inject(forwardRef(() => AuthService)) private authService: AuthService,
   ) {}
 
   async getAvatar(id: string): Promise<ApiResponse<string>> {
     const studentAvatar = await Student.findOneBy({ id });
     if (!studentAvatar) {
-      return { isSuccess: false, error: 'Nie znaleziono użytkownika' };
+      throw new HttpException(`Nie znaleziono studenta!`, HttpStatus.BAD_REQUEST);
     }
     return { isSuccess: true, payload: studentAvatar.githubUsername };
   }
@@ -52,9 +49,8 @@ export class StudentService {
       .getRawOne();
 
     if (!studentCv) {
-      return { isSuccess: false, error: 'Nie znaleziono studenta' };
+      throw new HttpException(`Nie znaleziono studenta!`, HttpStatus.BAD_REQUEST);
     }
-
     return { isSuccess: true, payload: studentCv };
   }
 
@@ -77,7 +73,7 @@ export class StudentService {
       .where('student.id = :id', { id })
       .getRawOne();
     if (!studentData) {
-      return { isSuccess: false, error: 'Nie znaleziono studenta' };
+      throw new HttpException(`Nie znaleziono studenta!`, HttpStatus.BAD_REQUEST);
     }
     return { isSuccess: true, payload: studentData };
   }
@@ -97,46 +93,8 @@ export class StudentService {
       await Student.save(student);
       return { isSuccess: true, payload: { id } };
     } catch {
-      return { isSuccess: false, error: 'Nie znaleziono studenta' };
+      throw new HttpException(`Nie znaleziono studenta!`, HttpStatus.BAD_REQUEST);
     }
-  }
-
-  async getFreeStudents(pageNumber: number, numberPerPage: number): Promise<ApiResponse<AvailableStudentsPaginated>> {
-    const count = await Student.createQueryBuilder('student')
-      .where('student.hr IS NULL')
-      .andWhere('student.active = :active', { active: true })
-      .andWhere('student.status = :status', { status: StudentStatus.AVAILABLE })
-      .getCount();
-
-    const studentData = await Student.createQueryBuilder('student')
-      .select([
-        'student.id',
-        'student.firstName',
-        'student.lastName',
-        'student.courseCompletion',
-        'student.courseEngagement',
-        'student.projectDegree',
-        'student.teamProjectDegree',
-        'student.expectedTypeWork',
-        'student.expectedContractType',
-        'student.targetWorkCity',
-        'student.expectedSalary',
-        'student.canTakeApprenticeship',
-        'student.monthsOfCommercialExp',
-      ])
-      .where('student.hr IS NULL')
-      .andWhere('student.active = :active', { active: true })
-      .andWhere('student.status = :status', { status: StudentStatus.AVAILABLE })
-      .skip(numberPerPage * (pageNumber - 1))
-      .take(numberPerPage)
-      .getRawMany();
-
-    const totalPages = Math.ceil(count / numberPerPage);
-
-    if (!studentData) {
-      return { isSuccess: false, error: 'Nie znaleziono studenta' };
-    }
-    return { isSuccess: true, payload: { studentData, totalPages } };
   }
 
   async getStudentByEmail(email: string): Promise<Student> {
@@ -159,7 +117,7 @@ export class StudentService {
         payload: { id },
       };
     } catch (e) {
-      return { isSuccess: false, error: 'Ups.... coś poszło nie tak' };
+      throw new HttpException(`Coś poszło nie tak!`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -176,8 +134,8 @@ export class StudentService {
         },
       );
       return { isSuccess: true, payload: id };
-    } catch (e) {
-      return { isSuccess: false, error: e.message };
+    } catch {
+      throw new HttpException(`Coś poszło nie tak!`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 }
