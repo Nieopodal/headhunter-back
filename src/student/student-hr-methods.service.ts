@@ -1,10 +1,10 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { availableFilter, interviewFilter } from './utils/filter-methods';
 import { Student } from './entity/student.entity';
 import { HrService } from '../hr/hr.service';
-import { FilterStudentDto } from './dto/filter-student.dto';
-import { availableFilter, interviewFilter } from './utils/filter-methods';
+import { FilterStudentDto } from './dto';
 import {
   ApiResponse,
   AvailableStudentsPaginated,
@@ -30,15 +30,9 @@ export class StudentHrMethodsService {
     });
 
     if (bookedStudents >= hr.maxReservedStudents) {
-      throw new HttpException(
-        {
-          isSuccess: false,
-          error: `Możesz zaprosić do rozmowy tylko ${hr.maxReservedStudents} ${
-            hr.maxReservedStudents === 1 ? 'studenta' : 'studentów'
-          }!`,
-        },
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new HttpException(`Możesz zaprosić do rozmowy tylko ${hr.maxReservedStudents} ${
+        hr.maxReservedStudents === 1 ? 'studenta' : 'studentów'
+      }!`, HttpStatus.BAD_REQUEST);
     }
 
     const isBooked = await Student.findOne({
@@ -49,13 +43,7 @@ export class StudentHrMethodsService {
     });
 
     if (isBooked) {
-      throw new HttpException(
-        {
-          isSuccess: false,
-          error: `Ten student jest już zapisany na rozmowę!`,
-        },
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new HttpException(`Ten student jest już zapisany na rozmowę!`, HttpStatus.BAD_REQUEST);
     }
 
     const foundStudent = await Student.findOne({
@@ -67,13 +55,7 @@ export class StudentHrMethodsService {
     });
 
     if (!foundStudent) {
-      throw new HttpException(
-        {
-          isSuccess: false,
-          error: `Ten student jest niedostępny!`,
-        },
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new HttpException(`Ten student jest niedostępny!`, HttpStatus.BAD_REQUEST);
     }
 
     foundStudent.status = StudentStatus.INTERVIEW;
@@ -102,13 +84,7 @@ export class StudentHrMethodsService {
     });
 
     if (!foundStudent) {
-      throw new HttpException(
-        {
-          isSuccess: false,
-          error: `Ten student jest niedostępny!`,
-        },
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new HttpException(`Ten student jest niedostępny!`, HttpStatus.BAD_REQUEST);
     }
 
     foundStudent.status = StudentStatus.AVAILABLE;
@@ -136,13 +112,7 @@ export class StudentHrMethodsService {
     });
 
     if (!foundStudent) {
-      throw new HttpException(
-        {
-          isSuccess: false,
-          error: `Ten student jest niedostępny!`,
-        },
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new HttpException(`Ten student jest niedostępny!`, HttpStatus.BAD_REQUEST);
     }
 
     foundStudent.status = StudentStatus.EMPLOYED;
@@ -191,13 +161,7 @@ export class StudentHrMethodsService {
         payload: { studentData: studentData.map(student => interviewFilter(student)), totalPages },
       };
     } catch {
-      throw new HttpException(
-        {
-          isSuccess: false,
-          error: `Coś poszło nie tak!`,
-        },
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      throw new HttpException(`Coś poszło nie tak!`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -233,13 +197,7 @@ export class StudentHrMethodsService {
         payload: { studentData: studentData.map(student => availableFilter(student)), totalPages },
       };
     } catch {
-      throw new HttpException(
-        {
-          isSuccess: false,
-          error: `Coś poszło nie tak!`,
-        },
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      throw new HttpException(`Coś poszło nie tak!`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -253,13 +211,7 @@ export class StudentHrMethodsService {
         },
       };
     } catch {
-      throw new HttpException(
-        {
-          isSuccess: false,
-          error: `Coś poszło nie tak!`,
-        },
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      throw new HttpException(`Coś poszło nie tak!`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -271,13 +223,7 @@ export class StudentHrMethodsService {
         payload: null,
       };
     } catch {
-      throw new HttpException(
-        {
-          isSuccess: false,
-          error: `Coś poszło nie tak!`,
-        },
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      throw new HttpException(`Coś poszło nie tak!`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 }

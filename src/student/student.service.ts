@@ -1,10 +1,10 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
-import { ApiResponse, SimpleStudentData, StudentCv, StudentStatus, AvailableStudentsPaginated } from '@Types';
-import { UpdateResponse } from 'src/types/auth/response.type';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
+import { UpdateResponse } from 'src/types/auth/response.type';
 import { Student } from './entity/student.entity';
 import { AuthService } from 'src/auth/auth.service';
+import { ApiResponse, AvailableStudentsPaginated, SimpleStudentData, StudentCv, StudentStatus } from '@Types';
 
 @Injectable()
 export class StudentService {

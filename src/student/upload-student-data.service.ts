@@ -1,13 +1,13 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { parse } from 'csv-parse';
 import { Readable } from 'stream';
+import { UserRegistrationTemplate } from '../templates/email/user-registration';
 import { Student } from './entity/student.entity';
 import { StudentService } from './student.service';
 import { AuthService } from '../auth/auth.service';
 import { UploadStudentsDto } from './dto';
-import { ApiResponse, UserRole } from '@Types';
 import { MailService } from '../mail/mail.service';
-import { UserRegistrationTemplate } from '../templates/email/user-registration';
+import { ApiResponse, UserRole } from '@Types';
 
 @Injectable()
 export class UploadStudentDataService {

@@ -1,9 +1,9 @@
 import { forwardRef, HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { UserRegistrationTemplate } from '../templates/email/user-registration';
 import { Hr } from './entity/hr.entity';
-import { ApiResponse, CreateResponse, UpdateResponse, UserRole } from '@Types';
 import { AuthService } from '../auth/auth.service';
 import { MailService } from '../mail/mail.service';
-import { UserRegistrationTemplate } from '../templates/email/user-registration';
+import { ApiResponse, CreateResponse, UpdateResponse, UserRole } from '@Types';
 
 @Injectable()
 export class HrService {

@@ -1,4 +1,3 @@
-import { ExpectedContractType, ExpectedTypeWork } from '@Types';
 import {
   IsArray,
   IsBoolean,
@@ -14,6 +13,8 @@ import {
   MaxLength,
   Min,
 } from 'class-validator';
+import { ExpectedContractType, ExpectedTypeWork } from '@Types';
+
 export class UpdateStudentDto {
   @IsNotEmpty()
   @IsEmail()

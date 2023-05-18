@@ -1,15 +1,15 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Patch, UseGuards } from '@nestjs/common';
-import { StudentService } from './student.service';
+import { Controller, Get, HttpCode, HttpStatus, Patch, UseGuards } from '@nestjs/common';
 import { GetUserData, GetUserId, Public, Role } from '../common/decorators';
-import { UpdateStudentDto } from './dto';
-import { ApiResponse, SimpleStudentData, StudentCv, UpdateResponse, UpdateStudentResponse, UserRole } from '@Types';
+import { StudentService } from './student.service';
+import { RegisterStudentDto, UpdateStudentDto } from './dto';
 import { UserRoleGuard } from 'src/common/guards/user-role.guard';
-import { RegisterStudentDto } from './dto/register-student.dto';
 import { MtGuard } from '../common/guards';
+import { ApiResponse, SimpleStudentData, StudentCv, UpdateResponse, UpdateStudentResponse, UserRole } from '@Types';
 
 @Controller('student')
 export class StudentController {
-  constructor(private studentService: StudentService) {}
+  constructor(private studentService: StudentService) {
+  }
 
   @UseGuards(UserRoleGuard)
   @Role(UserRole.STUDENT)
@@ -22,7 +22,7 @@ export class StudentController {
   @UseGuards(UserRoleGuard)
   @Role(UserRole.STUDENT)
   @HttpCode(HttpStatus.OK)
-  @Get('/simple/')
+  @Get('/simple')
   async getSimpleStudentData(@GetUserId() id: string): Promise<ApiResponse<SimpleStudentData>> {
     return await this.studentService.simpleStudentData(id);
   }
@@ -37,7 +37,7 @@ export class StudentController {
 
   @UseGuards(UserRoleGuard)
   @Role(UserRole.STUDENT)
-  @Patch('update')
+  @Patch('/update')
   @HttpCode(HttpStatus.ACCEPTED)
   updateStudent(
     @GetUserId() id: string,
@@ -48,7 +48,7 @@ export class StudentController {
 
   @Public()
   @UseGuards(MtGuard)
-  @Patch('register')
+  @Patch('/register')
   registerStudent(
     @GetUserId() id: string,
     @GetUserData() registerData: RegisterStudentDto,

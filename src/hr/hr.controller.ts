@@ -1,5 +1,11 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { GetUserData, GetUserId, Public, Role } from '../common/decorators';
+import { StudentService } from '../student/student.service';
+import { StudentHrMethodsService } from '../student/student-hr-methods.service';
+import { MtGuard, UserRoleGuard } from '../common/guards';
+import { HrService } from './hr.service';
+import { FilterStudentDto } from '../student/dto';
+import { UpdateHrDto } from './dto';
 import {
   ApiResponse,
   AvailableStudentsPaginated,
@@ -9,12 +15,6 @@ import {
   UpdateResponse,
   UserRole,
 } from '@Types';
-import { StudentService } from '../student/student.service';
-import { StudentHrMethodsService } from '../student/student-hr-methods.service';
-import { MtGuard, UserRoleGuard } from '../common/guards';
-import { HrService } from './hr.service';
-import { FilterStudentDto } from '../student/dto/filter-student.dto';
-import { UpdateHrDto } from './dto/update-hr.dto';
 
 @Controller('hr')
 export class HrController {
