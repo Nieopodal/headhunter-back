@@ -1,19 +1,16 @@
-import { Injectable } from '@nestjs/common';
-import {
-  ApiResponse,
-  SimpleStudentData,
-  UpdateStudentResponse,
-  StudentCv,
-  StudentStatus,
-  AvailableStudentsPaginated,
-} from '@Types';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { ApiResponse, SimpleStudentData, StudentCv, StudentStatus, AvailableStudentsPaginated } from '@Types';
 import { UpdateResponse } from 'src/types/auth/response.type';
-
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 import { Student } from './entity/student.entity';
-import * as bcrypt from 'bcrypt';
+import { AuthService } from 'src/auth/auth.service';
 
 @Injectable()
 export class StudentService {
+  constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache,@Inject(forwardRef(() => AuthService)) private authService: AuthService) {
+  }
   async getAvatar(id: string): Promise<ApiResponse<string>> {
     const studentAvatar = await Student.findOneBy({ id });
     if (!studentAvatar) {
@@ -154,7 +151,7 @@ export class StudentService {
 
   async updateStudent(data, id): Promise<ApiResponse<UpdateResponse>> {
     try {
-      await Student.createQueryBuilder('student').update(Student).set(data).where('id=:id', { id }).execute();
+      await Student.update({ id }, data);
       return {
         isSuccess: true,
         payload: { id },
@@ -164,25 +161,18 @@ export class StudentService {
     }
   }
 
-  async registerStudentData(id, token, registerData): Promise<ApiResponse<UpdateStudentResponse>> {
-    const user = await Student.findOneBy({ id });
-    if (!user) {
-      return { isSuccess: false, error: 'Blędne dane' };
-    }
-    if (token !== user.verificationToken) {
-      return { isSuccess: false, error: 'Błędne dane' };
-    }
+  async registerStudentData(id, registerData): Promise<ApiResponse<UpdateResponse>> {
     try {
-      await Student.createQueryBuilder('student')
-        .update(Student)
-        .set(registerData)
-        .where('student.id = :id', { id })
-        .execute();
-      await Student.createQueryBuilder('student')
-        .update(Student)
-        .set({ password: await bcrypt.hash(registerData.password, 10), active: true, verificationToken: null })
-        .where('student.id = :id', { id })
-        .execute();
+      await Student.update(
+        { id },
+        {
+          ...registerData,
+          password: await this.authService.hashData(registerData.password),
+          active: true,
+          verificationToken: null,
+          activationUrl: null,
+        },
+      );
       return { isSuccess: true, payload: id };
     } catch (e) {
       return { isSuccess: false, error: e.message };

@@ -10,6 +10,7 @@ import {
   IsOptional,
   IsPhoneNumber,
   IsString,
+  Matches,
   Max,
   MaxLength,
   Min,
@@ -22,6 +23,7 @@ export class RegisterStudentDto {
 
   @IsNotEmpty()
   @IsString()
+  @Matches(/^(?=.[a-z])(?=.[A-Z])(?=.[0-9])(?=.[!@#$%^&*])(?=.{6,})/)
   @MaxLength(255)
   password: string;
 

@@ -1,37 +1,12 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Student } from './entity/student.entity';
-import { ApiResponse, StudentStatus, StudentsToInterviewPaginated, StudentToInterview } from '@Types';
+import { ApiResponse, StudentStatus, StudentsToInterviewPaginated } from '@Types';
 import { HrService } from '../hr/hr.service';
+import { interviewFilter } from './utils/filter-methods';
 
 @Injectable()
 export class StudentHrMethodsService {
   constructor(private readonly hrService: HrService) {}
-
-  filter(data: Student): StudentToInterview {
-    const {
-      education,
-      courses,
-      role,
-      createdAt,
-      updatedAt,
-      refreshToken,
-      active,
-      githubUsername,
-      status,
-      hr,
-      bio,
-      contactNumber,
-      portfolioUrls,
-      email,
-      password,
-      verificationToken,
-      scrumProjectUrls,
-      projectUrls,
-      workExperience,
-      ...rest
-    } = data;
-    return rest;
-  }
 
   async setToInterview(id: string, hrId: string): Promise<ApiResponse<null>> {
     const hr = await this.hrService.getHrById(hrId);
@@ -205,7 +180,7 @@ export class StudentHrMethodsService {
     return {
       isSuccess: true,
       payload: {
-        studentData: studentsToInterview.map((student) => this.filter(student)),
+        studentData: studentsToInterview.map((student) => interviewFilter(student)),
         totalPages,
       },
     };

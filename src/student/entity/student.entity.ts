@@ -1,4 +1,4 @@
-import { ExpectedContractType, ExpectedTypeWork, StudentStatus, UserRole } from '@Types';
+import { ExpectedContractType, ExpectedTypeWork, StudentStatus, UserRole } from '../../types';
 import {
   BaseEntity,
   Column,
@@ -63,7 +63,7 @@ export class Student extends BaseEntity {
   @Column({ length: 60, nullable: true })
   targetWorkCity: string;
 
-  @Column({ type: 'enum', enum: ExpectedContractType, default: ExpectedContractType.none })
+  @Column({ type: 'enum', enum: ExpectedContractType, default: ExpectedContractType.NONE })
   expectedContractType: ExpectedContractType;
 
   @Column({ type: 'numeric', precision: 9, scale: 2, nullable: true })

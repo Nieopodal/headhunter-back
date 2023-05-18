@@ -1,4 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { ForbiddenException, HttpException, HttpStatus, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 import { LoginUserDto } from './dto';
 import { AdminService } from '../admin/admin.service';
 import { StudentService } from '../student/student.service';
@@ -28,6 +31,7 @@ import { MyUnauthorizedException } from '../common/exceptions/invalid-token.exce
 @Injectable()
 export class AuthService {
   constructor(
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private adminService: AdminService,
     private studentService: StudentService,
     private hrService: HrService,
@@ -155,6 +159,7 @@ export class AuthService {
     if (user.refreshToken !== null) {
       user.refreshToken = null;
       await user.save();
+      await this.cacheManager.del('filter');
       res.clearCookie('jwt-refresh');
       return {
         isSuccess: true,

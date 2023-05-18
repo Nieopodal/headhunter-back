@@ -55,10 +55,13 @@ export type SimpleStudentData = {
   monthsOfCommercialExp: number;
 };
 
-export type StudentToInterview = SimpleStudentData & {
+export type AvailableStudent = SimpleStudentData & {
   id: string;
   firstName: string;
   lastName: string;
+};
+
+export type StudentToInterview = AvailableStudent & {
   reservationTime: Date;
 };
 
@@ -72,25 +75,25 @@ export type StudentsToInterviewPaginated = {
 };
 
 export type AvailableStudentsPaginated = {
-  studentData: SimpleStudentData[];
-  totalPages: number;
+  studentData: AvailableStudent[],
+  totalPages: number
 };
 
 export type StudentCv = StudentPartialData & SimpleStudentData;
 
 export enum ExpectedTypeWork {
-  office = 'Na miejscu',
-  move = 'Przeprowadzka',
-  remote = 'Praca zdalna',
-  hybrid = 'Praca hybrydowa',
+  OFFICE = 'Na miejscu',
+  MOVE = 'Przeprowadzka',
+  REMOTE = 'Praca zdalna',
+  HYBRID = 'Praca hybrydowa',
   DM = 'Nie ma znaczenia',
 }
 
 export enum ExpectedContractType {
   B2B = 'Możliwe B2B',
-  employ = 'Tylko umowa o pracę',
-  contract = 'Umowa zlecenie / dzieło',
-  none = 'Brak preferencji',
+  EMPLOY = 'Tylko umowa o pracę',
+  CONTRACT = 'Umowa zlecenie / dzieło',
+  NONE = 'Brak preferencji',
 }
 
 export enum StudentStatus {
