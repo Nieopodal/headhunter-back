@@ -26,48 +26,41 @@ export class HrService {
 
   async createHr(formData): Promise<ApiResponse<CreateResponse>> {
     if (await this.getHrByEmail(formData.email))
-      throw new HttpException(
-        {
-          isSuccess: false,
-          error: `Użytkownik o emailu ${formData.email} już istnieje`,
-        },
-        HttpStatus.BAD_REQUEST,
+      throw new HttpException(`Użytkownik o emailu ${formData.email} już istnieje`, HttpStatus.BAD_REQUEST);
+    try {
+      const hr = new Hr();
+      hr.email = formData.email;
+      hr.fullName = formData.fullName;
+      hr.company = formData.company;
+      hr.maxReservedStudents = formData.maxReservedStudents;
+      await hr.save();
+      hr.verificationToken = await this.authService.hashData(
+        await this.authService.generateEmailToken(hr.id, hr.email),
       );
-    const hr = new Hr();
-    hr.email = formData.email;
-    hr.fullName = formData.fullName;
-    hr.company = formData.company;
-    hr.maxReservedStudents = formData.maxReservedStudents;
-    await hr.save();
-    hr.verificationToken = await this.authService.hashData(await this.authService.generateEmailToken(hr.id, hr.email));
-    await hr.save();
-    hr.activationUrl = await this.mailService.generateUrl(hr);
-    await hr.save();
-
-    this.mailService
-      .sendEmailsToUsers(this.mailService, [hr], 'Potwierdzenie rejestracji', (activationUrl) =>
-        UserRegistrationTemplate(activationUrl, UserRole.HR),
-      )
-      .catch((error) => {
-        console.error('Failed to send email to HR:', error.message);
-      });
-
-    return {
-      isSuccess: true,
-      payload: { id: hr.id },
-    };
+      await hr.save();
+      hr.activationUrl = await this.mailService.generateUrl(hr);
+      await hr.save();
+      this.mailService
+        .sendEmailsToUsers(this.mailService, [hr], 'Potwierdzenie rejestracji', (activationUrl) =>
+          UserRegistrationTemplate(activationUrl, UserRole.HR),
+        )
+        .catch((error) => {
+          console.error('Failed to send email to HR:', error.message);
+        });
+      return {
+        isSuccess: true,
+        payload: { id: hr.id },
+      };
+    } catch (e) {
+      throw new HttpException('Dodanie użytkownika nie powiodło się. Spróbuj ponownie później', HttpStatus.BAD_REQUEST);
+    }
   }
 
   async setPasswordHr(id, data): Promise<ApiResponse<UpdateResponse>> {
     const user = await this.getHrById(id);
     if (!user || !data.password)
-      throw new HttpException(
-        {
-          isSuccess: false,
-          error: 'Ups... coś poszło nie tak.',
-        },
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new HttpException('Zmiana hasła nie powiodła się. Spróbuj ponownie później', HttpStatus.BAD_REQUEST);
+
     user.password = await this.authService.hashData(data.password);
     await user.save();
     return {

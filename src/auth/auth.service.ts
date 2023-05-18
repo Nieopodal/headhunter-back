@@ -1,3 +1,4 @@
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ForbiddenException, HttpException, HttpStatus, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
@@ -24,6 +25,8 @@ import { PasswordChangedTemplate } from '../templates/email/password-change';
 import { Admin } from '../admin/entity/admin.entity';
 import { Student } from '../student/entity/student.entity';
 import { Hr } from '../hr/entity/hr.entity';
+import { InvalidCredentialsException } from '../common/exceptions/invalid-credentials.exception';
+import { MyUnauthorizedException } from '../common/exceptions/invalid-token.exception';
 
 @Injectable()
 export class AuthService {
@@ -86,10 +89,6 @@ export class AuthService {
     return { access_token: at, refresh_token: rt };
   }
 
-  async getDecodedToken(rt: string) {
-    return this.jwtService.decode(rt);
-  }
-
   async checkUserByEmail(email: string): Promise<CheckUserResponse> {
     const admin = await this.adminService.getAdminByEmail(email);
 
@@ -116,7 +115,6 @@ export class AuthService {
       email: user.email,
       role: user.role,
     };
-
     if (user instanceof Admin) {
       return {
         ...obj,
@@ -141,47 +139,38 @@ export class AuthService {
 
   async login(login: LoginUserDto, response: Response): Promise<ApiResponse<UserDataResponse>> {
     const user = await this.checkUserByEmail(login.email);
-    if (!user) return { isSuccess: false, error: 'Nie znaleziono użytkownika' };
+    if (!user) throw new InvalidCredentialsException();
+
     const passwordMatches = await this.compareHashedData(login.password, user.password);
-    if (!passwordMatches) return { isSuccess: false, error: 'Niepoprawne hasło' };
+    if (!passwordMatches) throw new InvalidCredentialsException();
+
     const tokens = await this.getTokens(user.id, user.email);
     await this.updateRtHash(user.id, tokens.refresh_token);
     response.cookie('jwt-refresh', tokens.refresh_token, { httpOnly: true });
-    try {
-      return {
-        isSuccess: true,
-        payload: { ...(await this.getUserData(user)), access_token: tokens.access_token },
-      };
-    } catch (e) {
-      return { isSuccess: false, error: 'Ups... coś poszło nie tak.' };
-    }
-  }
-
-  async logout(id: string): Promise<ApiResponse<any>> {
-    const user = await this.checkUserById(id);
-    if (!user) {
-      throw new NotFoundException('User not found');
-    } else if (user.refreshToken !== null) {
-      await this.cacheManager.del('filter');
-      user.refreshToken = null;
-      await user.save();
-    }
     return {
       isSuccess: true,
-      payload: null,
+      payload: { ...(await this.getUserData(user)), access_token: tokens.access_token },
     };
+  }
+
+  async logout(id: string, res: Response): Promise<ApiResponse<any>> {
+    const user = await this.checkUserById(id);
+    if (!user) throw new HttpException('Nie ma takiego użytkownika w systemie', HttpStatus.NOT_FOUND);
+    if (user.refreshToken !== null) {
+      user.refreshToken = null;
+      await user.save();
+      await this.cacheManager.del('filter');
+      res.clearCookie('jwt-refresh');
+      return {
+        isSuccess: true,
+        payload: null,
+      };
+    }
   }
 
   async confirmFromEmail(param): Promise<ApiResponse<ConfirmResponse>> {
     const user = await this.checkUserById(param.id);
-    if (!user || param.token !== user.verificationToken)
-      throw new HttpException(
-        {
-          isSuccess: false,
-          error: 'Ups... coś poszło nie tak.',
-        },
-        HttpStatus.BAD_REQUEST,
-      );
+    if (!user || param.token !== user.verificationToken) throw new MyUnauthorizedException();
     return {
       isSuccess: true,
       payload: { email: user.email, emailToken: await this.generateEmailToken(user.id, user.email) },
@@ -190,49 +179,30 @@ export class AuthService {
 
   async recoveryPassword(data): Promise<ApiResponse<RecoveryPasswordResponse>> {
     const user = await this.checkUserByEmail(data.email);
-    if (!user)
-      throw new HttpException(
-        {
-          isSuccess: false,
-          error: `Nie ma takiego adresu email w systemie`,
-        },
-        HttpStatus.BAD_REQUEST,
-      );
+    if (!user.email) throw new HttpException(`Nie ma takiego adresu email w systemie`, HttpStatus.NOT_FOUND);
     try {
       user.verificationToken = await this.hashData(await this.generateEmailToken(user.id, user.email));
       await user.save();
       user.activationUrl = await this.mailService.generateUrl(user);
       await user.save();
-
       await this.mailService.sendEmailsToUsers(this.mailService, [user], 'Zmiana hasła', (activationUrl) =>
         RecoveryPasswordTemplate(activationUrl),
       );
-    } catch (e) {
       return {
-        isSuccess: false,
-        error: 'Ups... coś poszło nie tak.',
+        isSuccess: true,
+        payload: { sentToEmail: user.email },
       };
+    } catch (e) {
+      throw new HttpException('Odzyskanie hasła nie powiodło się. Spróbuj ponownie później', HttpStatus.BAD_REQUEST);
     }
-    return {
-      isSuccess: true,
-      payload: { sentToEmail: user.email },
-    };
   }
 
   async changePassword(data, id): Promise<ApiResponse<UpdateResponse>> {
     const user = await this.checkUserById(id);
-    if (!user)
-      throw new HttpException(
-        {
-          isSuccess: false,
-          error: 'Ups... coś poszło nie tak.',
-        },
-        HttpStatus.BAD_REQUEST,
-      );
+    if (!data.password) new HttpException('Nie prawidłowe hasło', HttpStatus.BAD_REQUEST);
     try {
       user.password = await this.hashData(data.password);
       await user.save();
-
       await this.mailService.sendEmailsToUsers(this.mailService, [user], 'Hasło zostało zmienione', () =>
         PasswordChangedTemplate(),
       );
@@ -241,39 +211,33 @@ export class AuthService {
         payload: { id: user.id },
       };
     } catch (e) {
-      return {
-        isSuccess: false,
-        error: 'Ups... coś poszło nie tak.',
-      };
+      throw new HttpException('Zmiana hasła nie powiodła się. Spróbuj ponownie później', HttpStatus.BAD_REQUEST);
     }
   }
 
-  async getUserInfo(token: string): Promise<ApiResponse<UserDataResponse>> {
-    const decodedJwt = await this.getDecodedToken(token);
-    const user = await this.checkUserByEmail(decodedJwt['email']);
-
-    try {
-      return {
-        isSuccess: true,
-        payload: await this.getUserData(user),
-      };
-    } catch (e) {
-      return { isSuccess: false, error: 'Ups... coś poszło nie tak.' };
-    }
+  async getUserInfo(id: string): Promise<ApiResponse<UserDataResponse>> {
+    const user = await this.checkUserById(id);
+    if (!user) throw new HttpException('Nie ma takiego użytkownika w systemie', HttpStatus.NOT_FOUND);
+    return {
+      isSuccess: true,
+      payload: await this.getUserData(user),
+    };
   }
 
-  async refreshTokens(rt: string, response: Response): Promise<Tokens> {
-    const decodedJwt = await this.getDecodedToken(rt);
-    const user = await this.checkUserById(decodedJwt['id']);
+  async refreshTokens(id: string, rt: string, res: Response): Promise<Tokens> {
+    const user = await this.checkUserById(id);
 
-    if (!user || !user.refreshToken) throw new ForbiddenException('Access Denied');
+    if (!user || !user.refreshToken) throw new Error();
 
     const rtMatches = await this.compareHashedData(rt, user.refreshToken);
-    if (!rtMatches) throw new ForbiddenException('Access Denied');
-
-    const tokens = await this.getTokens(user.id, user.email);
-    await this.updateRtHash(user.id, tokens.refresh_token);
-    response.cookie('jwt-refresh', tokens.refresh_token, { httpOnly: true });
-    return { access_token: tokens.access_token };
+    if (!rtMatches) throw new InvalidCredentialsException();
+    try {
+      const tokens = await this.getTokens(user.id, user.email);
+      await this.updateRtHash(user.id, tokens.refresh_token);
+      res.cookie('jwt-refresh', tokens.refresh_token, { httpOnly: true });
+      return { access_token: tokens.access_token };
+    } catch (e) {
+      throw new InvalidCredentialsException();
+    }
   }
 }

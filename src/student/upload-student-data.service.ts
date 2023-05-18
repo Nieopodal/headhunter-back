@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { parse } from 'csv-parse';
 import { Readable } from 'stream';
 import { Student } from './entity/student.entity';
@@ -69,7 +69,7 @@ export class UploadStudentDataService {
 
       return { isSuccess: true, payload: { numberAddedStudents: records.length } };
     } catch (e) {
-      return { isSuccess: false, error: 'Ups... coś poszło nie tak.' };
+      throw new HttpException('Dodanie pliku nie powiodło się. Spróbuj ponownie później', HttpStatus.BAD_REQUEST);
     }
   }
 }
