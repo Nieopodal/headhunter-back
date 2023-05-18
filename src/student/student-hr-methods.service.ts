@@ -1,12 +1,24 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 import { Student } from './entity/student.entity';
-import { ApiResponse, StudentStatus, StudentsToInterviewPaginated } from '@Types';
 import { HrService } from '../hr/hr.service';
-import { interviewFilter } from './utils/filter-methods';
+import { FilterStudentDto } from './dto/filter-student.dto';
+import { availableFilter, interviewFilter } from './utils/filter-methods';
+import {
+  ApiResponse,
+  AvailableStudentsPaginated,
+  StudentFilter,
+  StudentStatus,
+  StudentsToInterviewPaginated,
+} from '@Types';
 
 @Injectable()
 export class StudentHrMethodsService {
-  constructor(private readonly hrService: HrService) {}
+  constructor(
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    private readonly hrService: HrService) {
+  }
 
   async setToInterview(id: string, hrId: string): Promise<ApiResponse<null>> {
     const hr = await this.hrService.getHrById(hrId);
@@ -147,27 +159,38 @@ export class StudentHrMethodsService {
     };
   }
 
-  async showStudentsToInterview(
-    id: string,
-    pageNumber: number,
-    numberPerPage: number,
-  ): Promise<ApiResponse<StudentsToInterviewPaginated>> {
-    const [studentsToInterview, count] = await Student.findAndCount({
-      relations: ['hr'],
-      where: {
-        status: StudentStatus.INTERVIEW,
-        active: true,
-        hr: {
-          id,
-        },
-      },
-      skip: numberPerPage * (pageNumber - 1),
-      take: numberPerPage,
-    });
+  async showInterviewStudents(name: string, pageNumber: number, numberPerPage: number, hrId: string): Promise<ApiResponse<StudentsToInterviewPaginated>> {
+    try {
+      const filterSchema: FilterStudentDto = await this.cacheManager.get('filter');
+      const [studentData, count] = await Student.createQueryBuilder('student')
+        .setParameter('check', filterSchema ? true : null)
+        .where('student.hr = :hrId', { hrId: hrId })
+        .andWhere('student.active = :active', { active: true })
+        .andWhere('student.status = :status', { status: StudentStatus.INTERVIEW })
+        .andWhere('(student.firstName LIKE :name OR student.lastName LIKE :name)', { name: `%${name}%` })
+        .andWhere('(:check IS NULL OR student.monthsOfCommercialExp >= :monthsOfCommercialExp)', { monthsOfCommercialExp: filterSchema ? filterSchema.monthsOfCommercialExp : false })
+        .andWhere('(:check IS NULL OR student.canTakeApprenticeship = :canTakeApprenticeship)', { canTakeApprenticeship: filterSchema ? filterSchema.canTakeApprenticeship : false })
+        .andWhere('(:check IS NULL OR student.expectedSalary BETWEEN :minSalary AND :maxSalary)', {
+          minSalary: filterSchema ? filterSchema.minSalary : false,
+          maxSalary: filterSchema ? filterSchema.maxSalary : false,
+        })
+        .andWhere('(:check IS NULL OR student.teamProjectDegree >= :teamProjectDegree)', { teamProjectDegree: filterSchema ? filterSchema.teamProjectDegree : false })
+        .andWhere('(:check IS NULL OR student.projectDegree >= :projectDegree)', { projectDegree: filterSchema ? filterSchema.projectDegree : null })
+        .andWhere('(:check IS NULL OR student.courseEngagement >= :courseEngagement)', { courseEngagement: filterSchema ? filterSchema.courseEngagement : null })
+        .andWhere('(:check IS NULL OR student.courseCompletion >= :courseCompletion)', { courseCompletion: filterSchema ? filterSchema.courseCompletion : null })
+        .andWhere('(:check IS NULL OR student.expectedContractType IN (:expectedContractType))', { expectedContractType: filterSchema ? filterSchema.expectedContractType : false })
+        .andWhere('(:check IS NULL OR student.expectedTypeWork IN (:expectedTypeWork))', { expectedTypeWork: filterSchema ? filterSchema.expectedTypeWork : false })
+        .skip(numberPerPage * (pageNumber - 1))
+        .take(numberPerPage)
+        .getManyAndCount();
 
-    const totalPages = Math.ceil(count / numberPerPage);
+      const totalPages = Math.ceil(count / numberPerPage);
 
-    if (!studentsToInterview) {
+      return {
+        isSuccess: true,
+        payload: { studentData: studentData.map(student => interviewFilter(student)), totalPages },
+      };
+    } catch {
       throw new HttpException(
         {
           isSuccess: false,
@@ -176,13 +199,85 @@ export class StudentHrMethodsService {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
+  }
 
-    return {
-      isSuccess: true,
-      payload: {
-        studentData: studentsToInterview.map((student) => interviewFilter(student)),
-        totalPages,
-      },
-    };
+  async showAvailableStudents(name: string, pageNumber: number, numberPerPage: number): Promise<ApiResponse<AvailableStudentsPaginated>> {
+    try {
+      const filterSchema: FilterStudentDto = await this.cacheManager.get('filter');
+      const [studentData, count] = await Student.createQueryBuilder('student')
+        .setParameter('check', filterSchema ? true : null)
+        .where('student.hr IS NULL')
+        .andWhere('student.active = :active', { active: true })
+        .andWhere('student.status = :status', { status: StudentStatus.AVAILABLE })
+        .andWhere('(student.firstName LIKE :name OR student.lastName LIKE :name)', { name: `%${name}%` })
+        .andWhere('(:check IS NULL OR student.monthsOfCommercialExp >= :monthsOfCommercialExp)', { monthsOfCommercialExp: filterSchema ? filterSchema.monthsOfCommercialExp : false })
+        .andWhere('(:check IS NULL OR student.canTakeApprenticeship = :canTakeApprenticeship)', { canTakeApprenticeship: filterSchema ? filterSchema.canTakeApprenticeship : false })
+        .andWhere('(:check IS NULL OR student.expectedSalary BETWEEN :minSalary AND :maxSalary)', {
+          minSalary: filterSchema ? filterSchema.minSalary : false,
+          maxSalary: filterSchema ? filterSchema.maxSalary : false,
+        })
+        .andWhere('(:check IS NULL OR student.teamProjectDegree >= :teamProjectDegree)', { teamProjectDegree: filterSchema ? filterSchema.teamProjectDegree : false })
+        .andWhere('(:check IS NULL OR student.projectDegree >= :projectDegree)', { projectDegree: filterSchema ? filterSchema.projectDegree : null })
+        .andWhere('(:check IS NULL OR student.courseEngagement >= :courseEngagement)', { courseEngagement: filterSchema ? filterSchema.courseEngagement : null })
+        .andWhere('(:check IS NULL OR student.courseCompletion >= :courseCompletion)', { courseCompletion: filterSchema ? filterSchema.courseCompletion : null })
+        .andWhere('(:check IS NULL OR student.expectedContractType IN (:expectedContractType))', { expectedContractType: filterSchema ? filterSchema.expectedContractType : false })
+        .andWhere('(:check IS NULL OR student.expectedTypeWork IN (:expectedTypeWork))', { expectedTypeWork: filterSchema ? filterSchema.expectedTypeWork : false })
+        .skip(numberPerPage * (pageNumber - 1))
+        .take(numberPerPage)
+        .getManyAndCount();
+
+      const totalPages = Math.ceil(count / numberPerPage);
+
+      return {
+        isSuccess: true,
+        payload: { studentData: studentData.map(student => availableFilter(student)), totalPages },
+      };
+    } catch {
+      throw new HttpException(
+        {
+          isSuccess: false,
+          error: `Coś poszło nie tak!`,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async setFilter(data: FilterStudentDto): Promise<ApiResponse<StudentFilter>> {
+    try {
+      await this.cacheManager.set('filter', data, 0);
+      return {
+        isSuccess: true,
+        payload: {
+          usedFilter: data,
+        },
+      };
+    } catch {
+      throw new HttpException(
+        {
+          isSuccess: false,
+          error: `Coś poszło nie tak!`,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async removeFilter(): Promise<ApiResponse<null>> {
+    try {
+      await this.cacheManager.del('filter');
+      return {
+        isSuccess: true,
+        payload: null,
+      };
+    } catch {
+      throw new HttpException(
+        {
+          isSuccess: false,
+          error: `Coś poszło nie tak!`,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 }

@@ -1,3 +1,5 @@
+import { FilterStudentDto } from '../../student/dto/filter-student.dto';
+
 export type Student = {
   id: string;
   email: string;
@@ -63,6 +65,7 @@ export type AvailableStudent = SimpleStudentData & {
 
 export type StudentToInterview = AvailableStudent & {
   reservationTime: Date;
+  githubUsername: string;
 };
 
 export type UpdateStudentResponse = {
@@ -78,6 +81,10 @@ export type AvailableStudentsPaginated = {
   studentData: AvailableStudent[],
   totalPages: number
 };
+
+export type StudentFilter = {
+  usedFilter: FilterStudentDto;
+}
 
 export type StudentCv = StudentPartialData & SimpleStudentData;
 

@@ -1,10 +1,10 @@
 import { Controller, Get, HttpCode, HttpStatus, Param, Patch, UseGuards } from '@nestjs/common';
 import { GetUserData, GetUserId, Public, Role } from '../common/decorators';
-
 import {
   ApiResponse,
   AvailableStudentsPaginated,
   StudentCv,
+  StudentFilter,
   StudentsToInterviewPaginated,
   UpdateResponse,
   UserRole,
@@ -22,42 +22,40 @@ export class HrController {
     private readonly studentHrService: StudentHrMethodsService,
     private readonly studentService: StudentService,
     private readonly hrService: HrService,
-  ) {}
-
-  @UseGuards(UserRoleGuard)
-  @Role(UserRole.HR)
-  @HttpCode(HttpStatus.OK)
-  @Get('/search-available/:name?/:pageNumber?/:numberPerPage?')
-  async availableStudentsSearch(
-    @Param('name') name: string = '',
-    @Param('pageNumber') pageNumber = 1,
-    @Param('numberPerPage') numberPerPage = 10,
-  ): Promise<ApiResponse<AvailableStudentsPaginated>> {
-    return this.studentService.availableStudentsSearch(name, pageNumber, numberPerPage);
+  ) {
   }
 
   @UseGuards(UserRoleGuard)
   @Role(UserRole.HR)
   @HttpCode(HttpStatus.OK)
-  @Get('/search-interview/:name?/:pageNumber?/:numberPerPage?')
-  async interviewStudentsSearch(
+  @Get('/remove-filter')
+  async removeFilter(): Promise<ApiResponse<null>> {
+    return this.studentHrService.removeFilter();
+  }
+
+  @UseGuards(UserRoleGuard)
+  @Role(UserRole.HR)
+  @HttpCode(HttpStatus.OK)
+  @Get('/show-available/:pageNumber?/:numberPerPage?/:name?')
+  async showAvailableStudents(
+    @Param('name') name: string = '',
+    @Param('pageNumber') pageNumber = 1,
+    @Param('numberPerPage') numberPerPage = 10,
+  ): Promise<ApiResponse<AvailableStudentsPaginated>> {
+    return this.studentHrService.showAvailableStudents(name, pageNumber, numberPerPage);
+  }
+
+  @UseGuards(UserRoleGuard)
+  @Role(UserRole.HR)
+  @HttpCode(HttpStatus.OK)
+  @Get('/show-interview/:pageNumber?/:numberPerPage?/:name?')
+  async showInterviewStudents(
     @GetUserId() hrId: string,
     @Param('name') name: string = '',
     @Param('pageNumber') pageNumber = 1,
     @Param('numberPerPage') numberPerPage = 10,
   ): Promise<ApiResponse<StudentsToInterviewPaginated>> {
-    return this.studentService.interviewStudentsSearch(name, pageNumber, numberPerPage, hrId);
-  }
-
-  @UseGuards(UserRoleGuard)
-  @Role(UserRole.HR)
-  @HttpCode(HttpStatus.OK)
-  @Get('/available/:pageNumber?/:numberPerPage?')
-  async showAvailableStudents(
-    @Param('pageNumber') pageNumber = 1,
-    @Param('numberPerPage') numberPerPage = 10,
-  ): Promise<ApiResponse<AvailableStudentsPaginated>> {
-    return this.studentService.getFreeStudents(pageNumber, numberPerPage);
+    return this.studentHrService.showInterviewStudents(name, pageNumber, numberPerPage, hrId);
   }
 
   @UseGuards(UserRoleGuard)
@@ -70,25 +68,11 @@ export class HrController {
 
   @UseGuards(UserRoleGuard)
   @Role(UserRole.HR)
-  @HttpCode(HttpStatus.OK)
-  @Get('/interview/:pageNumber?/:numberPerPage?')
-  async showStudentsToInterview(
-    @GetUserId() hrId: string,
-    @Param('pageNumber') pageNumber = 1,
-    @Param('numberPerPage') numberPerPage = 10,
-  ): Promise<ApiResponse<StudentsToInterviewPaginated>> {
-    return this.studentHrService.showStudentsToInterview(hrId, pageNumber, numberPerPage);
-  }
-
-  @UseGuards(UserRoleGuard)
-  @Role(UserRole.HR)
-  @Post('/set-filter/:pageNumber?/:numberPerPage?')
+  @Post('/set-filter')
   async setFilter(
     @Body() data: FilterStudentDto,
-    @Param('pageNumber') pageNumber = 1,
-    @Param('numberPerPage') numberPerPage = 10,
-  ): Promise<ApiResponse<AvailableStudentsPaginated>> {
-    return this.studentService.setFilter(data, pageNumber, numberPerPage);
+  ): Promise<ApiResponse<StudentFilter>> {
+    return this.studentHrService.setFilter(data);
   }
 
   @UseGuards(UserRoleGuard)
@@ -118,7 +102,7 @@ export class HrController {
   @Public()
   @UseGuards(MtGuard)
   @HttpCode(HttpStatus.OK)
-  @Patch('update')
+  @Patch('/update')
   setPasswordHr(@GetUserId() id: string, @GetUserData() data: UpdateHrDto): Promise<ApiResponse<UpdateResponse>> {
     return this.hrService.setPasswordHr(id, data);
   }
