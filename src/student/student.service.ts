@@ -1,13 +1,16 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { ApiResponse, SimpleStudentData, StudentCv, StudentStatus, AvailableStudentsPaginated } from '@Types';
 import { UpdateResponse } from 'src/types/auth/response.type';
-
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 import { Student } from './entity/student.entity';
-import { AuthService } from '../auth/auth.service';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class StudentService {
-  constructor(@Inject(forwardRef(() => AuthService)) private authService: AuthService) {}
+  constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache,@Inject(forwardRef(() => AuthService)) private authService: AuthService) {
+  }
   async getAvatar(id: string): Promise<ApiResponse<string>> {
     const studentAvatar = await Student.findOneBy({ id });
     if (!studentAvatar) {
