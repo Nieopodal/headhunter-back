@@ -6,7 +6,7 @@ import { AdminService } from '../admin/admin.service';
 import { StudentService } from '../student/student.service';
 import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
-import * as bcrypt from 'bcrypt';
+import * as bcryptjs from 'bcryptjs';
 import { ConfigService } from '@nestjs/config';
 import {
   ApiResponse,
@@ -26,6 +26,7 @@ import { Student } from '../student/entity/student.entity';
 import { Hr } from '../hr/entity/hr.entity';
 import { InvalidCredentialsException } from '../common/exceptions/invalid-credentials.exception';
 import { MyUnauthorizedException } from '../common/exceptions/invalid-token.exception';
+import {configCookie, configToken} from "../config/config";
 
 @Injectable()
 export class AuthService {
@@ -40,7 +41,7 @@ export class AuthService {
   ) {}
 
   async hashData(data: string): Promise<string> {
-    const hashedData = await bcrypt.hash(data, 10);
+    const hashedData = await bcryptjs.hash(data, 10);
     if (!hashedData.includes('/')) {
       return hashedData;
     } else {
@@ -49,7 +50,7 @@ export class AuthService {
   }
 
   async compareHashedData(plainText: string, hashedText: string): Promise<boolean> {
-    return await bcrypt.compare(plainText, hashedText);
+    return await bcryptjs.compare(plainText, hashedText);
   }
 
   async updateRtHash(id, rt: string): Promise<void> {
@@ -62,8 +63,8 @@ export class AuthService {
     return await this.jwtService.signAsync(
       { id, email },
       {
-        secret: this.configService.get('SECRET_KEY_MT'),
-        expiresIn: this.configService.get('EXPIRES_IN_MT'),
+        secret: configToken.secretKeyMt,
+        expiresIn: configToken.expiresInMt,
       },
     );
   }
@@ -73,15 +74,15 @@ export class AuthService {
       this.jwtService.signAsync(
         { id, email },
         {
-          secret: this.configService.get('SECRET_KEY_AT'),
-          expiresIn: this.configService.get('EXPIRES_IN_AT'),
+          secret: configToken.secretKeyAt,
+          expiresIn: configToken.expiresInAt,
         },
       ),
       this.jwtService.signAsync(
         { id, email },
         {
-          secret: this.configService.get('SECRET_KEY_RT'),
-          expiresIn: this.configService.get('EXPIRES_IN_RT'),
+          secret: configToken.secretKeyRt,
+          expiresIn: configToken.expiresInRt,
         },
       ),
     ]);
@@ -145,7 +146,11 @@ export class AuthService {
 
     const tokens = await this.getTokens(user.id, user.email);
     await this.updateRtHash(user.id, tokens.refresh_token);
-    response.cookie('jwt-refresh', tokens.refresh_token, { httpOnly: true });
+    response.cookie('jwt-refresh', tokens.refresh_token, {
+      httpOnly: configCookie.httpOnly,
+      domain: configCookie.domain,
+      secure: configCookie.secure,
+    });
     return {
       isSuccess: true,
       payload: { ...(await this.getUserData(user)), access_token: tokens.access_token },
@@ -159,7 +164,11 @@ export class AuthService {
       user.refreshToken = null;
       await user.save();
       await this.cacheManager.del('filter');
-      res.clearCookie('jwt-refresh');
+      res.clearCookie('jwt-refresh', {
+        httpOnly: configCookie.httpOnly,
+        domain: configCookie.domain,
+        secure: configCookie.secure,
+      });
       return {
         isSuccess: true,
         payload: null,
@@ -234,7 +243,11 @@ export class AuthService {
     try {
       const tokens = await this.getTokens(user.id, user.email);
       await this.updateRtHash(user.id, tokens.refresh_token);
-      res.cookie('jwt-refresh', tokens.refresh_token, { httpOnly: true });
+      res.cookie('jwt-refresh', tokens.refresh_token, {
+        httpOnly: configCookie.httpOnly,
+        domain: configCookie.domain,
+        secure: configCookie.secure,
+      });
       return { access_token: tokens.access_token };
     } catch (e) {
       throw new InvalidCredentialsException();
