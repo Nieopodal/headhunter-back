@@ -127,6 +127,7 @@ export class StudentService {
           ...registerData,
           password: await this.authService.hashData(registerData.password),
           active: true,
+          status: StudentStatus.AVAILABLE,
           verificationToken: null,
           activationUrl: null,
         },

@@ -2,21 +2,26 @@ import { Body, Controller, Get, HttpCode, HttpStatus, Param, Patch, Post, Res, U
 import { Response } from 'express';
 import { ChangePasswordDto, LoginUserDto } from './dto';
 import { AuthService } from './auth.service';
-import { ApiResponse, ConfirmResponse, RecoveryPasswordResponse, Tokens, UpdateResponse } from '@Types';
-import { GetUserData, GetUserId, Public } from '../common/decorators';
-import { UserDataResponse } from '@Types';
-import { RtGuard } from '../common/guards';
-import { GetToken } from '../common/decorators';
+import {
+  ApiResponse,
+  ConfirmResponse,
+  RecoveryPasswordResponse,
+  Tokens,
+  UpdateResponse,
+  UserDataResponse,
+} from '@Types';
+import { GetToken, GetUserData, GetUserId, Public } from '../common/decorators';
+import { MtGuard, RtGuard } from '../common/guards';
 import { RecoveryPasswordDto } from './dto/recovery-password.dto';
 import { ConfirmDto } from './dto/confirm.dto';
-import { MtGuard } from '../common/guards';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService) {
+  }
 
   @Public()
-  @Post('login')
+  @Post('/login')
   @HttpCode(HttpStatus.OK)
   async login(
     @Body() loginData: LoginUserDto,
@@ -25,7 +30,7 @@ export class AuthController {
     return await this.authService.login(loginData, response);
   }
 
-  @Post('logout')
+  @Post('/logout')
   @HttpCode(HttpStatus.OK)
   logout(@GetUserId() id: string, @Res({ passthrough: true }) res: Response): Promise<any> {
     return this.authService.logout(id, res);
@@ -39,7 +44,7 @@ export class AuthController {
   }
 
   @Public()
-  @Post('password/recovery')
+  @Post('/password/recovery')
   @HttpCode(HttpStatus.OK)
   recoveryPassword(@Body() data: RecoveryPasswordDto): Promise<ApiResponse<RecoveryPasswordResponse>> {
     return this.authService.recoveryPassword(data);
@@ -47,7 +52,7 @@ export class AuthController {
 
   @Public()
   @UseGuards(MtGuard)
-  @Patch('password/reset')
+  @Patch('/password/reset')
   @HttpCode(HttpStatus.OK)
   changePassword(
     @GetUserId() id: string,
@@ -58,7 +63,7 @@ export class AuthController {
 
   @Public()
   @UseGuards(RtGuard)
-  @Get('user')
+  @Get('/user')
   @HttpCode(HttpStatus.FOUND)
   getUserInfo(@GetUserId() id: string): Promise<ApiResponse<UserDataResponse>> {
     return this.authService.getUserInfo(id);
@@ -66,7 +71,7 @@ export class AuthController {
 
   @Public()
   @UseGuards(RtGuard)
-  @Post('refresh')
+  @Post('/refresh')
   @HttpCode(HttpStatus.OK)
   refreshTokens(
     @GetToken() rt: string,
