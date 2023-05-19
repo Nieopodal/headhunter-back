@@ -12,19 +12,9 @@ MegaK HeadHunter is a project made by participants of a Polish webdev course cal
 
 MegaK HeadHunter is an IT employment-focused platform, which allows the students, who have completed the abovementioned course, to apply for their first jobs. It allows head hunters from various companies to browse each sudent's CV's and appoint interviews.
 
-# Check out the live demo
+# Check out our demo 
 
-**https://mwyso.usermd.net**
-
-Test student account credentials:
-
-**login**: student@hh.com
-**password**: Test123!@#
-
-Test headhunter account credentials:
-
-**login**: hr@hh.com
-**password**: Test123!@#
+**https://youtu.be/CeIFVlNlzPw**
 
 # Features 🔧
 
@@ -90,6 +80,10 @@ Check it out at [https://github.com/Nieopodal/headhunter-front](https://github.c
 │   ├── headhunter-back
 │   ├── headhunter-front
 ```
+
+# For future:
+
+* Finish hosting our app (**in progress**)
 
 # About the authors
 This version of MegaK HeadHunter app was made by participants of the group #2 from the 2nd edition of [MegaKurs](https://megak.pl) webdev course:
