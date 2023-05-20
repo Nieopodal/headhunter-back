@@ -178,7 +178,12 @@ export class AuthService {
 
   async recoveryPassword(data): Promise<ApiResponse<RecoveryPasswordResponse>> {
     const user = await this.checkUserByEmail(data.email);
-    if (!user) throw new HttpException(`Nie ma takiego adresu email w systemie`, HttpStatus.NOT_FOUND);
+    if (!user) {
+      return {
+        isSuccess: true,
+        payload: { sentToEmail: data.email },
+      };
+    }
     try {
       user.verificationToken = await this.hashData(await this.generateEmailToken(user.id, user.email));
       await user.save();
