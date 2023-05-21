@@ -2,14 +2,13 @@ import { Controller, Get, HttpCode, HttpStatus, Patch, UseGuards } from '@nestjs
 import { GetUserData, GetUserId, Public, Role } from '../common/decorators';
 import { StudentService } from './student.service';
 import { RegisterStudentDto, UpdateStudentDto } from './dto';
-import { UserRoleGuard } from 'src/common/guards/user-role.guard';
-import { MtGuard } from '../common/guards';
-import { ApiResponse, SimpleStudentData, StudentCv, UpdateResponse, UpdateStudentResponse, UserRole } from '@Types';
+
+import { MtGuard, UserRoleGuard } from '../common/guards';
+import { ApiResponse, SimpleStudentData, StudentCv, UpdateResponse, UpdateStudentResponse, UserRole } from '../types';
 
 @Controller('student')
 export class StudentController {
-  constructor(private studentService: StudentService) {
-  }
+  constructor(private studentService: StudentService) {}
 
   @UseGuards(UserRoleGuard)
   @Role(UserRole.STUDENT)

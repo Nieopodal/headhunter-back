@@ -7,7 +7,7 @@ import { StudentService } from './student.service';
 import { AuthService } from '../auth/auth.service';
 import { UploadStudentsDto } from './dto';
 import { MailService } from '../mail/mail.service';
-import { ApiResponse, UserRole } from '@Types';
+import { ApiResponse, UserRole } from '../types';
 
 @Injectable()
 export class UploadStudentDataService {

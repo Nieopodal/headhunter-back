@@ -14,7 +14,7 @@ import {
   StudentsToInterviewPaginated,
   UpdateResponse,
   UserRole,
-} from '@Types';
+} from '../types';
 
 @Controller('hr')
 export class HrController {

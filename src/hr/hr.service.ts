@@ -3,7 +3,7 @@ import { UserRegistrationTemplate } from '../templates/email/user-registration';
 import { Hr } from './entity/hr.entity';
 import { AuthService } from '../auth/auth.service';
 import { MailService } from '../mail/mail.service';
-import { ApiResponse, CreateResponse, UpdateResponse, UserRole } from '@Types';
+import { ApiResponse, CreateResponse, UpdateResponse, UserRole } from '../types';
 
 @Injectable()
 export class HrService {

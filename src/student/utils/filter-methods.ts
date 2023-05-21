@@ -1,5 +1,5 @@
 import { Student } from '../entity/student.entity';
-import { AvailableStudent, StudentToInterview } from '@Types';
+import { AvailableStudent, StudentToInterview } from '../../types';
 
 export const availableFilter = (data: Student): AvailableStudent => {
   const {

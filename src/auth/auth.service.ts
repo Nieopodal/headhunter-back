@@ -16,7 +16,7 @@ import {
   Tokens,
   UpdateResponse,
   UserDataResponse,
-} from '@Types';
+} from '../types';
 import { HrService } from '../hr/hr.service';
 import { MailService } from '../mail/mail.service';
 import { RecoveryPasswordTemplate } from '../templates/email/recovery-password';

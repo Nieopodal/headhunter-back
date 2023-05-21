@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { Student } from '../student/entity/student.entity';
-import { StudentStatus } from '@Types';
+import { StudentStatus } from '../types';
 
 @Injectable()
 export class CronService {

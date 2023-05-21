@@ -2,7 +2,7 @@ import { Body, Controller, HttpCode, HttpStatus, Post, UploadedFile, UseIntercep
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Express } from 'express';
 import { UploadStudentDataService } from '../student/upload-student-data.service';
-import { ApiResponse, CreateResponse } from '@Types';
+import { ApiResponse, CreateResponse } from '../types';
 import { HrDto } from '../hr/dto';
 import { HrService } from '../hr/hr.service';
 

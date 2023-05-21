@@ -9,7 +9,7 @@ import {
   Tokens,
   UpdateResponse,
   UserDataResponse,
-} from '@Types';
+} from '../types';
 import { GetToken, GetUserData, GetUserId, Public } from '../common/decorators';
 import { MtGuard, RtGuard } from '../common/guards';
 import { RecoveryPasswordDto } from './dto/recovery-password.dto';
@@ -17,8 +17,7 @@ import { ConfirmDto } from './dto/confirm.dto';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {
-  }
+  constructor(private authService: AuthService) {}
 
   @Public()
   @Post('/login')

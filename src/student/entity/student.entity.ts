@@ -8,7 +8,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Hr } from '../../hr/entity/hr.entity';
-import { ExpectedContractType, ExpectedTypeWork, StudentStatus, UserRole } from '@Types';
+import { ExpectedContractType, ExpectedTypeWork, StudentStatus, UserRole } from '../../types';
 
 @Entity()
 export class Student extends BaseEntity {

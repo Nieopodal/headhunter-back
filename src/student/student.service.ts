@@ -1,14 +1,12 @@
 import { forwardRef, HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { UpdateResponse } from 'src/types/auth/response.type';
+
 import { Student } from './entity/student.entity';
-import { AuthService } from 'src/auth/auth.service';
-import { ApiResponse, SimpleStudentData, StudentCv, StudentStatus } from '@Types';
+import { ApiResponse, SimpleStudentData, StudentCv, StudentStatus, UpdateResponse } from '../types';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable()
 export class StudentService {
-  constructor(
-    @Inject(forwardRef(() => AuthService)) private authService: AuthService,
-  ) {}
+  constructor(@Inject(forwardRef(() => AuthService)) private authService: AuthService) {}
 
   async getAvatar(id: string): Promise<ApiResponse<string>> {
     const studentAvatar = await Student.findOneBy({ id });

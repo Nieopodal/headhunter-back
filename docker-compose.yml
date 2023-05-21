@@ -1,0 +1,49 @@
+version: '3.9'
+services:
+  frontend:
+    container_name: headhunter-front
+    build:
+      context: ../headhunter-front
+      dockerfile: Dockerfile
+    image: react
+    ports:
+      - "80:80"
+    volumes:
+      - .:/app
+
+  backend:
+      container_name: headhunter-back
+      build: .
+      image: server
+      ports:
+        - '3000:3000'
+      volumes:
+        - .:/app/build
+      env_file:
+        - .env
+      depends_on: [db]
+
+  db:
+    image: mariadb:latest
+    container_name: mariadb
+    command: --default-authentication-plugin=mysql_native_password
+    restart: unless-stopped
+    ports:
+      - '3306:3306'
+    env_file:
+      - .env
+
+#  nginx:
+#    container_name: nginx
+#    restart: always
+#    build:
+#      context: ../headhunter-front/nginx
+#      dockerfile: Dockerfile
+#    ports:
+#      - '80:80'
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - '8080:8080'

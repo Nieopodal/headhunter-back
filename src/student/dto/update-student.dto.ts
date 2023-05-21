@@ -13,7 +13,7 @@ import {
   MaxLength,
   Min,
 } from 'class-validator';
-import { ExpectedContractType, ExpectedTypeWork } from '@Types';
+import { ExpectedContractType, ExpectedTypeWork } from '../../types';
 
 export class UpdateStudentDto {
   @IsNotEmpty()
