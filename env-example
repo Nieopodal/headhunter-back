@@ -8,6 +8,10 @@ DB_USERNAME=root
 DB_PASSWORD=root123
 DB_NAME=hunterNest
 
+# Create database
+MARIADB_ROOT_PASSWORD=root123
+MARIADB_DATABASE=hunterNest
+
 # Migrations
 TYPEORM_ENTITIES=dist/**/*.entity.js
 

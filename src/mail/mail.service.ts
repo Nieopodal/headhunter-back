@@ -17,7 +17,7 @@ export class MailService {
   async generateUrl(data, actionType): Promise<string> {
     const { id, role, verificationToken } = data;
     const appUrl = this.configService.get('APP_URL');
-    return `${appUrl}/api/auth/${actionType}/${role}/confirm/${id}/${verificationToken}`;
+    return `${appUrl}/auth/${actionType}/${role}/confirm/${id}/${verificationToken}`;
   }
 
   async sendMail(to: string, subject: string, html: string): Promise<SendMailInfo> {

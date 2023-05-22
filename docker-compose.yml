@@ -33,15 +33,6 @@ services:
     env_file:
       - .env
 
-#  nginx:
-#    container_name: nginx
-#    restart: always
-#    build:
-#      context: ../headhunter-front/nginx
-#      dockerfile: Dockerfile
-#    ports:
-#      - '80:80'
-
   adminer:
     image: adminer
     restart: always
