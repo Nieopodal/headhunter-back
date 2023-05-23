@@ -11,11 +11,12 @@ import { UnauthorizedExceptionFilter } from './common/filters/unauthorized-excep
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const configService = app.get(ConfigService);
+  app.setGlobalPrefix('api');
   app.useGlobalPipes(new ValidationPipe());
   app.use(helmet());
   app.use(cookieParser());
   app.enableCors({
-    origin: configService.get('CORS_CLIENTS_URL'),
+    origin: 'https://mwyso.usermd.net',
     credentials: true,
   });
 
