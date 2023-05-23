@@ -20,12 +20,6 @@ MegaK HeadHunter is an IT employment-focused platform, which allows the students
 
 **https://mwyso.usermd.net/**
 
-Test <b>admin</b> account credentials:
-
-login: admnin@hh.com
-
-password: Test123
-
 Test <b>student</b> account credentials:
 
 login: student@hh.com 
