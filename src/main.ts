@@ -16,7 +16,7 @@ async function bootstrap() {
   app.use(helmet());
   app.use(cookieParser());
   app.enableCors({
-    origin: 'https://mwyso.usermd.net',
+    origin: 'https://headhunter.mwyso.usermd.net',
     credentials: true,
   });
 
