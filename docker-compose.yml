@@ -1,40 +1,55 @@
 version: '3.9'
+
 services:
+
   frontend:
     container_name: headhunter-front
     build:
       context: ../headhunter-front
       dockerfile: Dockerfile
     image: react
+    restart: unless-stopped
     ports:
       - "80:80"
     volumes:
-      - .:/app
+      - web_data:/app
+    networks:
+      - hunter_network
 
   backend:
       container_name: headhunter-back
       build: .
       image: server
+      restart: unless-stopped
       ports:
         - '3000:3000'
       volumes:
-        - .:/app/build
+        - api_data:/app/build
       env_file:
         - .env
       depends_on: [db]
+      networks:
+        - hunter_network
 
   db:
     image: mariadb:latest
     container_name: mariadb
     command: --default-authentication-plugin=mysql_native_password
-    restart: unless-stopped
-    ports:
-      - '3306:3306'
-    env_file:
-      - .env
-
-  adminer:
-    image: adminer
     restart: always
     ports:
-      - '8080:8080'
+      - '3306:3306'
+    volumes:
+      - db_data:/var/lib/mysql/data
+    env_file:
+      - .env
+    networks:
+      - hunter_network
+
+volumes:
+  web_data:
+  api_data:
+  db_data:
+
+networks:
+  hunter_network:
+    driver: bridge
