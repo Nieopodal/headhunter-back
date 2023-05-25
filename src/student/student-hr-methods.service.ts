@@ -129,7 +129,7 @@ export class StudentHrMethodsService {
 
   async showInterviewStudents(name: string, pageNumber: number, numberPerPage: number, hrId: string): Promise<ApiResponse<StudentsToInterviewPaginated>> {
     try {
-      const filterSchema: FilterStudentDto = await this.cacheManager.get('filter');
+      const filterSchema: FilterStudentDto = await this.cacheManager.get(`filter-${hrId}`);
       const [studentData, count] = await Student.createQueryBuilder('student')
         .setParameter('check', filterSchema ? true : null)
         .where('student.hr = :hrId', { hrId: hrId })
@@ -163,9 +163,9 @@ export class StudentHrMethodsService {
     }
   }
 
-  async showAvailableStudents(name: string, pageNumber: number, numberPerPage: number): Promise<ApiResponse<AvailableStudentsPaginated>> {
+  async showAvailableStudents(name: string, pageNumber: number, numberPerPage: number, hrId: string): Promise<ApiResponse<AvailableStudentsPaginated>> {
     try {
-      const filterSchema: FilterStudentDto = await this.cacheManager.get('filter');
+      const filterSchema: FilterStudentDto = await this.cacheManager.get(`filter-${hrId}`);
       const [studentData, count] = await Student.createQueryBuilder('student')
         .setParameter('check', filterSchema ? true : null)
         .where('student.hr IS NULL')
@@ -199,9 +199,9 @@ export class StudentHrMethodsService {
     }
   }
 
-  async setFilter(data: FilterStudentDto): Promise<ApiResponse<StudentFilter>> {
+  async setFilter(data: FilterStudentDto, hrId: string): Promise<ApiResponse<StudentFilter>> {
     try {
-      await this.cacheManager.set('filter', data, 0);
+      await this.cacheManager.set(`filter-${hrId}`, data, 0);
       return {
         isSuccess: true,
         payload: {
@@ -209,13 +209,14 @@ export class StudentHrMethodsService {
         },
       };
     } catch {
+      console.log('???');
       throw new HttpException(`Coś poszło nie tak!`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
-  async removeFilter(): Promise<ApiResponse<null>> {
+  async removeFilter(hrId: string): Promise<ApiResponse<null>> {
     try {
-      await this.cacheManager.del('filter');
+      await this.cacheManager.del(`filter-${hrId}`);
       return {
         isSuccess: true,
         payload: null,

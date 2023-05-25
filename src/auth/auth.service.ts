@@ -158,7 +158,7 @@ export class AuthService {
     if (user.refreshToken !== null) {
       user.refreshToken = null;
       await user.save();
-      await this.cacheManager.del('filter');
+      await this.cacheManager.del(`filter-${id}`);
       res.clearCookie('jwt-refresh');
       return {
         isSuccess: true,

@@ -26,27 +26,25 @@ export class HrController {
 
   @UseGuards(UserRoleGuard)
   @Role(UserRole.HR)
-  @HttpCode(HttpStatus.OK)
   @Get('/remove-filter')
-  async removeFilter(): Promise<ApiResponse<null>> {
-    return this.studentHrService.removeFilter();
+  async removeFilter(@GetUserId() hrId: string): Promise<ApiResponse<null>> {
+    return this.studentHrService.removeFilter(hrId);
   }
 
   @UseGuards(UserRoleGuard)
   @Role(UserRole.HR)
-  @HttpCode(HttpStatus.OK)
   @Get('/show-available/:pageNumber?/:numberPerPage?/:name?')
   async showAvailableStudents(
+    @GetUserId() hrId: string,
     @Param('name') name: string = '',
     @Param('pageNumber') pageNumber = 1,
     @Param('numberPerPage') numberPerPage = 10,
   ): Promise<ApiResponse<AvailableStudentsPaginated>> {
-    return this.studentHrService.showAvailableStudents(name, pageNumber, numberPerPage);
+    return this.studentHrService.showAvailableStudents(name, pageNumber, numberPerPage, hrId);
   }
 
   @UseGuards(UserRoleGuard)
   @Role(UserRole.HR)
-  @HttpCode(HttpStatus.OK)
   @Get('/show-interview/:pageNumber?/:numberPerPage?/:name?')
   async showInterviewStudents(
     @GetUserId() hrId: string,
@@ -59,7 +57,6 @@ export class HrController {
 
   @UseGuards(UserRoleGuard)
   @Role(UserRole.HR)
-  @HttpCode(HttpStatus.OK)
   @Get('/interview/cv/:id')
   async showStudentCv(@Param('id') id: string): Promise<ApiResponse<StudentCv>> {
     return this.studentService.getStudentCv(id);
@@ -68,8 +65,11 @@ export class HrController {
   @UseGuards(UserRoleGuard)
   @Role(UserRole.HR)
   @Post('/set-filter')
-  async setFilter(@Body() data: FilterStudentDto): Promise<ApiResponse<StudentFilter>> {
-    return this.studentHrService.setFilter(data);
+  async setFilter(
+    @GetUserId() hrId: string,
+    @Body() data: FilterStudentDto,
+  ): Promise<ApiResponse<StudentFilter>> {
+    return this.studentHrService.setFilter(data, hrId);
   }
 
   @UseGuards(UserRoleGuard)
