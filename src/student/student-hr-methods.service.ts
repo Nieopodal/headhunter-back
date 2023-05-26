@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { Cache } from 'cache-manager';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { availableFilter, interviewFilter } from './utils/filter-methods';
+import { getInterviewOrAvailableStudents } from './utils/get-interview-or-available-students';
 import { Student } from './entity/student.entity';
 import { HrService } from '../hr/hr.service';
 import { FilterStudentDto } from './dto';
@@ -130,29 +131,10 @@ export class StudentHrMethodsService {
   async showInterviewStudents(name: string, pageNumber: number, numberPerPage: number, hrId: string): Promise<ApiResponse<StudentsToInterviewPaginated>> {
     try {
       const filterSchema: FilterStudentDto = await this.cacheManager.get(`filter-${hrId}`);
-      const [studentData, count] = await Student.createQueryBuilder('student')
-        .setParameter('check', filterSchema ? true : null)
-        .where('student.hr = :hrId', { hrId: hrId })
-        .andWhere('student.active = :active', { active: true })
-        .andWhere('student.status = :status', { status: StudentStatus.INTERVIEW })
-        .andWhere('(student.firstName LIKE :name OR student.lastName LIKE :name)', { name: `%${name}%` })
-        .andWhere('(:check IS NULL OR student.monthsOfCommercialExp >= :monthsOfCommercialExp)', { monthsOfCommercialExp: filterSchema ? filterSchema.monthsOfCommercialExp : false })
-        .andWhere('(:check IS NULL OR student.canTakeApprenticeship = :canTakeApprenticeship)', { canTakeApprenticeship: filterSchema ? filterSchema.canTakeApprenticeship : false })
-        .andWhere('(:check IS NULL OR student.expectedSalary BETWEEN :minSalary AND :maxSalary)', {
-          minSalary: filterSchema ? filterSchema.minSalary : false,
-          maxSalary: filterSchema ? filterSchema.maxSalary : false,
-        })
-        .andWhere('(:check IS NULL OR student.teamProjectDegree >= :teamProjectDegree)', { teamProjectDegree: filterSchema ? filterSchema.teamProjectDegree : false })
-        .andWhere('(:check IS NULL OR student.projectDegree >= :projectDegree)', { projectDegree: filterSchema ? filterSchema.projectDegree : null })
-        .andWhere('(:check IS NULL OR student.courseEngagement >= :courseEngagement)', { courseEngagement: filterSchema ? filterSchema.courseEngagement : null })
-        .andWhere('(:check IS NULL OR student.courseCompletion >= :courseCompletion)', { courseCompletion: filterSchema ? filterSchema.courseCompletion : null })
-        .andWhere('(:check IS NULL OR student.expectedContractType IN (:expectedContractType))', { expectedContractType: filterSchema ? filterSchema.expectedContractType : false })
-        .andWhere('(:check IS NULL OR student.expectedTypeWork IN (:expectedTypeWork))', { expectedTypeWork: filterSchema ? filterSchema.expectedTypeWork : false })
-        .skip(numberPerPage * (pageNumber - 1))
-        .take(numberPerPage)
-        .getManyAndCount();
-
-      const totalPages = Math.ceil(count / numberPerPage);
+      const {
+        studentData,
+        totalPages,
+      } = await getInterviewOrAvailableStudents(filterSchema, pageNumber, numberPerPage, hrId, StudentStatus.INTERVIEW, name);
 
       return {
         isSuccess: true,
@@ -166,29 +148,10 @@ export class StudentHrMethodsService {
   async showAvailableStudents(name: string, pageNumber: number, numberPerPage: number, hrId: string): Promise<ApiResponse<AvailableStudentsPaginated>> {
     try {
       const filterSchema: FilterStudentDto = await this.cacheManager.get(`filter-${hrId}`);
-      const [studentData, count] = await Student.createQueryBuilder('student')
-        .setParameter('check', filterSchema ? true : null)
-        .where('student.hr IS NULL')
-        .andWhere('student.active = :active', { active: true })
-        .andWhere('student.status = :status', { status: StudentStatus.AVAILABLE })
-        .andWhere('(student.firstName LIKE :name OR student.lastName LIKE :name)', { name: `%${name}%` })
-        .andWhere('(:check IS NULL OR student.monthsOfCommercialExp >= :monthsOfCommercialExp)', { monthsOfCommercialExp: filterSchema ? filterSchema.monthsOfCommercialExp : false })
-        .andWhere('(:check IS NULL OR student.canTakeApprenticeship = :canTakeApprenticeship)', { canTakeApprenticeship: filterSchema ? filterSchema.canTakeApprenticeship : false })
-        .andWhere('(:check IS NULL OR student.expectedSalary BETWEEN :minSalary AND :maxSalary)', {
-          minSalary: filterSchema ? filterSchema.minSalary : false,
-          maxSalary: filterSchema ? filterSchema.maxSalary : false,
-        })
-        .andWhere('(:check IS NULL OR student.teamProjectDegree >= :teamProjectDegree)', { teamProjectDegree: filterSchema ? filterSchema.teamProjectDegree : false })
-        .andWhere('(:check IS NULL OR student.projectDegree >= :projectDegree)', { projectDegree: filterSchema ? filterSchema.projectDegree : null })
-        .andWhere('(:check IS NULL OR student.courseEngagement >= :courseEngagement)', { courseEngagement: filterSchema ? filterSchema.courseEngagement : null })
-        .andWhere('(:check IS NULL OR student.courseCompletion >= :courseCompletion)', { courseCompletion: filterSchema ? filterSchema.courseCompletion : null })
-        .andWhere('(:check IS NULL OR student.expectedContractType IN (:expectedContractType))', { expectedContractType: filterSchema ? filterSchema.expectedContractType : false })
-        .andWhere('(:check IS NULL OR student.expectedTypeWork IN (:expectedTypeWork))', { expectedTypeWork: filterSchema ? filterSchema.expectedTypeWork : false })
-        .skip(numberPerPage * (pageNumber - 1))
-        .take(numberPerPage)
-        .getManyAndCount();
-
-      const totalPages = Math.ceil(count / numberPerPage);
+      const {
+        studentData,
+        totalPages,
+      } = await getInterviewOrAvailableStudents(filterSchema, pageNumber, numberPerPage, hrId, StudentStatus.AVAILABLE, name);
 
       return {
         isSuccess: true,
@@ -209,7 +172,6 @@ export class StudentHrMethodsService {
         },
       };
     } catch {
-      console.log('???');
       throw new HttpException(`Coś poszło nie tak!`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
