@@ -13,7 +13,6 @@ export class StudentController {
 
   @UseGuards(UserRoleGuard)
   @Role(UserRole.STUDENT)
-  @HttpCode(HttpStatus.OK)
   @Get('/avatar')
   async getAvatar(@GetUserId() id: string): Promise<ApiResponse<string>> {
     return await this.studentService.getAvatar(id);
@@ -21,7 +20,6 @@ export class StudentController {
 
   @UseGuards(UserRoleGuard)
   @Role(UserRole.STUDENT)
-  @HttpCode(HttpStatus.OK)
   @Get('/simple')
   async getSimpleStudentData(@GetUserId() id: string): Promise<ApiResponse<SimpleStudentData>> {
     return await this.studentService.simpleStudentData(id);
@@ -29,7 +27,6 @@ export class StudentController {
 
   @UseGuards(UserRoleGuard)
   @Role(UserRole.STUDENT)
-  @HttpCode(HttpStatus.OK)
   @Get('/cv')
   async getStudentCv(@GetUserId() id: string): Promise<ApiResponse<StudentCv>> {
     return await this.studentService.getStudentCv(id);
@@ -58,7 +55,6 @@ export class StudentController {
 
   @UseGuards(UserRoleGuard)
   @Role(UserRole.STUDENT)
-  @HttpCode(HttpStatus.OK)
   @Patch('/employed')
   deactivate(@GetUserId() id: string): Promise<ApiResponse<any>> {
     return this.studentService.deactivate(id);

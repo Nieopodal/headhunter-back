@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { GetUserData, GetUserId, Public, Role } from '../common/decorators';
 import { StudentService } from '../student/student.service';
 import { StudentHrMethodsService } from '../student/student-hr-methods.service';
@@ -74,7 +74,6 @@ export class HrController {
 
   @UseGuards(UserRoleGuard)
   @Role(UserRole.HR)
-  @HttpCode(HttpStatus.OK)
   @Patch('/interview/:id')
   async setToInterview(@Param('id') id: string, @GetUserId() hrId: string): Promise<ApiResponse<null>> {
     return this.studentHrService.setToInterview(id, hrId);
@@ -82,7 +81,6 @@ export class HrController {
 
   @UseGuards(UserRoleGuard)
   @Role(UserRole.HR)
-  @HttpCode(HttpStatus.OK)
   @Patch('/withdraw/:id')
   async setDisinterest(@Param('id') id: string, @GetUserId() hrId: string): Promise<ApiResponse<null>> {
     return this.studentHrService.setDisinterest(id, hrId);
@@ -90,7 +88,6 @@ export class HrController {
 
   @UseGuards(UserRoleGuard)
   @Role(UserRole.HR)
-  @HttpCode(HttpStatus.OK)
   @Patch('/employed/:id')
   async setEmployed(@Param('id') id: string, @GetUserId() hrId: string): Promise<ApiResponse<null>> {
     return this.studentHrService.setEmployed(id, hrId);
@@ -98,7 +95,6 @@ export class HrController {
 
   @Public()
   @UseGuards(MtGuard)
-  @HttpCode(HttpStatus.OK)
   @Patch('/update')
   setPasswordHr(@GetUserId() id: string, @GetUserData() data: UpdateHrDto): Promise<ApiResponse<UpdateResponse>> {
     return this.hrService.setPasswordHr(id, data);
