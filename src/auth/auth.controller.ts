@@ -22,7 +22,6 @@ export class AuthController {
 
   @Public()
   @Post('/login')
-  @HttpCode(HttpStatus.OK)
   async login(
     @Body() loginData: LoginUserDto,
     @Res({ passthrough: true }) response: Response,
@@ -31,21 +30,18 @@ export class AuthController {
   }
 
   @Post('/logout')
-  @HttpCode(HttpStatus.OK)
   logout(@GetUserId() id: string, @Res({ passthrough: true }) res: Response): Promise<any> {
     return this.authService.logout(id, res);
   }
 
   @Public()
   @Post('*/confirm/:id/:token')
-  @HttpCode(HttpStatus.OK)
   confirmFromEmail(@Param() param: ConfirmDto): Promise<ApiResponse<ConfirmResponse>> {
     return this.authService.confirmFromEmail(param);
   }
 
   @Public()
   @Post('/password/recovery')
-  @HttpCode(HttpStatus.OK)
   recoveryPassword(@Body() data: RecoveryPasswordDto): Promise<ApiResponse<RecoveryPasswordResponse>> {
     return this.authService.recoveryPassword(data);
   }
@@ -53,7 +49,6 @@ export class AuthController {
   @Public()
   @UseGuards(MtGuard)
   @Patch('/password/reset')
-  @HttpCode(HttpStatus.OK)
   changePassword(
     @GetUserId() id: string,
     @GetUserData() data: ChangePasswordDto,
@@ -72,7 +67,6 @@ export class AuthController {
   @Public()
   @UseGuards(RtGuard)
   @Post('/refresh')
-  @HttpCode(HttpStatus.OK)
   refreshTokens(
     @GetToken() rt: string,
     @GetUserId() id: string,
