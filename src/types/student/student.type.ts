@@ -104,7 +104,7 @@ export enum ExpectedContractType {
 }
 
 export enum StudentStatus {
-  AVAILABLE = 'available',
-  INTERVIEW = 'interview',
-  EMPLOYED = 'employed',
+  AVAILABLE = 'Dostępny',
+  INTERVIEW = 'Na rozmowie',
+  EMPLOYED = 'Zatrudniony',
 }
