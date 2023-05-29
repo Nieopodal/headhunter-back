@@ -85,7 +85,7 @@ export class AuthService {
         },
       ),
     ]);
-    return { access_token: at, refresh_token: rt };
+    return { accessToken: at, refreshToken: rt };
   }
 
   async checkUserByEmail(email: string): Promise<CheckUserResponse> {
@@ -144,11 +144,11 @@ export class AuthService {
     if (!passwordMatches) throw new InvalidCredentialsException();
 
     const tokens = await this.getTokens(user.id, user.email);
-    await this.updateRtHash(user.id, tokens.refresh_token);
-    response.cookie('jwt-refresh', tokens.refresh_token, { httpOnly: true });
+    await this.updateRtHash(user.id, tokens.refreshToken);
+    response.cookie('jwt-refresh', tokens.refreshToken, { httpOnly: true, secure: true });
     return {
       isSuccess: true,
-      payload: { ...(await this.getUserData(user)), access_token: tokens.access_token },
+      payload: { ...(await this.getUserData(user)), accessToken: tokens.accessToken },
     };
   }
 
@@ -238,9 +238,9 @@ export class AuthService {
     if (!rtMatches) throw new InvalidCredentialsException();
     try {
       const tokens = await this.getTokens(user.id, user.email);
-      await this.updateRtHash(user.id, tokens.refresh_token);
-      res.cookie('jwt-refresh', tokens.refresh_token, { httpOnly: true });
-      return { access_token: tokens.access_token };
+      await this.updateRtHash(user.id, tokens.refreshToken);
+      res.cookie('jwt-refresh', tokens.refreshToken, { httpOnly: true });
+      return { accessToken: tokens.accessToken };
     } catch (e) {
       throw new InvalidCredentialsException();
     }
