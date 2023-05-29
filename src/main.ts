@@ -16,7 +16,7 @@ async function bootstrap() {
   app.use(helmet());
   app.use(cookieParser());
   app.enableCors({
-    origin: configService.get('CORS_CLIENTS_URL'),
+    origin: /^(https:\/\/(?:www\.)?webdevjs\.pl)$/i,
     credentials: true,
   });
 

@@ -1,7 +1,7 @@
 {
   "name": "headhunter-back",
   "version": "1.0.2",
-  "description": "<p align=\"center\">\r   <a href=\"http://nestjs.com/\" target=\"blank\"><img src=\"https://nestjs.com/img/logo-small.svg\" width=\"200\" alt=\"Nest Logo\" /></a>\r </p>",
+  "description": "<p align=\\\"center\\\">\\r   <a href=\\\"https://nestjs.com/\\\" target=\\\"blank\\\"><img src=\\\"https://nestjs.com/img/logo-small.svg\\\" width=\\\"200\\\" alt=\\\"Nest Logo\\\" /></a>\\r </p>",
   "author": "",
   "private": true,
   "license": "UNLICENSED",
@@ -45,6 +45,7 @@
     "mysql2": "^2.3.3",
     "nodemailer": "^6.9.1",
     "p-map": "^6.0.0",
+    "package.json": "^2.0.1",
     "passport": "^0.6.0",
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",

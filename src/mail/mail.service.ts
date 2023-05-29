@@ -4,7 +4,6 @@ import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
 import { StudentService } from '../student/student.service';
 import { SendMailInfo } from '../types';
-import { AuthService } from '../auth/auth.service';
 
 @Injectable()
 export class MailService {
