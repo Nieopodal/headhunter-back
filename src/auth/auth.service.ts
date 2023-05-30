@@ -145,7 +145,11 @@ export class AuthService {
 
     const tokens = await this.getTokens(user.id, user.email);
     await this.updateRtHash(user.id, tokens.refresh_token);
-    response.cookie('jwt-refresh', tokens.refresh_token, { httpOnly: true });
+    response.cookie('jwt-refresh', tokens.refresh_token, {
+      httpOnly: true,
+      sameSite: 'none',
+      secure: true,
+    });
     return {
       isSuccess: true,
       payload: { ...(await this.getUserData(user)), access_token: tokens.access_token },
@@ -158,8 +162,8 @@ export class AuthService {
     if (user.refreshToken !== null) {
       user.refreshToken = null;
       await user.save();
-      await this.cacheManager.del(`filter-${id}`);
       res.clearCookie('jwt-refresh');
+      await this.cacheManager.del(`filter-${id}`);
       return {
         isSuccess: true,
         payload: null,
