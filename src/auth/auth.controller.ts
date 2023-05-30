@@ -17,8 +17,7 @@ import { ConfirmDto } from './dto/confirm.dto';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {
-  }
+  constructor(private authService: AuthService) {}
 
   @Public()
   @Post('/login')
@@ -71,7 +70,7 @@ export class AuthController {
     @GetToken() rt: string,
     @GetUserId() id: string,
     @Res({ passthrough: true }) res: Response,
-  ): Promise<Tokens> {
+  ): Promise<ApiResponse<Tokens>> {
     return this.authService.refreshTokens(id, rt, res);
   }
 }
