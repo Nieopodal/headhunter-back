@@ -88,6 +88,10 @@ export class AuthService {
     return { accessToken: at, refreshToken: rt };
   }
 
+  async checkEmail(email: string): Promise<boolean> {
+    return !!(await this.checkUserByEmail(email));
+  }
+
   async checkUserByEmail(email: string): Promise<CheckUserResponse> {
     const admin = await this.adminService.getAdminByEmail(email);
 
@@ -139,6 +143,8 @@ export class AuthService {
   async login(login: LoginUserDto, response: Response): Promise<ApiResponse<UserDataResponse>> {
     const user = await this.checkUserByEmail(login.email);
     if (!user) throw new InvalidCredentialsException();
+    if (user instanceof Student && !user.active)
+      throw new HttpException('Konto jest nieaktywne!', HttpStatus.BAD_REQUEST);
 
     const passwordMatches = await this.compareHashedData(login.password, user.password);
     if (!passwordMatches) throw new InvalidCredentialsException();

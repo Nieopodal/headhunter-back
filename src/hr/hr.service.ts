@@ -25,7 +25,7 @@ export class HrService {
   }
 
   async createHr(formData): Promise<ApiResponse<CreateResponse>> {
-    if (await this.getHrByEmail(formData.email))
+    if (await this.authService.checkEmail(formData.email))
       throw new HttpException(`Użytkownik o emailu ${formData.email} już istnieje`, HttpStatus.BAD_REQUEST);
     try {
       const hr = new Hr();
