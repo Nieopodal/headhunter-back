@@ -145,7 +145,7 @@ export class AuthService {
 
     const tokens = await this.getTokens(user.id, user.email);
     await this.updateRtHash(user.id, tokens.refreshToken);
-    response.cookie('jwt-refresh', tokens.refreshToken, { httpOnly: true, secure: true });
+    response.cookie('jwt-refresh', tokens.refreshToken, { httpOnly: true });
     return {
       isSuccess: true,
       payload: { ...(await this.getUserData(user)), accessToken: tokens.accessToken },
@@ -229,7 +229,7 @@ export class AuthService {
     };
   }
 
-  async refreshTokens(id: string, rt: string, res: Response): Promise<Tokens> {
+  async refreshTokens(id: string, rt: string, res: Response): Promise<ApiResponse<Tokens>> {
     const user = await this.checkUserById(id);
 
     if (!user || !user.refreshToken) throw new Error();
@@ -240,7 +240,12 @@ export class AuthService {
       const tokens = await this.getTokens(user.id, user.email);
       await this.updateRtHash(user.id, tokens.refreshToken);
       res.cookie('jwt-refresh', tokens.refreshToken, { httpOnly: true });
-      return { accessToken: tokens.accessToken };
+      return {
+        isSuccess: true,
+        payload: {
+          accessToken: tokens.accessToken,
+        },
+      };
     } catch (e) {
       throw new InvalidCredentialsException();
     }

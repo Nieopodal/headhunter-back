@@ -70,7 +70,7 @@ export class AuthController {
     @GetToken() rt: string,
     @GetUserId() id: string,
     @Res({ passthrough: true }) res: Response,
-  ): Promise<Tokens> {
+  ): Promise<ApiResponse<Tokens>> {
     return this.authService.refreshTokens(id, rt, res);
   }
 }
