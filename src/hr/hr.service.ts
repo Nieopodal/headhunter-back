@@ -25,7 +25,7 @@ export class HrService {
   }
 
   async createHr(formData): Promise<ApiResponse<CreateResponse>> {
-    if (await this.getHrByEmail(formData.email))
+    if (await this.authService.checkEmail(formData.email))
       throw new HttpException(`Użytkownik o emailu ${formData.email} już istnieje`, HttpStatus.BAD_REQUEST);
     try {
       const hr = new Hr();
@@ -60,8 +60,9 @@ export class HrService {
     const user = await this.getHrById(id);
     if (!user || !data.password)
       throw new HttpException('Zmiana hasła nie powiodła się. Spróbuj ponownie później', HttpStatus.BAD_REQUEST);
-
     user.password = await this.authService.hashData(data.password);
+    user.verificationToken = null;
+    user.activationUrl = null;
     await user.save();
     return {
       isSuccess: true,

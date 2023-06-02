@@ -6,7 +6,7 @@ export type BasicDataResponse = {
   id: string;
   email: string;
   role: string;
-  access_token?: string;
+  accessToken?: string;
 };
 
 export type AdminDataResponse = {
