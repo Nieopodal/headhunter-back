@@ -31,4 +31,4 @@ EMAIL_FROM=admin@test.example.com
 EMAIL_SECURE=false
 
 #App URL
-APP_URL=http://localhost:3000/
+APP_URL=http://localhost:3000

@@ -19,7 +19,6 @@ export class UploadStudentDataService {
 
   async uploadFile(file): Promise<ApiResponse<object>> {
     const records = [];
-    const students = await this.studentService.get();
     const parser = parse({
       delimiter: ';',
       trim: true,
@@ -38,7 +37,7 @@ export class UploadStudentDataService {
           data.projectDegree = Number(record.projectDegree);
           data.teamProjectDegree = Number(record.teamProjectDegree);
           data.scrumProjectUrls = record.scrumProjectUrls;
-          if (!students.some((std) => std.email == record.email)) {
+          if (!(await this.authService.checkEmail(record.email))) {
             await data.save();
             data.verificationToken = await this.authService.hashData(
               await this.authService.generateEmailToken(data.id, data.email),

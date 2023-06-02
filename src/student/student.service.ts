@@ -6,9 +6,7 @@ import { ApiResponse, SimpleStudentData, StudentCv, StudentStatus } from '@Types
 
 @Injectable()
 export class StudentService {
-  constructor(
-    @Inject(forwardRef(() => AuthService)) private authService: AuthService,
-  ) {}
+  constructor(@Inject(forwardRef(() => AuthService)) private authService: AuthService) {}
 
   async getAvatar(id: string): Promise<ApiResponse<string>> {
     const studentAvatar = await Student.findOneBy({ id });
