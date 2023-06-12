@@ -47,7 +47,7 @@ export class Hr extends BaseEntity {
   @Column({ length: 255, nullable: true, default: null })
   verificationToken: string;
 
-  @Column({ default: '', length: 255 })
+  @Column({ length: 255, nullable: true, default: null })
   activationUrl: string;
 
   @CreateDateColumn({ type: 'timestamp' })

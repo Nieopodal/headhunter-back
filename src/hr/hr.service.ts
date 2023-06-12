@@ -61,6 +61,7 @@ export class HrService {
     if (!user || !data.password)
       throw new HttpException('Zmiana hasła nie powiodła się. Spróbuj ponownie później', HttpStatus.BAD_REQUEST);
     user.password = await this.authService.hashData(data.password);
+    user.active = true;
     user.verificationToken = null;
     user.activationUrl = null;
     await user.save();
