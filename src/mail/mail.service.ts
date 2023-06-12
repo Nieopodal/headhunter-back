@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
 import { StudentService } from '../student/student.service';
 import { SendMailInfo } from '@Types';
+import {configUrl} from "../config/config";
 
 @Injectable()
 export class MailService {
@@ -15,7 +16,7 @@ export class MailService {
 
   async generateUrl(data, actionType): Promise<string> {
     const { id, role, verificationToken } = data;
-    const appUrl = this.configService.get('APP_URL');
+    const appUrl = configUrl.appUrl;
     return `${appUrl}/auth/${actionType}/${role}/confirm/${id}/${verificationToken}`;
   }
 
