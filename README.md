@@ -88,7 +88,7 @@ Check it out at [https://github.com/Nieopodal/headhunter-front](https://github.c
 ```
 ├─ //your folder
 │   ├── headhunter-back
-│   ├── headhunter-front
+│   ├── headhunter-front 
 ```
 
 # About the authors
