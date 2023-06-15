@@ -104,7 +104,7 @@ This version of MegaK HeadHunter app was made by participants of the group #2 fr
 * Arek [https://github.com/bubelarek](https://github.com/bubelarek)
 
 
-It was a great co-working experience 🤝
+It was a great co-working experience 🤝 
 
 <!-- MARKDOWN LINKS & IMAGES -->
 [nodejs]: https://img.shields.io/badge/node.js-6DA55F?style=for-the-badge&logo=node.js&logoColor=white
