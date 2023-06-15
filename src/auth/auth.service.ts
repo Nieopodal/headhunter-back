@@ -85,7 +85,11 @@ export class AuthService {
         },
       ),
     ]);
-    return { access_token: at, refresh_token: rt };
+    return { accessToken: at, refreshToken: rt };
+  }
+
+  async checkEmail(email: string): Promise<boolean> {
+    return !!(await this.checkUserByEmail(email));
   }
 
   async checkUserByEmail(email: string): Promise<CheckUserResponse> {
@@ -139,16 +143,18 @@ export class AuthService {
   async login(login: LoginUserDto, response: Response): Promise<ApiResponse<UserDataResponse>> {
     const user = await this.checkUserByEmail(login.email);
     if (!user) throw new InvalidCredentialsException();
+    if (user instanceof Student && !user.active)
+      throw new HttpException('Konto jest nieaktywne!', HttpStatus.BAD_REQUEST);
 
     const passwordMatches = await this.compareHashedData(login.password, user.password);
     if (!passwordMatches) throw new InvalidCredentialsException();
 
     const tokens = await this.getTokens(user.id, user.email);
-    await this.updateRtHash(user.id, tokens.refresh_token);
-    response.cookie('jwt-refresh', tokens.refresh_token, { httpOnly: true });
+    await this.updateRtHash(user.id, tokens.refreshToken);
+    response.cookie('jwt-refresh', tokens.refreshToken, { httpOnly: true });
     return {
       isSuccess: true,
-      payload: { ...(await this.getUserData(user)), access_token: tokens.access_token },
+      payload: { ...(await this.getUserData(user)), accessToken: tokens.accessToken },
     };
   }
 
@@ -158,7 +164,7 @@ export class AuthService {
     if (user.refreshToken !== null) {
       user.refreshToken = null;
       await user.save();
-      await this.cacheManager.del('filter');
+      await this.cacheManager.del(`filter-${id}`);
       res.clearCookie('jwt-refresh');
       return {
         isSuccess: true,
@@ -229,7 +235,7 @@ export class AuthService {
     };
   }
 
-  async refreshTokens(id: string, rt: string, res: Response): Promise<Tokens> {
+  async refreshTokens(id: string, rt: string, res: Response): Promise<ApiResponse<Tokens>> {
     const user = await this.checkUserById(id);
 
     if (!user || !user.refreshToken) throw new Error();
@@ -238,9 +244,14 @@ export class AuthService {
     if (!rtMatches) throw new InvalidCredentialsException();
     try {
       const tokens = await this.getTokens(user.id, user.email);
-      await this.updateRtHash(user.id, tokens.refresh_token);
-      res.cookie('jwt-refresh', tokens.refresh_token, { httpOnly: true });
-      return { access_token: tokens.access_token };
+      await this.updateRtHash(user.id, tokens.refreshToken);
+      res.cookie('jwt-refresh', tokens.refreshToken, { httpOnly: true });
+      return {
+        isSuccess: true,
+        payload: {
+          accessToken: tokens.accessToken,
+        },
+      };
     } catch (e) {
       throw new InvalidCredentialsException();
     }

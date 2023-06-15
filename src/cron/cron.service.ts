@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { Student } from '../student/entity/student.entity';
 import { StudentStatus } from '@Types';
@@ -21,7 +21,7 @@ export class CronService {
         });
       }
     } catch {
-      throw new HttpException('Wystąpił nieznany błąd', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new Error('Wystąpił nieznany błąd!');
     }
   }
 }

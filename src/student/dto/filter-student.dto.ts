@@ -2,7 +2,6 @@ import { ArrayMinSize, IsArray, IsBoolean, IsEnum, IsNotEmpty, IsNumber, Max, Mi
 import { ExpectedContractType, ExpectedTypeWork } from '@Types';
 
 export class FilterStudentDto {
-
   @IsNotEmpty()
   @IsNumber()
   @Min(0)

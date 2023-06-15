@@ -4,5 +4,5 @@ export type Admin = {
   email: string;
   password: string;
   role: string;
-  refresh_token: string;
+  refreshToken: string;
 };
